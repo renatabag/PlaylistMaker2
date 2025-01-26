@@ -6,4 +6,8 @@
     </style>
 
     <style name="Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker" />
+    <dimen name="main_text_size">22sp</dimen>
+    <dimen name="button_corner_radius">16dp</dimen>
+    <dimen name="main_padding">20dp</dimen>
+
 </resources>

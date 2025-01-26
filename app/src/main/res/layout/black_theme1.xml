@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="@dimen/main_padding"
-    android:background="@color/main_background_color"
+    android:background="@color/main_background_color_black"
     tools:context=".MainActivity">
 
 
@@ -34,10 +34,10 @@
             app:cornerRadius="@dimen/button_corner_radius"
             android:text="@string/search_button_text"
             android:textSize="@dimen/main_text_size"
-            android:textColor="@color/text_color"
+            android:textColor="@color/main_background_color_black"
             app:icon="@drawable/searh"
             app:iconGravity="textStart"
-            app:iconTint="@color/text_color" />
+            app:iconTint="@color/icon_color_black" />
 
         <Button
             android:layout_width="match_parent"
@@ -47,10 +47,10 @@
             app:cornerRadius="@dimen/button_corner_radius"
             android:text="@string/media_library_button_text"
             android:textSize="@dimen/main_text_size"
-            android:textColor="@color/text_color"
+            android:textColor="@color/main_background_color_black"
             app:icon="@drawable/music"
             app:iconGravity="textStart"
-            app:iconTint="@color/text_color"/>
+            app:iconTint="@color/icon_color_black"/>
 
         <Button
             android:layout_width="match_parent"
@@ -60,9 +60,9 @@
             app:cornerRadius="@dimen/button_corner_radius"
             android:text="@string/settings_button_text"
             android:textSize="@dimen/main_text_size"
-            android:textColor="@color/text_color"
+            android:textColor="@color/main_background_color_black"
             app:icon="@drawable/settings"
             app:iconGravity="textStart"
-            app:iconTint="@color/text_color"/>
+            app:iconTint="@color/icon_color_black"/>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
