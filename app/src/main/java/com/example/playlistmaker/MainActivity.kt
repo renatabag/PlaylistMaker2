@@ -1,9 +1,9 @@
 package com.example.playlistmaker
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.button.MaterialButton
@@ -16,22 +16,25 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        val button1 = findViewById<MaterialButton>(R.id.button1)
-        val button2 = findViewById<MaterialButton>(R.id.button2)
-        val button3 = findViewById<MaterialButton>(R.id.button3)
+        val searchButton = findViewById<MaterialButton>(R.id.button1)
+        val mediaLibraryButton = findViewById<MaterialButton>(R.id.button2)
+        val settingsButton = findViewById<MaterialButton>(R.id.button3)
 
-        button1?.setOnClickListener(object : View.OnClickListener {
+        searchButton?.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
-                Toast.makeText(this@MainActivity, "Нажата кнопка ПОИСК", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this@MainActivity, SearchActivity::class.java)
+                startActivity(intent)
             }
         })
 
-        button2?.setOnClickListener {
-            Toast.makeText(this@MainActivity, "Нажата кнопка МЕДИАТЕКА", Toast.LENGTH_SHORT).show()
+        mediaLibraryButton?.setOnClickListener {
+            val intent = Intent(this, MediaLibraryActivity::class.java)
+            startActivity(intent)
         }
 
-        button3?.setOnClickListener {
-            Toast.makeText(this@MainActivity, "Нажата кнопка НАСТРОЙКИ", Toast.LENGTH_SHORT).show()
+        settingsButton?.setOnClickListener {
+            val intent = Intent(this, SettingsActivity::class.java)
+            startActivity(intent)
         }
     }
 }

@@ -21,6 +21,7 @@
             android:layout_height="wrap_content"
             android:background="@color/white"
             android:layout_gravity="start"
+            android:id="@+id/button_back"
             android:text="Назад"
             android:textColor="#1A1B22"
             android:textSize="22sp"

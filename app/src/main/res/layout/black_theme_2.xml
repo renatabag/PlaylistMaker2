@@ -26,7 +26,8 @@
             android:layout_gravity="start"
             android:text="Назад"
             android:textColor="@color/white"
-            android:textSize="@dimen/main_text_size"/>
+            android:textSize="@dimen/main_text_size"
+            />
 
         <Button
             android:layout_width="match_parent"
