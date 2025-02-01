@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="20dp"
-    android:background="#FFFFF"
+    android:background="@color/white"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -19,7 +19,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#FFFFF"
+            android:background="@color/white"
             android:layout_gravity="start"
             android:text="Назад"
             android:textColor="#1A1B22"
@@ -31,9 +31,9 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFF"
+            android:background="@color/white"
             android:gravity="start"
-            android:backgroundTint="#ffffff"
+            android:backgroundTint="@color/white"
             app:cornerRadius="0dp"
             android:text="Темная тема"
             android:textSize="16sp"
@@ -46,7 +46,7 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFF"
+            android:background="@color/white"
             android:gravity="start"
             app:cornerRadius="0dp"
             android:text="Поделиться приложением"
@@ -60,7 +60,7 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFF"
+            android:background="@color/white"
             android:gravity="start"
             app:cornerRadius="0dp"
             android:text="Написать в поддержку"
@@ -73,7 +73,7 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFF"
+            android:background="@color/white"
             app:cornerRadius="0dp"
             android:text="Пользовательское соглашение"
             android:gravity="start"
