@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_marginTop="0dp">
+        android:layout_marginTop="@dimen/zero">
 
         <TextView
             android:layout_width="wrap_content"
@@ -28,7 +28,7 @@
 
         <Button
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="@dimen/zero"
             android:layout_weight="1"
             android:backgroundTint="@color/white"
             app:cornerRadius="@dimen/button_corner_radius"
@@ -41,7 +41,7 @@
 
         <Button
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="@dimen/zero"
             android:layout_weight="1"
             android:backgroundTint="@color/white"
             app:cornerRadius="@dimen/button_corner_radius"
@@ -54,7 +54,7 @@
 
         <Button
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="@dimen/zero"
             android:layout_weight="1"
             android:backgroundTint="@color/white"
             app:cornerRadius="@dimen/button_corner_radius"

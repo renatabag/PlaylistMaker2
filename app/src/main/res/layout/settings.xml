@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="20dp"
+    android:padding="@dimen/main_padding"
     android:background="@color/white"
     tools:context=".MainActivity">
 
@@ -14,74 +14,74 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_marginTop="0dp">
+        android:layout_marginTop="@dimen/zero">
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:background='@android:color/transparent'
             android:layout_gravity="start"
             android:id="@+id/button_back"
-            android:text="Назад"
-            android:textColor="#1A1B22"
-            android:textSize="22sp"
+            android:text="@string/back_button_text"
+            android:textColor="@color/dark"
+            android:textSize="@dimen/main_text_size"
             app:icon="@drawable/back"
             app:iconGravity="textStart"
-            app:iconTint="#000000"/>
+            app:iconTint="@color/black"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:background='@android:color/transparent'
             android:gravity="start"
             android:backgroundTint="@color/white"
-            app:cornerRadius="0dp"
-            android:text="Темная тема"
-            android:textSize="16sp"
-            android:textColor="#1A1B22"
+            app:cornerRadius="@dimen/zero"
+            android:text="@string/dark_theme_button_text"
+            android:textSize="@dimen/button_corner_radius"
+            android:textColor="@color/dark"
             app:icon="@drawable/off"
-            app:iconTint="#AEAFB4"
+            app:iconTint="@color/grey"
             app:iconGravity="end"
             />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:background='@android:color/transparent'
             android:gravity="start"
-            app:cornerRadius="0dp"
-            android:text="Поделиться приложением"
-            android:textSize="16sp"
-            android:textColor="#1A1B22"
+            app:cornerRadius="@dimen/zero"
+            android:text="@string/share_app_button_text"
+            android:textSize="@dimen/button_corner_radius"
+            android:textColor="@color/dark"
             app:icon="@drawable/share"
-            app:iconTint="#AEAFB4"
+            app:iconTint="@color/grey"
             app:iconGravity="end"
             />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:background='@android:color/transparent'
             android:gravity="start"
-            app:cornerRadius="0dp"
-            android:text="Написать в поддержку"
-            android:textSize="16sp"
-            android:textColor="#1A1B22"
+            app:cornerRadius="@dimen/zero"
+            android:text="@string/support_button_text"
+            android:textSize="@dimen/button_corner_radius"
+            android:textColor="@color/dark"
             app:icon="@drawable/support"
-            app:iconTint="#AEAFB4"
+            app:iconTint="@color/grey"
             app:iconGravity="end"
             />
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            app:cornerRadius="0dp"
-            android:text="Пользовательское соглашение"
+            android:background='@android:color/transparent'
+            app:cornerRadius="@dimen/zero"
+            android:text="@string/agreement_button_text"
             android:gravity="start"
-            android:textSize="16sp"
-            android:textColor="#1A1B22"
+            android:textSize="@dimen/button_corner_radius"
+            android:textColor="@color/dark"
             app:icon="@drawable/open"
-            app:iconTint="#AEAFB4"
+            app:iconTint="@color/grey"
             app:iconGravity="end"
             />
     </LinearLayout>
