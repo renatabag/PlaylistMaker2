@@ -24,9 +24,13 @@
             android:layout_height="wrap_content"
             android:background='@android:color/transparent'
             android:layout_gravity="start"
-            android:text="@string/back_button_text"
+            android:text="@string/settings_button_text"
             android:textColor="@color/white"
+            app:icon="@drawable/baseline_arrow_back_24"
+            app:iconGravity="textStart"
+            app:iconTint="@color/white"
             android:textSize="@dimen/main_text_size"
+            android:textAllCaps="false"
             />
 
         <Button
@@ -39,9 +43,10 @@
             android:text="@string/dark_theme_button_text"
             android:textSize="@dimen/button_corner_radius"
             android:textColor="@color/white"
-            app:icon="@drawable/control"
+            app:icon="@drawable/baseline_toggle_off_24"
             app:iconTint="@color/white"
             app:iconGravity="end"
+            android:textAllCaps="false"
             />
 
         <Button
@@ -53,9 +58,10 @@
             android:text="@string/share_app_button_text"
             android:textSize="@dimen/button_corner_radius"
             android:textColor="@color/white"
-            app:icon="@drawable/share"
+            app:icon="@drawable/baseline_share_24"
             app:iconTint="@color/white"
             app:iconGravity="end"
+            android:textAllCaps="false"
             />
 
         <Button
@@ -67,9 +73,10 @@
             android:text="@string/support_button_text"
             android:textSize="@dimen/button_corner_radius"
             android:textColor="@color/white"
-            app:icon="@drawable/support"
+            app:icon="@drawable/baseline_support_agent_24"
             app:iconTint="@color/white"
             app:iconGravity="end"
+            android:textAllCaps="false"
             />
         <Button
             android:layout_width="match_parent"
@@ -80,9 +87,10 @@
             android:gravity="start"
             android:textSize="@dimen/button_corner_radius"
             android:textColor="@color/white"
-            app:icon="@drawable/open"
+            app:icon="@drawable/baseline_arrow_forward_ios_24"
             app:iconTint="@color/white"
             app:iconGravity="end"
+            android:textAllCaps="false"
             />
     </LinearLayout>
 
