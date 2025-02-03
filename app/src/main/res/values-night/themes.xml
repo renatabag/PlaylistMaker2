@@ -1,7 +1,55 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
+    <style name="Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker" />
+    <dimen name="main_text_size">22sp</dimen>
+    <dimen name="button_corner_radius">16dp</dimen>
+    <dimen name="main_padding">20dp</dimen>
+    <dimen name="zero">0dp</dimen>
+
+    <style name="primary_settings_back_button" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@android:color/transparent</item>
+        <item name="android:layout_gravity">start</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/main_text_size</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconTint">@color/white</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+    </style>
+
+    <style name="primary_settings_button" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@android:color/transparent</item>
+        <item name="android:gravity">start</item>
+        <item name="cornerRadius">@dimen/zero</item>
+        <item name="android:textSize">@dimen/button_corner_radius</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="iconTint">@color/grey</item>
+        <item name="iconGravity">end</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+    </style>
+
+    <style name="primary_text">
+        <item name="android:layout_gravity">start</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/main_text_size</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+    </style>
+
+    <style name="primary_activity_main_button" parent="Widget.MaterialComponents.Button">
+        <item name="android:backgroundTint">@color/white</item>
+        <item name="cornerRadius">@dimen/button_corner_radius</item>
+        <item name="android:textSize">@dimen/main_text_size</item>
+        <item name="android:textColor">@color/dark</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconTint">@color/dark</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+    </style>
+
     <style name="Base.Theme.PlaylistMaker" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="android:background">@color/dark</item>
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 </resources>

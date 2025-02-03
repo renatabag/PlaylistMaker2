@@ -7,10 +7,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="@dimen/main_padding"
-    android:background="@color/blue"
-    tools:context=".MainActivity">
-
-
+    tools:context=".MainActivity"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,54 +19,35 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="start"
             android:text="@string/playlist_maker_title"
-            android:textColor="@color/white"
-            android:textSize="@dimen/main_text_size"/>
+            style="@style/primary_text"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="@dimen/zero"
             android:layout_weight="1"
             android:id="@+id/button1"
-            android:backgroundTint="@color/white"
-            app:cornerRadius="@dimen/button_corner_radius"
             android:text="@string/search_button_text"
-            android:textSize="@dimen/main_text_size"
-            android:textColor="@color/dark"
             app:icon="@drawable/baseline_search_24"
-            app:iconGravity="textStart"
-            app:iconTint="@color/black"
-            android:textAllCaps="false"/>
+            style="@style/primary_activity_main_button"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="@dimen/zero"
             android:layout_weight="1"
             android:id="@+id/button2"
-            android:backgroundTint="@color/white"
-            app:cornerRadius="@dimen/button_corner_radius"
             android:text="@string/media_library_button_text"
-            android:textSize="@dimen/main_text_size"
-            android:textColor="@color/black"
+            android:backgroundTint="@color/white"
             app:icon="@drawable/baseline_library_music_24"
-            app:iconGravity="textStart"
-            app:iconTint="@color/black"
-            android:textAllCaps="false"/>
+            style="@style/primary_activity_main_button"/>
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="@dimen/zero"
             android:layout_weight="1"
             android:id="@+id/button3"
-            android:backgroundTint="@color/white"
-            app:cornerRadius="@dimen/button_corner_radius"
             android:text="@string/settings_button_text"
-            android:textSize="@dimen/main_text_size"
-            android:textColor="@color/black"
             app:icon="@drawable/baseline_settings_24"
-            app:iconGravity="textStart"
-            app:iconTint="@color/black"
-            android:textAllCaps="false"/>
+            style="@style/primary_activity_main_button"/>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
