@@ -17,6 +17,7 @@
         android:layout_marginTop="@dimen/zero">
 
         <Button
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/button_back"
@@ -26,6 +27,7 @@
             />
 
         <Button
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/dark_theme_button_text"
@@ -34,6 +36,7 @@
             />
 
         <Button
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/button_share_settings"
@@ -43,6 +46,7 @@
             />
 
         <Button
+
             android:id="@+id/support_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -51,6 +55,8 @@
             style="@style/primary_settings_button"
             />
         <Button
+
+            android:id="@+id/link_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/agreement_button_text"

@@ -3,9 +3,9 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.button.MaterialButton
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,9 +15,9 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        val searchButton = findViewById<MaterialButton>(R.id.button1)
-        val mediaLibraryButton = findViewById<MaterialButton>(R.id.button2)
-        val settingsButton = findViewById<MaterialButton>(R.id.button3)
+        val searchButton = findViewById<Button>(R.id.button1)
+        val mediaLibraryButton = findViewById<Button>(R.id.button2)
+        val settingsButton = findViewById<Button>(R.id.button3)
 
         searchButton?.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {

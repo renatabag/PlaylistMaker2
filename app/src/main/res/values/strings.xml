@@ -16,4 +16,7 @@
 
     <string name="adress_practicum">https://practicum.yandex.ru/profile/android-developer/</string>
     <string name="share_app">Поделиться приложением через</string>
+
+    <string name="link">https://yandex.ru/legal/practicum_offer/</string>
+
 </resources>

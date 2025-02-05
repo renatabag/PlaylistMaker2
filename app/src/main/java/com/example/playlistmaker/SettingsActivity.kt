@@ -3,8 +3,8 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.button.MaterialButton
 
 class SettingsActivity : AppCompatActivity() {
     @SuppressLint("WrongViewCast", "MissingInflatedId")
@@ -12,7 +12,7 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings)
 
-        val backButton = findViewById<MaterialButton>(R.id.button_back)
+        val backButton = findViewById<Button>(R.id.button_back)
 
         backButton?.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
@@ -20,13 +20,13 @@ class SettingsActivity : AppCompatActivity() {
             finish()
         }
 
-        val shareButton = findViewById<MaterialButton>(R.id.button_share_settings)
+        val shareButton = findViewById<Button>(R.id.button_share_settings)
         shareButton.setOnClickListener {
             val shareIntent = shareApp()
             startActivity(Intent.createChooser(shareIntent, getString(R.string.share_app)))
         }
 
-        val supportButton = findViewById<MaterialButton>(R.id.support_button)
+        val supportButton = findViewById<Button>(R.id.support_button)
         supportButton?.setOnClickListener {
             val developerEmail = getString(R.string.developer_email)
             val subject = getString(R.string.support_email_subject)
@@ -42,8 +42,15 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
+        val linkButton=findViewById<Button>(R.id.link_button)
+        linkButton.setOnClickListener{
+            val link = getString(R.string.link)
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse(link)
+            }
+            startActivity(intent)
+        }
     }
-
     private fun shareApp(): Intent {
         val shareText = getString(R.string.adress_practicum)
         return Intent().apply {
@@ -52,4 +59,5 @@ class SettingsActivity : AppCompatActivity() {
             type = "text/plain"
         }
     }
+
 }
