@@ -36,12 +36,14 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/button_share_settings"
             android:text="@string/share_app_button_text"
             app:icon="@drawable/baseline_share_24"
             style="@style/primary_settings_button"
             />
 
         <Button
+            android:id="@+id/support_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/support_button_text"
