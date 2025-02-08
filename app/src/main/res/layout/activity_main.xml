@@ -23,7 +23,6 @@
             style="@style/primary_text"/>
 
         <Button
-
             android:layout_width="match_parent"
             android:layout_height="@dimen/zero"
             android:layout_weight="1"
@@ -33,7 +32,6 @@
             style="@style/primary_activity_main_button"/>
 
         <Button
-
             android:layout_width="match_parent"
             android:layout_height="@dimen/zero"
             android:layout_weight="1"
@@ -44,7 +42,6 @@
             style="@style/primary_activity_main_button"/>
 
         <Button
-
             android:layout_width="match_parent"
             android:layout_height="@dimen/zero"
             android:layout_weight="1"

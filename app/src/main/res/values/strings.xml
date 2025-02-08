@@ -19,4 +19,5 @@
 
     <string name="link">https://yandex.ru/legal/practicum_offer/</string>
 
+    <string name="input_hint">Поиск</string>
 </resources>

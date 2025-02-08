@@ -5,6 +5,9 @@
     <dimen name="button_corner_radius">16dp</dimen>
     <dimen name="main_padding">20dp</dimen>
     <dimen name="zero">0dp</dimen>
+    <dimen name="radius">8dp</dimen>
+    <color name="rectangle_color">#E6E8EB</color>
+    <color name="rectangle_text_color">#AEAFB4</color>
 
     <style name="primary_settings_back_button" parent="Widget.MaterialComponents.Button">
         <item name="android:backgroundTint">@android:color/white</item>
@@ -46,8 +49,9 @@
         <item name="iconTint">@color/black</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:fontFamily">@font/ys_display_medium</item>
-
     </style>
+
+
     <style name="Base.Theme.PlaylistMaker" parent="Theme.Material3.DayNight.NoActionBar">
 
         <item name="android:background">@color/blue</item>

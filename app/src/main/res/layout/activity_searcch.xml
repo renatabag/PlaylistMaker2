@@ -1,6 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/main_padding"
+    tools:context=".SettingsActivity"
+    style="@style/Base.Theme.PlaylistMakerr"
+    >
 
+
+    <LinearLayout
+        style="@style/Base.Theme.PlaylistMakerr"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="24dp"
+        tools:layout_editor_absoluteY="36dp">
+
+        <Button
+            android:id="@+id/button_back"
+            style="@style/primary_settings_back_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="@dimen/radius"
+            android:text="@string/search_button_text"
+            app:icon="@drawable/baseline_arrow_back_24" />
+
+        <EditText
+            android:id="@+id/inputEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rectangle"
+            android:textColor="@color/rectangle_text_color"
+            android:drawableStart="@drawable/baseline_search_24"
+            android:drawablePadding="@dimen/radius"
+            android:drawableTint="@color/rectangle_text_color"
+            android:hint="@string/input_hint"
+            android:textColorHint="@color/rectangle_text_color"
+            android:inputType="text"
+            android:padding="@dimen/radius"
+            android:textCursorDrawable="@color/blue"
+            android:drawableEnd="@drawable/baseline_clear_24"
+            />
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
