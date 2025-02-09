@@ -9,6 +9,7 @@
     <color name="rectangle_color">#E6E8EB</color>
     <color name="rectangle_text_color">#AEAFB4</color>
 
+
     <style name="primary_settings_back_button" parent="Widget.MaterialComponents.Button">
         <item name="android:backgroundTint">@android:color/white</item>
         <item name="android:layout_gravity">start</item>
@@ -41,6 +42,7 @@
     </style>
 
     <style name="primary_activity_main_button" parent="Widget.MaterialComponents.Button">
+
         <item name="android:backgroundTint">@color/white</item>
         <item name="cornerRadius">@dimen/button_corner_radius</item>
         <item name="android:textSize">@dimen/main_text_size</item>

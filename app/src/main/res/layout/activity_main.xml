@@ -29,7 +29,7 @@
             android:id="@+id/button1"
             android:text="@string/search_button_text"
             app:icon="@drawable/baseline_search_24"
-            style="@style/primary_activity_main_button"/>
+            style="@style/primary_activity_main_button" />
 
         <Button
             android:layout_width="match_parent"
