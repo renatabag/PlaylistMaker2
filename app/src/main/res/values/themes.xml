@@ -8,6 +8,8 @@
     <dimen name="radius">8dp</dimen>
     <color name="rectangle_color">#E6E8EB</color>
     <color name="rectangle_text_color">#AEAFB4</color>
+    <dimen name="small_padding">12dp</dimen>
+
 
 
     <style name="primary_settings_back_button" parent="Widget.MaterialComponents.Button">

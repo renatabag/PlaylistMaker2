@@ -7,6 +7,7 @@
     <dimen name="zero">0dp</dimen>
     <color name="rectangle_text_color">#1A1B22</color>
     <color name="rectangle_color">#FFFFFFFF</color>
+    <dimen name="small_padding">12dp</dimen>
 
 
     <style name="primary_settings_back_button" parent="Widget.MaterialComponents.Button">
