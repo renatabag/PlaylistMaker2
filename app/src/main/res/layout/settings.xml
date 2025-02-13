@@ -25,7 +25,8 @@
             app:icon="@drawable/baseline_arrow_back_24"
             style="@style/primary_settings_back_button"
             android:background="@android:color/transparent"
-            app:iconPadding="@dimen/small_padding"/>
+            app:iconPadding="@dimen/small_padding"
+            app:iconSize="@dimen/button_size"/>
 
         <Button
             android:layout_marginTop="@dimen/small_padding"
