@@ -19,6 +19,7 @@
         <item name="iconTint">@color/white</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="iconPadding">@dimen/small_padding</item>
     </style>
 
     <style name="primary_settings_button" parent="Widget.MaterialComponents.Button">
