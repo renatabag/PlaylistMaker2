@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".SettingsActivity"
-    android:paddingVertical="@dimen/padding_vertical"
+    android:paddingVertical="@dimen/padding_vertical_settings"
     >
 
     <LinearLayout
@@ -17,7 +17,6 @@
         android:layout_marginTop="@dimen/zero">
 
         <Button
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/button_back"
