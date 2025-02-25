@@ -11,9 +11,19 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 
+interface OnItemClickListener {
+    fun onItemClick(track: Track)
+}
+
 class SearchActivity : AppCompatActivity() {
+
+    private lateinit var recyclerView: RecyclerView
+    lateinit var adapter: TrackAdapter
+    private val tracks: MutableList<Track> = mutableListOf()
 
     private lateinit var inputEditText: EditText
     private var searchText: String = ""
@@ -27,10 +37,23 @@ class SearchActivity : AppCompatActivity() {
         override fun afterTextChanged(s: Editable?) {}
     }
 
-    @SuppressLint("ClickableViewAccessibility", "WrongViewCast")
+    @SuppressLint("ClickableViewAccessibility", "WrongViewCast", "MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_searcch)
+
+        recyclerView = findViewById(R.id.recyclerView) // <-- Corrected ID
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        val onItemClickListener = object : OnItemClickListener {
+            override fun onItemClick(track: Track) {
+                // Handle click (e.g., open a new screen with track information)
+                println("Clicked on track: ${track.trackName}") // Example
+            }
+        }
+
+        adapter = TrackAdapter(tracks, onItemClickListener)
+        recyclerView.adapter = adapter
 
         val backButton = findViewById<MaterialButton>(R.id.button_back)
         inputEditText = findViewById(R.id.inputEditText)
@@ -46,12 +69,18 @@ class SearchActivity : AppCompatActivity() {
 
         inputEditText.addTextChangedListener(textWatcher)
 
-
         inputEditText.doAfterTextChanged { text ->
             if (text.isNullOrEmpty()) {
-                inputEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(ContextCompat.getDrawable(this, R.drawable.baseline_search_24), null, null, null);
+                inputEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    ContextCompat.getDrawable(this, R.drawable.baseline_search_24), null, null, null
+                )
             } else {
-                inputEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(ContextCompat.getDrawable(this, R.drawable.baseline_search_24), null, ContextCompat.getDrawable(this, R.drawable.baseline_clear_24), null);
+                inputEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    ContextCompat.getDrawable(this, R.drawable.baseline_search_24),
+                    null,
+                    ContextCompat.getDrawable(this, R.drawable.baseline_clear_24),
+                    null
+                )
             }
         }
 
@@ -65,9 +94,7 @@ class SearchActivity : AppCompatActivity() {
             }
             return@setOnTouchListener false
         }
-
     }
-
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -75,7 +102,8 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun hideKeyboard() {
-        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val inputMethodManager =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(inputEditText.windowToken, 0)
     }
 

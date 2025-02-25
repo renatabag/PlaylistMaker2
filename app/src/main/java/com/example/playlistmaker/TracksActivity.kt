@@ -23,7 +23,10 @@ class TracksActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
         trackList.addAll(getDummyTracks())
 
         trackAdapter = TrackAdapter(trackList, this)
+
         recyclerView.adapter = trackAdapter
+
+        Glide.with(applicationContext).load(item_image).into(trackImageView)
     }
 
     override fun onTrackClick(track: Track) {
@@ -64,4 +67,5 @@ class TracksActivity : AppCompatActivity(), TrackAdapter.OnTrackClickListener {
             )
         )
     }
+
 }

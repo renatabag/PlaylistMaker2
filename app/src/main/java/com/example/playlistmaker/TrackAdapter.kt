@@ -8,13 +8,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
-public class TrackAdapter(
+class TrackAdapter(
     private val tracks: List<Track>,
-    private val onTrackClickListener: OnTrackClickListener
+    private val onTrackClickListener: OnItemClickListener
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
-    interface OnTrackClickListener {
-        fun onTrackClick(track: Track)
+    interface OnItemClickListener {
+        fun onItemClick(track: Track)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
@@ -25,7 +25,7 @@ public class TrackAdapter(
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tracks[position])
         holder.itemView.setOnClickListener {
-            onTrackClickListener.onTrackClick(tracks[holder.adapterPosition])
+            onTrackClickListener.onItemClick(tracks[holder.adapterPosition])
         }
     }
 
@@ -34,7 +34,6 @@ public class TrackAdapter(
     }
 
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
         private val trackNameView: TextView = itemView.findViewById(R.id.trackName)
         private val artistNameView: TextView = itemView.findViewById(R.id.artistName)
         private val trackTimeView: TextView = itemView.findViewById(R.id.trackTime)
