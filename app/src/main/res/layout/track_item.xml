@@ -17,24 +17,16 @@
         android:orientation="horizontal"
         android:padding="@dimen/activity_search_padding"
         >
-
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="@dimen/image_size"
-            android:layout_height="@dimen/image_size"
-            app:cardCornerRadius="@dimen/very_small_padding"
-            app:cardElevation="@dimen/very_small_padding"
-            app:cardPreventCornerOverlap="true"
-            android:backgroundTint="@color/background">
-
             <ImageView
                 android:id="@+id/item_image"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="@dimen/image_size"
+                android:layout_height="@dimen/image_size"
                 android:scaleType="centerCrop"
                 android:src="@drawable/placeholder"
-                android:backgroundTint="@color/white"/>
-        </androidx.cardview.widget.CardView>
+                android:background="@android:color/transparent"
+                android:transformPivotX="@dimen/very_small_padding"
+                android:transformPivotY="@dimen/very_small_padding"/>
+
 
 
         <LinearLayout

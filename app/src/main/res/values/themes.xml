@@ -23,7 +23,10 @@
     <dimen name="very_small_padding">2dp</dimen>
     <dimen name="small_text_track">11sp</dimen>
     <dimen name="four_dp">4dp</dimen>
-
+    <color name="blue_switch">#3772E7</color>
+    <color name="grey_switch">#AEAFB4</color>
+    <color name="blue_switch_light">#9FBBF3</color>
+    <color name="grey_switch_light">#E6E8EB</color>
 
 
     <style name="primary_settings_back_button" parent="Widget.MaterialComponents.Button">
