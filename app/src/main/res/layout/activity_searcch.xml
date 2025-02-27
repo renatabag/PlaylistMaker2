@@ -9,6 +9,7 @@
     tools:context=".SettingsActivity"
     android:paddingVertical="@dimen/small_padding"
     style="@style/Base.Theme.PlaylistMakerr"
+    android:backgroundTint="@color/background"
     >
 
 
@@ -64,6 +65,12 @@
                 android:paddingEnd="@dimen/radius"/>
         </FrameLayout>
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/tracksList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:backgroundTint="@color/background"/>
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

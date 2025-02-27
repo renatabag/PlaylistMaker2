@@ -2,6 +2,7 @@
     <!-- Base application theme. -->
     <style name="Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker" />
     <dimen name="main_text_size">22sp</dimen>
+    <dimen name="small_track_text_size">16sp</dimen>
     <dimen name="padding_vertical">21dp</dimen>
     <dimen name="padding_vertical_settings">10dp</dimen>
     <dimen name="button_corner_radius">16dp</dimen>
@@ -9,11 +10,19 @@
     <dimen name="activity_search_padding">16dp</dimen>
     <dimen name="zero">0dp</dimen>
     <dimen name="radius">8dp</dimen>
+    <dimen name="margine_top_track">5dp</dimen>
     <color name="rectangle_color">#E6E8EB</color>
     <color name="rectangle_text_color">#AEAFB4</color>
     <dimen name="small_padding">12dp</dimen>
     <dimen name="button_size">24dp</dimen>
     <dimen name="settings_padding">28dp</dimen>
+    <color name="track_text_color">#000000</color>
+    <color name="track_small_text_color">#AEAFB4</color>
+    <color name="background">#FFFFFF</color>
+    <dimen name="image_size">45dp</dimen>
+    <dimen name="very_small_padding">2dp</dimen>
+    <dimen name="small_text_track">11sp</dimen>
+    <dimen name="four_dp">4dp</dimen>
 
 
 

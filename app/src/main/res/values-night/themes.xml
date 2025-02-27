@@ -8,6 +8,14 @@
     <color name="rectangle_text_color">#1A1B22</color>
     <color name="rectangle_color">#FFFFFFFF</color>
     <dimen name="small_padding">12dp</dimen>
+    <color name="track_text_color">#FFFFFF</color>
+    <color name="track_small_text_color">#FFFFFFFF</color>
+    <color name="background">#1A1B22</color>
+    <dimen name="image_size">45sp</dimen>
+    <dimen name="very_small_padding">2dp</dimen>
+    <dimen name="small_track_text_size">16sp</dimen>
+    <dimen name="small_text_track">11sp</dimen>
+    <dimen name="four_dp">4dp</dimen>
 
 
     <style name="primary_settings_back_button" parent="Widget.MaterialComponents.Button">
