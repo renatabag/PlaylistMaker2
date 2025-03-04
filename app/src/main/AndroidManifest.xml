@@ -32,16 +32,16 @@
         <activity
             android:theme="@style/Base.Theme.PlaylistMakerr"
             android:name=".SettingsActivity"
-            android:exported="false"
+            android:exported="true"
             />
         <activity
             android:theme="@style/Base.Theme.PlaylistMakerr"
             android:name=".MediaLibraryActivity"
-            android:exported="false"/>
+            android:exported="true"/>
         <activity
             android:theme="@style/Base.Theme.PlaylistMaker"
             android:name=".SearchActivity"
-            android:exported="false"/>
+            android:exported="true"/>
     </application>
 
 </manifest>
