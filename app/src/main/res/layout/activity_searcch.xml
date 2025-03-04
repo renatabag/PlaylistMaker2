@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:background="@color/background"
     tools:context=".SettingsActivity"
     android:paddingVertical="@dimen/small_padding"
-    style="@style/Base.Theme.PlaylistMakerr"
-    android:backgroundTint="@color/background"
-    >
-
+    style="@style/Base.Theme.PlaylistMakerr">
 
     <LinearLayout
         style="@style/Base.Theme.PlaylistMakerr"
@@ -19,6 +17,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <!-- Кнопка "Назад" -->
         <Button
             android:id="@+id/button_back"
             style="@style/primary_settings_back_button"
@@ -28,10 +27,9 @@
             app:icon="@drawable/baseline_arrow_back_24"
             app:iconSize="@dimen/button_size"
             android:background="@android:color/transparent"
-            app:iconPadding = "@dimen/button_size"
-            />
+            app:iconPadding="@dimen/button_size" />
 
-
+        <!-- Поле поиска и кнопка очистки -->
         <FrameLayout
             android:padding="@dimen/activity_search_padding"
             android:layout_width="match_parent"
@@ -53,7 +51,7 @@
                 android:padding="@dimen/radius"
                 android:textCursorDrawable="@color/blue"
                 android:imeOptions="actionDone"
-                android:singleLine="true"/>
+                android:singleLine="true" />
 
             <ImageView
                 android:id="@+id/clearIcon"
@@ -64,35 +62,26 @@
                 android:visibility="gone"
                 android:contentDescription="@string/clear_input"
                 app:tint="@color/dark_grey"
-                android:paddingEnd="@dimen/radius"/>
+                android:paddingEnd="@dimen/radius" />
         </FrameLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/tracksList"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/white"
-            android:backgroundTint="@color/background"/>
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/white" />
 
         <ViewStub
             android:id="@+id/emptyStateStub"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout="@layout/activity_search_empty"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout="@layout/activity_search_empty" />
 
         <ViewStub
             android:id="@+id/errorStateStub"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout="@layout/activity_search_error"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout="@layout/activity_search_error" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

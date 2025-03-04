@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.ViewStub
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
@@ -22,6 +23,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var retryButton: Button
     private lateinit var tracksList: RecyclerView
     private lateinit var clearIcon: ImageView
+    private lateinit var emptyViewStub: ViewStub
+    private lateinit var errorViewStub: ViewStub
     private var emptyView: View? = null
     private var errorView: View? = null
     private val trackAdapter = TrackAdapter(emptyList())
@@ -35,6 +38,8 @@ class SearchActivity : AppCompatActivity() {
         retryButton = findViewById(R.id.retryButton)
         tracksList = findViewById(R.id.tracksList)
         clearIcon = findViewById(R.id.clearIcon)
+        emptyViewStub = findViewById(R.id.emptyStateStub)
+        errorViewStub = findViewById(R.id.errorStateStub)
 
         tracksList.layoutManager = LinearLayoutManager(this)
         tracksList.adapter = trackAdapter
@@ -103,7 +108,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun showEmptyState() {
         if (emptyView == null) {
-            emptyView = this.findViewById(R.id.emptyState)
+            emptyView = emptyViewStub.inflate()
         }
         tracksList.visibility = View.GONE
         retryButton.visibility = View.GONE
@@ -113,7 +118,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun showErrorState() {
         if (errorView == null) {
-            errorView = findViewById(R.id.errorState)
+            errorView = errorViewStub.inflate()
             errorView?.findViewById<Button>(R.id.retryButton)?.setOnClickListener {
                 performSearch(inputEditText.text.toString())
             }
