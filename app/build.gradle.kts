@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED_EXPRESSION")
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.playlistmaker"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.playlistmaker"
@@ -33,6 +35,9 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    buildFeatures{
+        viewBinding; true
+    }
 }
 
 dependencies {
@@ -45,4 +50,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation ("com.github.bumptech.glide:glide:4.14.2")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.14.2")
 }

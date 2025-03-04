@@ -5,15 +5,49 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:orientation="vertical"
+    android:padding="@dimen/main_padding"
+    tools:context=".MainActivity"
+    >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="@dimen/zero">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/playlist_maker_title"
+            style="@style/primary_text"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/zero"
+            android:layout_weight="1"
+            android:id="@+id/button1"
+            android:text="@string/search_button_text"
+            app:icon="@drawable/baseline_search_24"
+            style="@style/primary_activity_main_button" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/zero"
+            android:layout_weight="1"
+            android:id="@+id/button2"
+            android:text="@string/media_library_button_text"
+            android:backgroundTint="@color/white"
+            app:icon="@drawable/baseline_library_music_24"
+            style="@style/primary_activity_main_button"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/zero"
+            android:layout_weight="1"
+            android:id="@+id/button3"
+            android:text="@string/settings_button_text"
+            app:icon="@drawable/baseline_settings_24"
+            style="@style/primary_activity_main_button"/>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
