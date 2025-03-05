@@ -1,16 +1,21 @@
 package com.example.playlistmaker
 
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
@@ -23,9 +28,13 @@ class SearchActivity : AppCompatActivity() {
 
     private lateinit var inputEditText: EditText
     private lateinit var recycler: RecyclerView
-    private lateinit var placeholderMessage: TextView
-    private lateinit var connectionErrorMessage: TextView
+    private lateinit var emptyStateContainer: LinearLayout
+    private lateinit var errorStateContainer: LinearLayout
     private lateinit var emptyImageView: ImageView
+    private lateinit var placeholderMessage: TextView
+    private lateinit var errorImageView: ImageView
+    private lateinit var connectionErrorMessage: TextView
+    private lateinit var adapter: TrackAdapter
     private var searchText: String = ""
 
     private val originalTracks = listOf(
@@ -61,6 +70,18 @@ class SearchActivity : AppCompatActivity() {
         )
     )
 
+    private val networkChangeReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (isNetworkAvailable()) {
+                // Интернет доступен, но экран не меняем
+                connectionErrorMessage.text = "Интернет доступен. Нажмите 'Обновить', чтобы продолжить."
+            } else {
+                // Интернет недоступен, показываем сообщение об ошибке
+                showErrorState("Нет подключения к интернету")
+            }
+        }
+    }
+
     @SuppressLint("ClickableViewAccessibility", "WrongViewCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,9 +90,21 @@ class SearchActivity : AppCompatActivity() {
         val backButton = findViewById<MaterialButton>(R.id.button_back)
         inputEditText = findViewById(R.id.inputEditText)
         recycler = findViewById(R.id.tracksList)
-        placeholderMessage = findViewById(R.id.placeholderMessage)
-        connectionErrorMessage = findViewById(R.id.connectionErrorMessage)
+        emptyStateContainer = findViewById(R.id.emptyStateContainer)
+        errorStateContainer = findViewById(R.id.errorStateContainer)
         emptyImageView = findViewById(R.id.emptyImageView)
+        placeholderMessage = findViewById(R.id.placeholderMessage)
+        errorImageView = findViewById(R.id.errorImageView)
+        connectionErrorMessage = findViewById(R.id.connectionErrorMessage)
+
+        val retryButton = findViewById<Button>(R.id.retryButton)
+        retryButton.setOnClickListener {
+            performSearch()
+        }
+
+        adapter = TrackAdapter(originalTracks)
+        recycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        recycler.adapter = adapter
 
         backButton.setOnClickListener {
             finish()
@@ -99,7 +132,7 @@ class SearchActivity : AppCompatActivity() {
         inputEditText.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_UP) {
                 if (event.rawX >= (inputEditText.right - inputEditText.compoundPaddingEnd)) {
-                    clearSearchInput() // Очищаем поле ввода и восстанавливаем список
+                    clearSearchInput()
                     return@setOnTouchListener true
                 }
             }
@@ -108,33 +141,40 @@ class SearchActivity : AppCompatActivity() {
 
         inputEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                performSearch() // Выполнение поискового запроса
-                hideKeyboard() // Скрытие клавиатуры
+                performSearch()
+                hideKeyboard()
                 true
             } else {
                 false
             }
         }
 
-        recycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        recycler.adapter = TrackAdapter(originalTracks) // Изначально показываем все треки
-
-        // Управление видимостью RecyclerView и TextView при старте
-        if (originalTracks.isEmpty()) {
-            recycler.visibility = View.GONE
-            placeholderMessage.visibility = View.VISIBLE
-            connectionErrorMessage.visibility = View.GONE
+        if (!isNetworkAvailable()) {
+            showErrorState("Нет подключения к интернету")
         } else {
-            recycler.visibility = View.VISIBLE
-            placeholderMessage.visibility = View.GONE
-            connectionErrorMessage.visibility = View.GONE
+            showContent()
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        registerReceiver(networkChangeReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(networkChangeReceiver)
+    }
+
     private fun performSearch() {
+        if (!isNetworkAvailable()) {
+            showErrorState("Нет подключения к интернету")
+            return
+        }
+
         val query = searchText.trim().lowercase(Locale.getDefault())
         val filteredTracks = if (query.isEmpty()) {
-            originalTracks // Если запрос пустой, показываем все треки
+            originalTracks
         } else {
             originalTracks.filter { track ->
                 track.trackName.lowercase(Locale.getDefault()).contains(query) ||
@@ -142,43 +182,30 @@ class SearchActivity : AppCompatActivity() {
             }
         }
 
-        // Обновляем адаптер RecyclerView
-        recycler.adapter = TrackAdapter(filteredTracks)
+        adapter.updateTracks(filteredTracks)
 
-        // Управление видимостью RecyclerView, картинки и текста
         if (filteredTracks.isEmpty()) {
-            recycler.visibility = View.GONE
-            emptyImageView.visibility = View.VISIBLE
-            placeholderMessage.visibility = View.VISIBLE
-            connectionErrorMessage.visibility = View.GONE
+            showEmptyState()
         } else {
-            recycler.visibility = View.VISIBLE
-            emptyImageView.visibility = View.GONE
-            placeholderMessage.visibility = View.GONE
-            connectionErrorMessage.visibility = View.GONE
+            showContent()
         }
     }
 
     private fun clearSearchInput() {
-        inputEditText.setText("") // Очищаем поле ввода
-        hideKeyboard() // Скрываем клавиатуру
-        restoreOriginalTracks() // Восстанавливаем оригинальный список треков
+        inputEditText.setText("")
+        hideKeyboard()
+        restoreOriginalTracks()
     }
 
     private fun restoreOriginalTracks() {
-        recycler.adapter = TrackAdapter(originalTracks) // Обновляем адаптер с оригинальным списком
+        adapter.updateTracks(originalTracks)
 
-        // Управление видимостью RecyclerView, картинки и текста
-        if (originalTracks.isEmpty()) {
-            recycler.visibility = View.GONE
-            emptyImageView.visibility = View.VISIBLE
-            placeholderMessage.visibility = View.VISIBLE
-            connectionErrorMessage.visibility = View.GONE
+        if (!isNetworkAvailable()) {
+            showErrorState("Нет подключения к интернету")
+        } else if (originalTracks.isEmpty()) {
+            showEmptyState()
         } else {
-            recycler.visibility = View.VISIBLE
-            emptyImageView.visibility = View.GONE
-            placeholderMessage.visibility = View.GONE
-            connectionErrorMessage.visibility = View.GONE
+            showContent()
         }
     }
 
@@ -187,35 +214,29 @@ class SearchActivity : AppCompatActivity() {
         inputMethodManager.hideSoftInputFromWindow(inputEditText.windowToken, 0)
     }
 
-    private fun showMessage(text: String, additionalMessage: String, isConnectionError: Boolean = false) {
-        if (text.isNotEmpty()) {
-            if (isConnectionError) {
-                // Показываем сообщение о проблемах со связью
-                connectionErrorMessage.visibility = View.VISIBLE
-                connectionErrorMessage.text = text
-                placeholderMessage.visibility = View.GONE // Скрываем обычное сообщение
-                emptyImageView.visibility = View.GONE // Скрываем картинку
-            } else {
-                // Показываем обычное сообщение
-                placeholderMessage.visibility = View.VISIBLE
-                placeholderMessage.text = text
-                connectionErrorMessage.visibility = View.GONE // Скрываем сообщение о проблемах со связью
-                emptyImageView.visibility = View.VISIBLE // Показываем картинку
-            }
+    private fun showContent() {
+        recycler.visibility = View.VISIBLE
+        emptyStateContainer.visibility = View.GONE
+        errorStateContainer.visibility = View.GONE
+    }
 
-            // Очищаем список и обновляем адаптер
-            recycler.adapter = TrackAdapter(emptyList())
+    private fun showEmptyState() {
+        recycler.visibility = View.GONE
+        emptyStateContainer.visibility = View.VISIBLE
+        errorStateContainer.visibility = View.GONE
+    }
 
-            // Показываем дополнительное сообщение в Toast
-            if (additionalMessage.isNotEmpty()) {
-                Toast.makeText(applicationContext, additionalMessage, Toast.LENGTH_LONG).show()
-            }
-        } else {
-            // Скрываем оба сообщения, если текст пуст
-            placeholderMessage.visibility = View.GONE
-            connectionErrorMessage.visibility = View.GONE
-            emptyImageView.visibility = View.GONE
-        }
+    private fun showErrorState(message: String) {
+        recycler.visibility = View.GONE
+        emptyStateContainer.visibility = View.GONE
+        errorStateContainer.visibility = View.VISIBLE
+        connectionErrorMessage.text = message
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkInfo = connectivityManager.activeNetworkInfo
+        return networkInfo != null && networkInfo.isConnected
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

@@ -22,4 +22,13 @@
     <string name="input_hint">Поиск</string>
 
     <string name="clear_input">Очистить</string>
+
+    <string name="text_empty">Ничего не нашлось</string>
+
+    <string name="text_error">Ошибка соединения</string>
+
+    <string name="text_enthernet">Загрузка не удалась. Проверьте подключение к интернету</string>
+
+    <string name="text_retry">Обновить</string>
+
 </resources>
