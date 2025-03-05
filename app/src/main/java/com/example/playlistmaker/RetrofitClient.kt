@@ -6,6 +6,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitClient {
     private const val BASE_URL = "https://itunes.apple.com"
 
+    private var token = ""
+
+
     val instance: ItunesApi by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)

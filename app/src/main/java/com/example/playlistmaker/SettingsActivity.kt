@@ -1,5 +1,4 @@
 package com.example.playlistmaker
-
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -14,30 +13,48 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.switchmaterial.SwitchMaterial
 
 class SettingsActivity : AppCompatActivity() {
-
     @SuppressLint("WrongViewCast", "MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings)
 
         val switchMaterial: SwitchMaterial = findViewById(R.id.mySwitch)
-        switchMaterial.thumbTintList = ColorStateList(
-            arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf(-android.R.attr.state_checked)),
-            intArrayOf(
-                ContextCompat.getColor(this, R.color.blue_switch),
-                ContextCompat.getColor(this, R.color.grey_switch)
-            )
-        )
-        switchMaterial.trackTintList = ColorStateList(
-            arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf(-android.R.attr.state_checked)),
-            intArrayOf(
-                ContextCompat.getColor(this, R.color.blue_switch_light),
-                ContextCompat.getColor(this, R.color.grey_switch_light)
-            )
+
+        val states = arrayOf(
+            intArrayOf(android.R.attr.state_checked),
+            intArrayOf(-android.R.attr.state_checked)
         )
 
+        val colors = intArrayOf(
+            ContextCompat.getColor(this, R.color.blue_switch),
+            ContextCompat.getColor(this, R.color.grey_switch),
+        )
+        val colorsTrack = intArrayOf(
+            ContextCompat.getColor(this, R.color.blue_switch_light),
+            ContextCompat.getColor(this, R.color.grey_switch_light)
+        )
+
+        val thumbColorStateList = ColorStateList(states, colors)
+        val trackColorStateList = ColorStateList(states,colorsTrack)
+        switchMaterial.thumbTintList = thumbColorStateList
+        switchMaterial.trackTintList = trackColorStateList
+
+
+        lateinit var inputEditText: EditText
+        var searchText: String = ""
+        val textWatcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                searchText = s.toString()
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        }
+
         val backButton = findViewById<MaterialButton>(R.id.button_back)
-        backButton.setOnClickListener {
+
+        backButton?.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()
@@ -50,7 +67,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         val supportButton = findViewById<MaterialButton>(R.id.support_button)
-        supportButton.setOnClickListener {
+        supportButton?.setOnClickListener {
             val developerEmail = getString(R.string.developer_email)
             val subject = getString(R.string.support_email_subject)
             val body = getString(R.string.support_email_body)
@@ -65,23 +82,22 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        val linkButton = findViewById<MaterialButton>(R.id.link_button)
-        linkButton.setOnClickListener {
+        val linkButton=findViewById<MaterialButton>(R.id.link_button)
+        linkButton.setOnClickListener{
             val link = getString(R.string.link)
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 data = Uri.parse(link)
             }
-            if (intent.resolveActivity(packageManager) != null) {
-                startActivity(intent)
-            }
+            startActivity(intent)
+        }
+    }
+    private fun shareApp(): Intent {
+        val shareText = getString(R.string.adress_practicum)
+        return Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, shareText)
+            type = "text/plain"
         }
     }
 
-    private fun shareApp(): Intent {
-        val shareText = getString(R.string.adress_practicum)
-        return Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, shareText)
-        }
-    }
 }

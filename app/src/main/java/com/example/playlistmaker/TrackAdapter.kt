@@ -1,6 +1,5 @@
 package com.example.playlistmaker
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,48 +7,41 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import java.text.SimpleDateFormat
-import java.util.Locale
 
-class TrackAdapter(private var tracks: List<Track>) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+class TrackAdapter(private val tracks: List<Track>): RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+    class TrackViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+        private val trackNameView:TextView
+        private val artistNameView:TextView
+        private val trackTimeView: TextView
+        private val artworkUrl100View: ImageView
 
-    inner class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val trackNameView: TextView = itemView.findViewById(R.id.trackName)
-        private val artistNameView: TextView = itemView.findViewById(R.id.artistName)
-        private val trackTimeView: TextView = itemView.findViewById(R.id.trackTime)
-        private val artworkView: ImageView = itemView.findViewById(R.id.item_image)
-
-        fun bind(track: Track) {
-            trackNameView.text = track.trackName
-            artistNameView.text = track.artistName
-            trackTimeView.text = formatTrackTime(track.trackTimeMillis)
-
-            Glide.with(itemView.context)
-                .load(track.artworkUrl100)
-                .placeholder(R.drawable.placeholder)
-                .error(R.drawable.placeholder)
-                .into(artworkView)
+        init {
+            trackNameView = itemView.findViewById(R.id.trackName)
+            artistNameView = itemView.findViewById(R.id.artistName)
+            trackTimeView = itemView.findViewById(R.id.trackTime)
+            artworkUrl100View = itemView.findViewById(R.id.item_image)
         }
 
-        private fun formatTrackTime(millis: Long): String {
-            return SimpleDateFormat("mm:ss", Locale.getDefault()).format(millis)
+        fun bind(model: Track) {
+            trackNameView.text = model.trackName
+            artistNameView.text = model.artistName
+            trackTimeView.text=model.trackTime
+
+            Glide.with(itemView.context)
+                .load(model.artworkUrl100)
+                .placeholder(R.drawable.placeholder)
+                .into(artworkUrl100View)
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.track_item, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.track_item, parent,false)
         return TrackViewHolder(view)
     }
 
+    override fun getItemCount()=tracks.size
+
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tracks[position])
-    }
-
-    override fun getItemCount(): Int = tracks.size
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateTracks(newTracks: List<Track>) {
-        tracks = newTracks
-        notifyDataSetChanged()
     }
 }
