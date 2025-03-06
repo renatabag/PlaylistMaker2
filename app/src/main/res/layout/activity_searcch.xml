@@ -72,14 +72,15 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/tracksList"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:background="@color/white"
+                android:backgroundTint="@color/background"
                 android:visibility="visible" />
 
             <LinearLayout
                 android:id="@+id/emptyStateContainer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:gravity="center_horizontal"
                 android:background="@color/background"

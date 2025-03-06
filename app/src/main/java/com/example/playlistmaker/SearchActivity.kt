@@ -73,10 +73,8 @@ class SearchActivity : AppCompatActivity() {
     private val networkChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (isNetworkAvailable()) {
-                // Интернет доступен, но экран не меняем
                 connectionErrorMessage.text = "Интернет доступен. Нажмите 'Обновить', чтобы продолжить."
             } else {
-                // Интернет недоступен, показываем сообщение об ошибке
                 showErrorState("Нет подключения к интернету")
             }
         }
@@ -102,9 +100,12 @@ class SearchActivity : AppCompatActivity() {
             performSearch()
         }
 
-        adapter = TrackAdapter(originalTracks)
+        adapter = TrackAdapter(emptyList())
         recycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recycler.adapter = adapter
+
+        recycler.visibility = View.GONE
+        emptyStateContainer.visibility = View.VISIBLE
 
         backButton.setOnClickListener {
             finish()
@@ -173,13 +174,15 @@ class SearchActivity : AppCompatActivity() {
         }
 
         val query = searchText.trim().lowercase(Locale.getDefault())
-        val filteredTracks = if (query.isEmpty()) {
-            originalTracks
-        } else {
-            originalTracks.filter { track ->
-                track.trackName.lowercase(Locale.getDefault()).contains(query) ||
-                        track.artistName.lowercase(Locale.getDefault()).contains(query)
-            }
+
+        if (query.isEmpty()) {
+            restoreOriginalState()
+            return
+        }
+
+        val filteredTracks = originalTracks.filter { track ->
+            track.trackName.lowercase(Locale.getDefault()).contains(query) ||
+                    track.artistName.lowercase(Locale.getDefault()).contains(query)
         }
 
         adapter.updateTracks(filteredTracks)
@@ -190,24 +193,21 @@ class SearchActivity : AppCompatActivity() {
             showContent()
         }
     }
+    private fun restoreOriginalState() {
+        adapter.updateTracks(emptyList())
+        recycler.visibility = View.GONE
+        emptyStateContainer.visibility = View.VISIBLE
+        errorStateContainer.visibility = View.VISIBLE
+        errorStateContainer.visibility = View.GONE
+        emptyStateContainer.visibility = View.GONE
+    }
 
     private fun clearSearchInput() {
         inputEditText.setText("")
         hideKeyboard()
-        restoreOriginalTracks()
+        restoreOriginalState()
     }
 
-    private fun restoreOriginalTracks() {
-        adapter.updateTracks(originalTracks)
-
-        if (!isNetworkAvailable()) {
-            showErrorState("Нет подключения к интернету")
-        } else if (originalTracks.isEmpty()) {
-            showEmptyState()
-        } else {
-            showContent()
-        }
-    }
 
     private fun hideKeyboard() {
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

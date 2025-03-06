@@ -10,7 +10,7 @@ import com.bumptech.glide.Glide
 
 class TrackAdapter(
     private var tracks: List<Track>,
-    private val onTrackClick: (Track) -> Unit = {} // Лямбда для обработки клика
+    private val onTrackClick: (Track) -> Unit = {}
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -51,6 +51,6 @@ class TrackAdapter(
 
     fun updateTracks(newTracks: List<Track>) {
         tracks = newTracks
-        notifyDataSetChanged() // Уведомляем адаптер об изменении данных
+        notifyDataSetChanged()
     }
 }
