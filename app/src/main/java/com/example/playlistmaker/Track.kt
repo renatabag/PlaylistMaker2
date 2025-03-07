@@ -1,13 +1,19 @@
 package com.example.playlistmaker
 
-import java.text.SimpleDateFormat
-import java.util.Locale
+data class Track(
+    val trackName: String?,
+    val artistName: String?,
+    val trackTimeMillis: Long?,
+    val artworkUrl100: String?
+) {
+    val trackTime: String
+        get() = formatTrackTime(trackTimeMillis ?: 0)
 
-data class Track (val trackName: String, val artistName: String, val trackTime: String, val artworkUrl100: String){
     companion object {
-        fun formatTrackTime(milliseconds: Long): String {
-            val dateFormat = SimpleDateFormat("mm:ss", Locale.getDefault())
-            return dateFormat.format(milliseconds)
+        fun formatTrackTime(millis: Long): String {
+            val minutes = millis / 1000 / 60
+            val seconds = millis / 1000 % 60
+            return String.format("%02d:%02d", minutes, seconds)
         }
     }
 }

@@ -22,6 +22,9 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.Locale
 
 class SearchActivity : AppCompatActivity() {
@@ -36,39 +39,6 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var connectionErrorMessage: TextView
     private lateinit var adapter: TrackAdapter
     private var searchText: String = ""
-
-    private val originalTracks = listOf(
-        Track(
-            trackName = "Smells Like Teen Spirit",
-            artistName = "Nirvana",
-            trackTime = Track.formatTrackTime(301000L),
-            artworkUrl100 = "https://example.com/nirvana.jpg"
-        ),
-        Track(
-            trackName = "Billie Jean",
-            artistName = "Michael Jackson",
-            trackTime = Track.formatTrackTime(275000L),
-            artworkUrl100 = "https://example.com/mj.jpg"
-        ),
-        Track(
-            trackName = "Stayin' Alive",
-            artistName = "Bee Gees",
-            trackTime = Track.formatTrackTime(250000L),
-            artworkUrl100 = "https://example.com/beegees.jpg"
-        ),
-        Track(
-            trackName = "Whole Lotta Love",
-            artistName = "Led Zeppelin",
-            trackTime = Track.formatTrackTime(333000L),
-            artworkUrl100 = "https://example.com/ledzeppelin.jpg"
-        ),
-        Track(
-            trackName = "Sweet Child O'Mine",
-            artistName = "Guns N' Roses",
-            trackTime = Track.formatTrackTime(303000L),
-            artworkUrl100 = "https://example.com/gunsnroses.jpg"
-        )
-    )
 
     private val networkChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -180,26 +150,36 @@ class SearchActivity : AppCompatActivity() {
             return
         }
 
-        val filteredTracks = originalTracks.filter { track ->
-            track.trackName.lowercase(Locale.getDefault()).contains(query) ||
-                    track.artistName.lowercase(Locale.getDefault()).contains(query)
-        }
+        RetrofitClient.itunesApi.search(query).enqueue(object : Callback<TrackResponse> {
+            override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
+                if (response.isSuccessful) {
+                    val tracks = response.body()?.results ?: emptyList()
+                    adapter.updateTracks(tracks)
 
-        adapter.updateTracks(filteredTracks)
+                    if (tracks.isEmpty()) {
+                        showEmptyState()
+                    } else {
+                        showContent()
+                    }
+                } else {
+                    showErrorState("Ошибка при загрузке данных: ${response.code()} ${response.message()}")
+                }
+            }
 
-        if (filteredTracks.isEmpty()) {
-            showEmptyState()
-        } else {
-            showContent()
-        }
+            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                showErrorState("Ошибка сети: ${t.message}")
+                t.printStackTrace()
+            }
+        })
     }
+
     private fun restoreOriginalState() {
         adapter.updateTracks(emptyList())
         recycler.visibility = View.GONE
         emptyStateContainer.visibility = View.VISIBLE
+        emptyStateContainer.visibility = View.GONE
         errorStateContainer.visibility = View.VISIBLE
         errorStateContainer.visibility = View.GONE
-        emptyStateContainer.visibility = View.GONE
     }
 
     private fun clearSearchInput() {
@@ -207,7 +187,6 @@ class SearchActivity : AppCompatActivity() {
         hideKeyboard()
         restoreOriginalState()
     }
-
 
     private fun hideKeyboard() {
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

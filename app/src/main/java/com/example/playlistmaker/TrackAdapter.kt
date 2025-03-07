@@ -20,14 +20,14 @@ class TrackAdapter(
         private val artworkUrl100View: ImageView = itemView.findViewById(R.id.item_image)
 
         fun bind(model: Track) {
-            trackNameView.text = model.trackName
-            artistNameView.text = model.artistName
+            trackNameView.text = model.trackName ?: "Unknown Track"
+            artistNameView.text = model.artistName ?: "Unknown Artist"
             trackTimeView.text = model.trackTime
 
             Glide.with(itemView.context)
                 .load(model.artworkUrl100)
-                .placeholder(R.drawable.error)
-                .error(R.drawable.placeholder)
+                .placeholder(R.drawable.placeholder)
+                .error(R.drawable.error)
                 .centerCrop()
                 .into(artworkUrl100View)
         }

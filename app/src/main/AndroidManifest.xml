@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <queries>
         <intent>
@@ -10,6 +11,8 @@
     </queries>
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -43,6 +46,9 @@
             android:theme="@style/Base.Theme.PlaylistMaker"
             android:name=".SearchActivity"
             android:exported="true"/>
+        <meta-data
+            android:name="android.app.lib_name"
+            android:value=""/>
     </application>
 
 </manifest>
