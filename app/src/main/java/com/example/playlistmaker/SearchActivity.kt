@@ -43,9 +43,9 @@ class SearchActivity : AppCompatActivity() {
     private val networkChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (isNetworkAvailable()) {
-                connectionErrorMessage.text = "Интернет доступен. Нажмите 'Обновить', чтобы продолжить."
+                connectionErrorMessage.text = "Интернет доступен"
             } else {
-                showErrorState("Нет подключения к интернету")
+                showErrorState("Проблемы о связью")
             }
         }
     }
@@ -121,7 +121,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         if (!isNetworkAvailable()) {
-            showErrorState("Нет подключения к интернету")
+            showErrorState("Проблемы со связью")
         } else {
             showContent()
         }
@@ -139,7 +139,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun performSearch() {
         if (!isNetworkAvailable()) {
-            showErrorState("Нет подключения к интернету")
+            showErrorState("Проблемы со связью")
             return
         }
 
