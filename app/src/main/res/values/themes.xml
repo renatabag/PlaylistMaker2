@@ -9,7 +9,7 @@
     <dimen name="padding_vertical_settings">10dp</dimen>
     <dimen name="button_corner_radius">16dp</dimen>
     <dimen name="main_padding">20dp</dimen>
-    <dimen name="activity_search_padding">16dp</dimen>
+    <dimen name="activity_search_padding">8dp</dimen>
     <dimen name="zero">0dp</dimen>
     <dimen name="radius">8dp</dimen>
     <dimen name="error_size">120dp</dimen>
