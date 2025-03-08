@@ -38,6 +38,7 @@
         android:text="@string/dark_theme_button_text"
         app:icon="@drawable/baseline_toggle_off_24" />
 
+
     <Button
 
             android:paddingLeft="@dimen/button_corner_radius"

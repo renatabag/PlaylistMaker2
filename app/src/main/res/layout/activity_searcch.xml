@@ -6,12 +6,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".SettingsActivity"
+    tools:context=".SearchActivity"
     android:paddingVertical="@dimen/small_padding"
     style="@style/Base.Theme.PlaylistMakerr"
     android:backgroundTint="@color/background"
     >
-
 
     <LinearLayout
         style="@style/Base.Theme.PlaylistMakerr"
@@ -28,9 +27,7 @@
             app:icon="@drawable/baseline_arrow_back_24"
             app:iconSize="@dimen/button_size"
             android:background="@android:color/transparent"
-            app:iconPadding = "@dimen/button_size"
-            />
-
+            app:iconPadding="@dimen/button_size" />
 
         <FrameLayout
             android:padding="@dimen/activity_search_padding"
@@ -51,7 +48,9 @@
                 android:textColorHint="@color/rectangle_text_color"
                 android:inputType="text"
                 android:padding="@dimen/radius"
-                android:textCursorDrawable="@color/blue" />
+                android:textCursorDrawable="@color/blue"
+                android:imeOptions="actionDone"
+                android:singleLine="true" />
 
             <ImageView
                 android:id="@+id/clearIcon"
@@ -62,15 +61,116 @@
                 android:visibility="gone"
                 android:contentDescription="@string/clear_input"
                 app:tint="@color/dark_grey"
-                android:paddingEnd="@dimen/radius"/>
+                android:paddingEnd="@dimen/radius" />
         </FrameLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/tracksList"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
-            android:backgroundTint="@color/background"/>
+            android:background="@color/background">
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tracksList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:backgroundTint="@color/background"
+                android:visibility="visible" />
+
+            <LinearLayout
+                android:id="@+id/emptyStateContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:background="@color/background"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/emptyImageView"
+                    android:layout_width="@dimen/error_size"
+                    android:layout_height="@dimen/error_size"
+                    android:src="@drawable/empty"
+                    android:visibility="visible"
+                    android:layout_marginTop="@dimen/margine_top_error"
+                    android:background="@color/background"/>
+
+                <TextView
+                    android:id="@+id/placeholderMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_error"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/ys_display_medium"
+                    android:textColor="@color/dark_white"
+                    android:text="@string/text_empty"
+                    android:layout_marginTop="@dimen/activity_search_padding"
+                    android:visibility="visible"
+                    android:background="@color/background" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/errorStateContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:background="@color/background"
+                android:layout_marginLeft="@dimen/button_size"
+                android:layout_marginRight="@dimen/button_size"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/errorImageView"
+                    android:layout_width="@dimen/error_size"
+                    android:layout_height="@dimen/error_size"
+                    android:src="@drawable/error"
+                    android:visibility="visible"
+                    android:layout_marginTop="@dimen/margine_top_error"
+                    android:background="@color/background"/>
+
+                <TextView
+                    android:id="@+id/connectionErrorMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_error"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/ys_display_medium"
+                    android:textColor="@color/dark_white"
+                    android:text="@string/text_error"
+                    android:layout_marginTop="@dimen/button_corner_radius"
+                    android:gravity="center_horizontal"
+                    android:visibility="visible"
+                    android:background="@color/background" />
+
+                <TextView
+                    android:id="@+id/retryText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_error"
+                    android:textStyle="bold"
+                    android:gravity="center_horizontal"
+                    android:fontFamily="@font/ys_display_medium"
+                    android:textColor="@color/dark_white"
+                    android:text="@string/text_enthernet"
+                    android:layout_marginTop="@dimen/activity_search_padding"
+                    android:visibility="visible"
+                    android:background="@color/background" />
+
+                <Button
+                    android:id="@+id/retryButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="@dimen/button_size"
+                    android:text="@string/text_retry"
+                    android:background="@drawable/radius"
+                    android:textColor="@color/background"
+                    android:textSize="@dimen/text_retry"
+                    app:backgroundTint="@color/dark_white"
+                    android:fontFamily="@font/ys_display_medium"
+                    android:textAllCaps="false"/>
+
+            </LinearLayout>
+        </FrameLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
