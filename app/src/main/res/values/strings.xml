@@ -9,6 +9,7 @@
     <string name="share_app_button_text">Поделиться приложением</string>
     <string name="support_button_text">Написать в поддержку</string>
     <string name="agreement_button_text">Пользовательское соглашение</string>
+    <string name="history_search">История поиска</string>
 
     <string name="developer_email">bagdanova.renata@gmail.com</string>
     <string name="support_email_subject">Сообщение разработчикам и разработчицам приложения Playlist Maker</string>
@@ -16,6 +17,7 @@
 
     <string name="adress_practicum">https://practicum.yandex.ru/profile/android-developer/</string>
     <string name="share_app">Поделиться приложением через</string>
+    <string name="clean_history">Очистить историю</string>
 
     <string name="link">https://yandex.ru/legal/practicum_offer/</string>
 

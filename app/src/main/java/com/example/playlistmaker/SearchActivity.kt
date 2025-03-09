@@ -1,5 +1,6 @@
 package com.example.playlistmaker
 
+import SearchHistory
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -17,7 +18,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -39,13 +39,17 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var connectionErrorMessage: TextView
     private lateinit var adapter: TrackAdapter
     private var searchText: String = ""
+    private lateinit var searchHistory: SearchHistory
+    private lateinit var clearHistoryButton: Button
+    private lateinit var historyTitle: TextView
+    private lateinit var clearIcon: ImageView
 
     private val networkChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (isNetworkAvailable()) {
                 connectionErrorMessage.text = "Интернет доступен"
             } else {
-                showErrorState("Проблемы о связью")
+                showErrorState("Проблемы со связью")
             }
         }
     }
@@ -54,6 +58,20 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_searcch)
+
+        searchHistory = SearchHistory(this)
+
+        adapter = TrackAdapter(emptyList()) { track ->
+            searchHistory.addTrack(track)
+        }
+
+        clearHistoryButton = findViewById(R.id.clearHistoryButton)
+        clearHistoryButton.setOnClickListener {
+            clearHistory()
+        }
+
+        historyTitle = findViewById(R.id.historyTitle)
+        clearIcon = findViewById(R.id.clearIcon)
 
         val backButton = findViewById<MaterialButton>(R.id.button_back)
         inputEditText = findViewById(R.id.inputEditText)
@@ -70,7 +88,6 @@ class SearchActivity : AppCompatActivity() {
             performSearch()
         }
 
-        adapter = TrackAdapter(emptyList())
         recycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recycler.adapter = adapter
 
@@ -89,15 +106,18 @@ class SearchActivity : AppCompatActivity() {
         inputEditText.doAfterTextChanged { text ->
             searchText = text?.toString() ?: ""
             if (text.isNullOrEmpty()) {
-                inputEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                    ContextCompat.getDrawable(this, R.drawable.baseline_search_24), null, null, null
-                )
+                showHistory()
+                clearIcon.visibility = View.GONE
             } else {
-                inputEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                    ContextCompat.getDrawable(this, R.drawable.baseline_search_24), null,
-                    ContextCompat.getDrawable(this, R.drawable.baseline_clear_24), null
-                )
+                performSearch()
+                clearIcon.visibility = View.VISIBLE
+                clearHistoryButton.visibility = View.GONE
+                historyTitle.visibility = View.GONE
             }
+        }
+
+        clearIcon.setOnClickListener {
+            clearSearchInput()
         }
 
         inputEditText.setOnTouchListener { _, event ->
@@ -125,6 +145,10 @@ class SearchActivity : AppCompatActivity() {
         } else {
             showContent()
         }
+
+        if (inputEditText.text.isNullOrEmpty()) {
+            showHistory()
+        }
     }
 
     override fun onResume() {
@@ -146,7 +170,7 @@ class SearchActivity : AppCompatActivity() {
         val query = searchText.trim().lowercase(Locale.getDefault())
 
         if (query.isEmpty()) {
-            restoreOriginalState()
+            showHistory()
             return
         }
 
@@ -173,19 +197,46 @@ class SearchActivity : AppCompatActivity() {
         })
     }
 
+
+
     private fun restoreOriginalState() {
         adapter.updateTracks(emptyList())
         recycler.visibility = View.GONE
         emptyStateContainer.visibility = View.VISIBLE
         emptyStateContainer.visibility = View.GONE
-        errorStateContainer.visibility = View.VISIBLE
         errorStateContainer.visibility = View.GONE
+        clearHistoryButton.visibility = View.GONE
+        historyTitle.visibility = View.GONE
     }
+
 
     private fun clearSearchInput() {
         inputEditText.setText("")
         hideKeyboard()
+        showHistory()
+    }
+
+    private fun clearHistory() {
+        searchHistory.clearHistory()
         restoreOriginalState()
+    }
+
+    private fun showHistory() {
+        val history = searchHistory.getHistory()
+        adapter.updateTracks(history)
+        if (history.isNotEmpty()) {
+            recycler.visibility = View.VISIBLE
+            emptyStateContainer.visibility = View.GONE
+            errorStateContainer.visibility = View.GONE
+            clearHistoryButton.visibility = View.VISIBLE
+            historyTitle.visibility = View.VISIBLE
+        } else {
+            recycler.visibility = View.GONE
+            emptyStateContainer.visibility = View.GONE
+            errorStateContainer.visibility = View.GONE
+            clearHistoryButton.visibility = View.GONE
+            historyTitle.visibility = View.GONE
+        }
     }
 
     private fun hideKeyboard() {

@@ -13,6 +13,7 @@ class TrackAdapter(
     private val onTrackClick: (Track) -> Unit = {}
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
+
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val trackNameView: TextView = itemView.findViewById(R.id.trackName)
         private val artistNameView: TextView = itemView.findViewById(R.id.artistName)

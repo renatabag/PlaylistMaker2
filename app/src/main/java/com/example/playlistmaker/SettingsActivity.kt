@@ -18,7 +18,20 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings)
 
-        val switchMaterial: SwitchMaterial = findViewById(R.id.mySwitch)
+
+        val switchMaterial: SwitchMaterial = findViewById(R.id.themeSwitcher)
+
+        switchMaterial.isChecked = (applicationContext as App).darkTheme
+
+        switchMaterial.setOnCheckedChangeListener { switcher, checked ->
+            (applicationContext as App).switchTheme(checked)
+        }
+
+        switchMaterial.isChecked = (applicationContext as App).darkTheme
+
+        switchMaterial.setOnCheckedChangeListener { switcher, checked ->
+            (applicationContext as App).switchTheme(checked)
+        }
 
         val states = arrayOf(
             intArrayOf(android.R.attr.state_checked),
@@ -35,7 +48,7 @@ class SettingsActivity : AppCompatActivity() {
         )
 
         val thumbColorStateList = ColorStateList(states, colors)
-        val trackColorStateList = ColorStateList(states,colorsTrack)
+        val trackColorStateList = ColorStateList(states, colorsTrack)
         switchMaterial.thumbTintList = thumbColorStateList
         switchMaterial.trackTintList = trackColorStateList
 
