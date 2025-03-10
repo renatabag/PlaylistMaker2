@@ -22,7 +22,7 @@
         android:padding="@dimen/activity_search_padding"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent">
+        android:background="@color/background" >
 
         <EditText
             android:id="@+id/inputEditText"
@@ -70,12 +70,18 @@
         android:padding="@dimen/activity_search_padding"
         android:background="@color/background" />
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@color/background">
+
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/tracksList"
@@ -101,6 +107,7 @@
             android:textAllCaps="false"
             />
     </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
         android:id="@+id/emptyStateContainer"
