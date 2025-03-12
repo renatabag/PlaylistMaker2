@@ -15,18 +15,13 @@ class TrackAdapter(
 
 
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val trackNameView: TextView = itemView.findViewById(R.id.trackName)
-        private val artistNameView: TextView = itemView.findViewById(R.id.artistName)
-        private val trackTimeView: TextView = itemView.findViewById(R.id.trackTime)
+        private val trackNameView: TextView = itemView.findViewById(R.id.track_name)
+        private val artistNameView: TextView = itemView.findViewById(R.id.artist_name)
+        private val trackTimeView: TextView = itemView.findViewById(R.id.track_time)
         private val artworkUrl100View: ImageView = itemView.findViewById(R.id.item_image)
-        private val collectionName: TextView=itemView.findViewById(R.id.album_label_text)
-        private val releaseDate: TextView = itemView.findViewById(R.id.year_label_text)
-        private val primaryGenreName:TextView = itemView.findViewById(R.id.genre_label_text)
-        private val country:TextView = itemView.findViewById(R.id.country_label_text)
-
         fun bind(model: Track) {
-            trackNameView.text = model.trackName ?: "Unknown Track"
-            artistNameView.text = model.artistName ?: "Unknown Artist"
+            trackNameView.text = model.trackName
+            artistNameView.text = model.artistName
             trackTimeView.text = model.trackTime
 
             Glide.with(itemView.context)
