@@ -1,11 +1,18 @@
 package com.example.playlistmaker
 
+import java.sql.Date
+import java.time.Year
+
 data class Track(
     val trackId: Int,
     val trackName: String?,
     val artistName: String?,
     val trackTimeMillis: Long?,
-    val artworkUrl100: String?
+    val artworkUrl100: String?,
+    val collectionName: String?,
+    val releaseDate:Year?,
+    val primaryGenreName:String?,
+    val country: String?
 ) {
     val trackTime: String
         get() = formatTrackTime(trackTimeMillis ?: 0)

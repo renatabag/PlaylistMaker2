@@ -32,5 +32,7 @@
     <string name="text_enthernet">Загрузка не удалась. Проверьте подключение к интернету</string>
 
     <string name="text_retry">Обновить</string>
+    <string name="text_time">0:30</string>
+    <string name="text_track">Yesterday (Remastered 2009)</string>
 
 </resources>

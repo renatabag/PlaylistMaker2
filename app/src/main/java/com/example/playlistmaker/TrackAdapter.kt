@@ -19,6 +19,10 @@ class TrackAdapter(
         private val artistNameView: TextView = itemView.findViewById(R.id.artistName)
         private val trackTimeView: TextView = itemView.findViewById(R.id.trackTime)
         private val artworkUrl100View: ImageView = itemView.findViewById(R.id.item_image)
+        private val collectionName: TextView=itemView.findViewById(R.id.album_label_text)
+        private val releaseDate: TextView = itemView.findViewById(R.id.year_label_text)
+        private val primaryGenreName:TextView = itemView.findViewById(R.id.genre_label_text)
+        private val country:TextView = itemView.findViewById(R.id.country_label_text)
 
         fun bind(model: Track) {
             trackNameView.text = model.trackName ?: "Unknown Track"
@@ -27,7 +31,7 @@ class TrackAdapter(
 
             Glide.with(itemView.context)
                 .load(model.artworkUrl100)
-                .placeholder(R.drawable.placeholder)
+                .placeholder(R.drawable.placeholder_track)
                 .error(R.drawable.error)
                 .centerCrop()
                 .into(artworkUrl100View)

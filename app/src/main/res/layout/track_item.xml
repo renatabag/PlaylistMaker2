@@ -14,7 +14,7 @@
         android:layout_width="@dimen/image_size"
         android:layout_height="@dimen/image_size"
         android:scaleType="centerCrop"
-        android:src="@drawable/placeholder"
+        android:src="@drawable/placeholder_track"
         android:background="@android:color/transparent"
         android:transformPivotX="@dimen/very_small_padding"
         android:transformPivotY="@dimen/very_small_padding"
