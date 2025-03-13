@@ -60,7 +60,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
-            android:id="@+id/track_time"
+            android:id="@+id/track_time_now"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/four_dp"
@@ -118,7 +118,7 @@
 
         <TextView
             android:id="@+id/track_name"
-            android:layout_width="@dimen/zero"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/track_player_main_size"
             android:layout_marginTop="@dimen/track_player_main_size"
@@ -127,6 +127,7 @@
             android:text="@string/text_track"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textSize="@dimen/main_text_size"
+            android:maxLines="1"
             android:textColor="@color/dark_white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -144,6 +145,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textSize="@dimen/text_retry"
             android:textColor="@color/dark_white"
+            android:maxLines="1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/track_name" />
@@ -157,37 +159,40 @@
             android:layout_marginRight="@dimen/margine_track"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/track_time">
+            app:layout_constraintTop_toBottomOf="@id/track_time_now">
 
             <TextView
                 android:id="@+id/duration_label"
                 android:layout_width="@dimen/zero"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/ys_display_medium"
-                android:text="@string/text_track"
+                android:text="@string/time"
                 android:textSize="@dimen/text_descriprion"
+                android:maxLines="1"
                 android:textColor="@color/grey"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/duration_label_text"
-                android:layout_width="@dimen/zero"
+                android:id="@+id/track_time"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/ys_display_medium"
                 android:text="@string/text_time"
+                android:maxLines="1"
                 android:textSize="@dimen/text_descriprion"
                 android:textColor="@color/track_text_color"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="DuplicateIds" />
 
             <TextView
                 android:id="@+id/album_label"
-                android:layout_width="@dimen/zero"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margine_descriprion"
                 android:fontFamily="@font/ys_display_medium"
-                android:text="@string/text_track"
+                android:text="@string/album"
                 android:textColor="@color/grey"
                 android:textSize="@dimen/text_descriprion"
                 app:layout_constraintStart_toStartOf="parent"
@@ -200,6 +205,7 @@
                 android:fontFamily="@font/ys_display_medium"
                 android:text="@string/text_track"
                 android:textSize="@dimen/text_descriprion"
+                android:maxLines="1"
                 android:textColor="@color/track_text_color"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/duration_label"
@@ -211,8 +217,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margine_descriprion"
                 android:fontFamily="@font/ys_display_medium"
-                android:text="@string/text_track"
+                android:text="@string/year"
                 android:textSize="@dimen/text_descriprion"
+                android:maxLines="1"
                 android:textColor="@color/grey"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -221,6 +228,7 @@
             <TextView
                 android:id="@+id/year_label_text"
                 android:layout_width="@dimen/zero"
+                android:maxLines="1"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/ys_display_medium"
                 android:text="@string/text_track"
@@ -237,8 +245,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margine_descriprion"
                 android:fontFamily="@font/ys_display_medium"
-                android:text="@string/text_track"
+                android:text="@string/genre"
                 android:textSize="@dimen/text_descriprion"
+                android:maxLines="1"
                 android:textColor="@color/grey"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -251,6 +260,7 @@
                 android:fontFamily="@font/ys_display_medium"
                 android:text="@string/text_track"
                 android:textSize="@dimen/text_descriprion"
+                android:maxLines="1"
                 android:textColor="@color/track_text_color"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/duration_label"
@@ -262,8 +272,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margine_descriprion"
                 android:fontFamily="@font/ys_display_medium"
-                android:text="@string/text_track"
+                android:text="@string/country"
                 android:textSize="@dimen/text_descriprion"
+                android:maxLines="1"
                 android:textColor="@color/grey"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -277,6 +288,7 @@
                 android:fontFamily="@font/ys_display_medium"
                 android:text="@string/text_track"
                 android:textSize="@dimen/text_descriprion"
+                android:maxLines="1"
                 android:textColor="@color/track_text_color"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/duration_label"

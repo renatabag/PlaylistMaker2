@@ -1,6 +1,6 @@
 package com.example.playlistmaker
 
-import SearchHistory
+import TrackAdapter
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -18,6 +18,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,9 +34,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var recycler: RecyclerView
     private lateinit var emptyStateContainer: LinearLayout
     private lateinit var errorStateContainer: LinearLayout
-    private lateinit var emptyImageView: ImageView
     private lateinit var placeholderMessage: TextView
-    private lateinit var errorImageView: ImageView
     private lateinit var connectionErrorMessage: TextView
     private lateinit var adapter: TrackAdapter
     private var searchText: String = ""
@@ -48,8 +47,9 @@ class SearchActivity : AppCompatActivity() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (isNetworkAvailable()) {
                 connectionErrorMessage.text = "Интернет доступен"
+                performSearch()
             } else {
-                showErrorState("Проблемы со связью")
+                showErrorState("Проблемы со связью", "Проверьте подключение к интернету")
             }
         }
     }
@@ -62,6 +62,10 @@ class SearchActivity : AppCompatActivity() {
         searchHistory = SearchHistory(this)
 
         adapter = TrackAdapter(emptyList()) { track ->
+            val intent = Intent(this, Track_player::class.java).apply {
+                putExtra("TRACK", track)
+            }
+            startActivity(intent)
             searchHistory.addTrack(track)
         }
 
@@ -78,15 +82,13 @@ class SearchActivity : AppCompatActivity() {
         recycler = findViewById(R.id.tracksList)
         emptyStateContainer = findViewById(R.id.emptyStateContainer)
         errorStateContainer = findViewById(R.id.errorStateContainer)
-        emptyImageView = findViewById(R.id.emptyImageView)
         placeholderMessage = findViewById(R.id.placeholderMessage)
-        errorImageView = findViewById(R.id.errorImageView)
         connectionErrorMessage = findViewById(R.id.connectionErrorMessage)
-
         val retryButton = findViewById<Button>(R.id.retryButton)
         retryButton.setOnClickListener {
             performSearch()
         }
+
 
         recycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recycler.adapter = adapter
@@ -98,6 +100,14 @@ class SearchActivity : AppCompatActivity() {
             finish()
         }
 
+        clearIcon.setOnClickListener {
+            clearSearchInput()
+        }
+
+        if (inputEditText.text.isNullOrEmpty()) {
+            showHistory()
+        }
+
         if (savedInstanceState != null) {
             searchText = savedInstanceState.getString(SEARCH_TEXT, "")
             inputEditText.setText(searchText)
@@ -106,18 +116,15 @@ class SearchActivity : AppCompatActivity() {
         inputEditText.doAfterTextChanged { text ->
             searchText = text?.toString() ?: ""
             if (text.isNullOrEmpty()) {
-                showHistory()
-                clearIcon.visibility = View.GONE
+                inputEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    ContextCompat.getDrawable(this, R.drawable.baseline_search_24), null, null, null
+                )
             } else {
-                performSearch()
-                clearIcon.visibility = View.VISIBLE
-                clearHistoryButton.visibility = View.GONE
-                historyTitle.visibility = View.GONE
+                inputEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    ContextCompat.getDrawable(this, R.drawable.baseline_search_24), null,
+                    ContextCompat.getDrawable(this, R.drawable.baseline_clear_24), null
+                )
             }
-        }
-
-        clearIcon.setOnClickListener {
-            clearSearchInput()
         }
 
         inputEditText.setOnTouchListener { _, event ->
@@ -141,14 +148,11 @@ class SearchActivity : AppCompatActivity() {
         }
 
         if (!isNetworkAvailable()) {
-            showErrorState("Проблемы со связью")
+            showErrorState("Нет подключения к интернету", "Проверьте подключение к интернету")
         } else {
             showContent()
         }
 
-        if (inputEditText.text.isNullOrEmpty()) {
-            showHistory()
-        }
     }
 
     override fun onResume() {
@@ -161,70 +165,10 @@ class SearchActivity : AppCompatActivity() {
         unregisterReceiver(networkChangeReceiver)
     }
 
-    private fun performSearch() {
-        if (!isNetworkAvailable()) {
-            showErrorState("Проблемы со связью")
-            return
-        }
-
-        val query = searchText.trim().lowercase(Locale.getDefault())
-
-        if (query.isEmpty()) {
-            showHistory()
-            return
-        }
-
-        RetrofitClient.itunesApi.search(query).enqueue(object : Callback<TrackResponse> {
-            override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
-                if (response.isSuccessful) {
-                    val tracks = response.body()?.results ?: emptyList()
-                    adapter.updateTracks(tracks)
-
-                    if (tracks.isEmpty()) {
-                        showEmptyState()
-                    } else {
-                        showContent()
-                    }
-                } else {
-                    showErrorState("Ошибка при загрузке данных: ${response.code()} ${response.message()}")
-                }
-            }
-
-            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                showErrorState("Ошибка сети: ${t.message}")
-                t.printStackTrace()
-            }
-        })
-    }
-
-
-
-    private fun restoreOriginalState() {
-        adapter.updateTracks(emptyList())
-        recycler.visibility = View.GONE
-        emptyStateContainer.visibility = View.VISIBLE
-        emptyStateContainer.visibility = View.GONE
-        errorStateContainer.visibility = View.GONE
-        clearHistoryButton.visibility = View.GONE
-        historyTitle.visibility = View.GONE
-    }
-
-
-    private fun clearSearchInput() {
-        inputEditText.setText("")
-        hideKeyboard()
-        showHistory()
-    }
-
-    private fun clearHistory() {
-        searchHistory.clearHistory()
-        restoreOriginalState()
-    }
-
     private fun showHistory() {
         val history = searchHistory.getHistory()
-        adapter.updateTracks(history)
         if (history.isNotEmpty()) {
+            adapter.updateTracks(history)
             recycler.visibility = View.VISIBLE
             emptyStateContainer.visibility = View.GONE
             errorStateContainer.visibility = View.GONE
@@ -239,9 +183,58 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    private fun restoreOriginalState() {
+        adapter.updateTracks(emptyList())
+        recycler.visibility = View.GONE
+        emptyStateContainer.visibility = View.VISIBLE
+        errorStateContainer.visibility = View.GONE
+    }
+
+    private fun clearSearchInput() {
+        inputEditText.setText("")
+        hideKeyboard()
+        showHistory()
+    }
+
     private fun hideKeyboard() {
         val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(inputEditText.windowToken, 0)
+    }
+
+    private fun performSearch() {
+        if (!isNetworkAvailable()) {
+            showErrorState("Проблемы со связью", "Проверьте подключение к интернету")
+            return
+        }
+        val query = searchText.trim().lowercase(Locale.getDefault())
+
+        if (query.isEmpty()) {
+            showHistory()
+            return
+        }
+
+        RetrofitClient.itunesApi.search(query).enqueue(object : Callback<TrackResponse> {
+            override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
+                if (response.isSuccessful) {
+                    val tracks = response.body()?.results ?: emptyList()
+                    adapter.updateTracks(tracks)
+                    if (tracks.isEmpty()) {
+                        showEmptyState()
+                    } else {
+                        showContent()
+                    }
+                } else {
+                    showErrorState("Ошибка при загрузке данных", "Код: ${response.code()}, Сообщение: ${response.message()}")
+                }
+            }
+
+            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                showErrorState("Ошибка сети", t.message ?: "Неизвестная ошибка")
+                t.printStackTrace()
+            }
+
+
+        })
     }
 
     private fun showContent() {
@@ -250,17 +243,20 @@ class SearchActivity : AppCompatActivity() {
         errorStateContainer.visibility = View.GONE
     }
 
+
     private fun showEmptyState() {
         recycler.visibility = View.GONE
         emptyStateContainer.visibility = View.VISIBLE
         errorStateContainer.visibility = View.GONE
+        clearHistoryButton.visibility = View.GONE
+        historyTitle.visibility = View.GONE
     }
 
-    private fun showErrorState(message: String) {
+    private fun showErrorState(title: String, message: String) {
         recycler.visibility = View.GONE
         emptyStateContainer.visibility = View.GONE
         errorStateContainer.visibility = View.VISIBLE
-        connectionErrorMessage.text = message
+        connectionErrorMessage.text = "$title\n$message"
     }
 
     private fun isNetworkAvailable(): Boolean {
@@ -272,6 +268,11 @@ class SearchActivity : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString(SEARCH_TEXT, searchText)
+    }
+
+    private fun clearHistory() {
+        searchHistory.clearHistory()
+        showHistory()
     }
 
     companion object {

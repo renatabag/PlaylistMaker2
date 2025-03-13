@@ -1,24 +1,27 @@
 package com.example.playlistmaker
 
+import Track
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 
 class Track_player : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.track_player)
+
+        val track = intent.getParcelableExtra<Track>("TRACK")
+        if (track != null) {
+            displayTrackDetails(track)
+        }
 
         val backButton = findViewById<ImageButton>(R.id.menu_button)
         backButton.setOnClickListener {
             finish()
         }
-
     }
 
     private fun displayTrackDetails(track: Track) {
@@ -33,9 +36,9 @@ class Track_player : AppCompatActivity() {
 
         trackNameView.text = track.trackName
         artistNameView.text = track.artistName
-        trackTimeView.text = track.trackTime
+        trackTimeView.text = Track.formatTrackTime(track.trackTimeMillis ?: 0)
         collectionNameView.text = track.collectionName
-        releaseDateView.text = track.releaseDate?.toString()
+        releaseDateView.text = track.getReleaseYear() // Используем метод getReleaseYear()
         genreView.text = track.primaryGenreName
         countryView.text = track.country
 

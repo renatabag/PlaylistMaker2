@@ -45,7 +45,7 @@
             android:name=".MediaLibraryActivity"
             android:exported="true"/>
         <activity
-            android:theme="@style/Base.Theme.PlaylistMaker"
+            android:theme="@style/Base.Theme.PlaylistMakerr"
             android:name=".SearchActivity"
             android:exported="true"/>
         <meta-data

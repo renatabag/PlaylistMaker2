@@ -26,4 +26,6 @@ class App : Application() {
         val sharedPreferences = getSharedPreferences("app_settings", MODE_PRIVATE)
         sharedPreferences.edit().putBoolean("dark_theme", darkThemeEnabled).apply()
     }
+
+
 }
