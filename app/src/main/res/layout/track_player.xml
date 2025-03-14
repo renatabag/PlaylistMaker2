@@ -209,7 +209,9 @@
                 android:textColor="@color/track_text_color"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/duration_label"
-                app:layout_constraintBaseline_toBaselineOf="@+id/album_label"/>
+                app:layout_constraintBaseline_toBaselineOf="@+id/album_label"
+                app:layout_constraintStart_toEndOf="@id/album_label"
+                android:gravity="right"/>
 
             <TextView
                 android:id="@+id/year_label"
