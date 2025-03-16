@@ -6,6 +6,7 @@
     <dimen name="text_retry">14sp</dimen>
     <dimen name="text_descriprion">13sp</dimen>
     <dimen name="margine_descriprion">17dp</dimen>
+    <dimen name="album_size">200dp</dimen>
     <dimen name="small_track_text_size">16sp</dimen>
     <dimen name="padding_vertical">21dp</dimen>
     <dimen name="padding_vertical_settings">10dp</dimen>

@@ -54,10 +54,20 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility", "WrongViewCast")
+    @SuppressLint("ClickableViewAccessibility", "WrongViewCast", "SoonBlockedPrivateApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_searcch)
+
+        inputEditText = findViewById(R.id.inputEditText)
+
+        try {
+            val field = TextView::class.java.getDeclaredField("mCursorDrawableRes")
+            field.isAccessible = true
+            field.set(inputEditText, R.drawable.cursor_blue) // Используем drawable-ресурс
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
         searchHistory = SearchHistory(this)
 
@@ -88,6 +98,7 @@ class SearchActivity : AppCompatActivity() {
         retryButton.setOnClickListener {
             performSearch()
         }
+
 
 
         recycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
@@ -154,6 +165,8 @@ class SearchActivity : AppCompatActivity() {
         }
 
     }
+
+
 
     override fun onResume() {
         super.onResume()
