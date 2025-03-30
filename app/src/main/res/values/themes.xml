@@ -17,6 +17,7 @@
     <dimen name="zero">0dp</dimen>
     <dimen name="radius">8dp</dimen>
     <dimen name="error_size">120dp</dimen>
+    <dimen name="circular_top">140dp</dimen>
     <dimen name="margine_top_track">5dp</dimen>
     <dimen name="margine_top_error">102dp</dimen>
     <color name="rectangle_color">#E6E8EB</color>
@@ -39,6 +40,7 @@
     <dimen name="margine_track">16dp</dimen>
     <dimen name="small_text_track">11sp</dimen>
     <dimen name="four_dp">4dp</dimen>
+    <dimen name="circular_size">44dp</dimen>
     <color name="dark_white">#1A1B22</color>
     <color name="blue_switch">#3772E7</color>
     <color name="grey_switch">#AEAFB4</color>

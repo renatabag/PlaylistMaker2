@@ -22,7 +22,7 @@
         android:padding="@dimen/activity_search_padding"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/background" >
+        android:background="@color/background">
 
         <EditText
             android:id="@+id/inputEditText"
@@ -70,122 +70,134 @@
         android:padding="@dimen/activity_search_padding"
         android:background="@color/background" />
 
-    <ScrollView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="match_parent">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progressBar"
+            android:layout_width="@dimen/circular_size"
+            android:layout_height="@dimen/circular_size"
+            android:indeterminate="true"
+            android:visibility="gone"
+            android:layout_marginTop="@dimen/circular_top"
+            android:layout_gravity="center_horizontal|top"
+            app:indicatorColor="@color/blue"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/background">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/tracksList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:backgroundTint="@color/background"
+                    android:visibility="visible" />
+
+                <Button
+                    android:id="@+id/clearHistoryButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/clean_history"
+                    android:visibility="gone"
+                    android:layout_marginTop="@dimen/button_size"
+                    android:layout_gravity="center_horizontal"
+                    android:background="@drawable/radius"
+                    android:textColor="@color/background"
+                    android:textSize="@dimen/text_retry"
+                    app:backgroundTint="@color/dark_white"
+                    android:fontFamily="@font/ys_display_medium"
+                    android:textAllCaps="false"/>
+            </LinearLayout>
+        </ScrollView>
 
         <LinearLayout
+            android:id="@+id/emptyStateContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:background="@color/background"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/emptyImageView"
+                android:layout_width="@dimen/error_size"
+                android:layout_height="@dimen/error_size"
+                android:src="@drawable/empty"
+                android:visibility="visible"
+                android:layout_marginTop="@dimen/margine_top_error"
+                android:background="@color/background"/>
+
+            <TextView
+                android:id="@+id/placeholderMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_error"
+                android:textStyle="bold"
+                android:fontFamily="@font/ys_display_medium"
+                android:textColor="@color/dark_white"
+                android:text="@string/text_empty"
+                android:layout_marginTop="@dimen/activity_search_padding"
+                android:visibility="visible"
+                android:background="@color/background" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/errorStateContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@color/background">
+            android:gravity="center_horizontal"
+            android:background="@color/background"
+            android:layout_marginLeft="@dimen/button_size"
+            android:layout_marginRight="@dimen/button_size"
+            android:visibility="gone">
 
+            <ImageView
+                android:id="@+id/errorImageView"
+                android:layout_width="@dimen/error_size"
+                android:layout_height="@dimen/error_size"
+                android:src="@drawable/error"
+                android:visibility="visible"
+                android:layout_marginTop="@dimen/margine_top_error"
+                android:background="@color/background"/>
 
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/tracksList"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:backgroundTint="@color/background"
-                android:visibility="visible" />
-
-            <Button
-                android:id="@+id/clearHistoryButton"
+            <TextView
+                android:id="@+id/connectionErrorMessage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/clean_history"
-                android:visibility="gone"
+                android:textSize="@dimen/text_error"
+                android:textStyle="bold"
+                android:fontFamily="@font/ys_display_medium"
+                android:textColor="@color/dark_white"
+                android:text="@string/text_error"
+                android:layout_marginTop="@dimen/button_corner_radius"
+                android:gravity="center_horizontal"
+                android:visibility="visible"
+                android:background="@color/background" />
+
+            <Button
+                android:id="@+id/retryButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginTop="@dimen/button_size"
-                android:layout_gravity="center_horizontal"
+                android:text="@string/text_retry"
                 android:background="@drawable/radius"
                 android:textColor="@color/background"
                 android:textSize="@dimen/text_retry"
                 app:backgroundTint="@color/dark_white"
                 android:fontFamily="@font/ys_display_medium"
-                android:textAllCaps="false"
-                />
+                android:textAllCaps="false"/>
         </LinearLayout>
-    </ScrollView>
-
-    <LinearLayout
-        android:id="@+id/emptyStateContainer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:background="@color/background"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/emptyImageView"
-            android:layout_width="@dimen/error_size"
-            android:layout_height="@dimen/error_size"
-            android:src="@drawable/empty"
-            android:visibility="visible"
-            android:layout_marginTop="@dimen/margine_top_error"
-            android:background="@color/background"/>
-
-        <TextView
-            android:id="@+id/placeholderMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/text_error"
-            android:textStyle="bold"
-            android:fontFamily="@font/ys_display_medium"
-            android:textColor="@color/dark_white"
-            android:text="@string/text_empty"
-            android:layout_marginTop="@dimen/activity_search_padding"
-            android:visibility="visible"
-            android:background="@color/background" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/errorStateContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:background="@color/background"
-        android:layout_marginLeft="@dimen/button_size"
-        android:layout_marginRight="@dimen/button_size"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/errorImageView"
-            android:layout_width="@dimen/error_size"
-            android:layout_height="@dimen/error_size"
-            android:src="@drawable/error"
-            android:visibility="visible"
-            android:layout_marginTop="@dimen/margine_top_error"
-            android:background="@color/background"/>
-
-        <TextView
-            android:id="@+id/connectionErrorMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/text_error"
-            android:textStyle="bold"
-            android:fontFamily="@font/ys_display_medium"
-            android:textColor="@color/dark_white"
-            android:text="@string/text_error"
-            android:layout_marginTop="@dimen/button_corner_radius"
-            android:gravity="center_horizontal"
-            android:visibility="visible"
-            android:background="@color/background" />
-
-        <Button
-            android:id="@+id/retryButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginTop="@dimen/button_size"
-            android:text="@string/text_retry"
-            android:background="@drawable/radius"
-            android:textColor="@color/background"
-            android:textSize="@dimen/text_retry"
-            app:backgroundTint="@color/dark_white"
-            android:fontFamily="@font/ys_display_medium"
-            android:textAllCaps="false"/>
-    </LinearLayout>
+    </FrameLayout>
 </LinearLayout>

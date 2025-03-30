@@ -8,6 +8,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
@@ -23,6 +25,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -42,6 +45,11 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var clearHistoryButton: Button
     private lateinit var historyTitle: TextView
     private lateinit var clearIcon: ImageView
+
+    private lateinit var progressBar: CircularProgressIndicator
+    private val handler = Handler(Looper.getMainLooper())
+    private var searchRunnable: Runnable? = null
+    private val debounceDelay = 2000L
 
     private val networkChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -64,7 +72,7 @@ class SearchActivity : AppCompatActivity() {
         try {
             val field = TextView::class.java.getDeclaredField("mCursorDrawableRes")
             field.isAccessible = true
-            field.set(inputEditText, R.drawable.cursor_blue) // Используем drawable-ресурс
+            field.set(inputEditText, R.drawable.cursor_blue)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -87,6 +95,7 @@ class SearchActivity : AppCompatActivity() {
         historyTitle = findViewById(R.id.historyTitle)
         clearIcon = findViewById(R.id.clearIcon)
 
+        progressBar = findViewById(R.id.progressBar)
         val backButton = findViewById<MaterialButton>(R.id.button_back)
         inputEditText = findViewById(R.id.inputEditText)
         recycler = findViewById(R.id.tracksList)
@@ -98,8 +107,6 @@ class SearchActivity : AppCompatActivity() {
         retryButton.setOnClickListener {
             performSearch()
         }
-
-
 
         recycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recycler.adapter = adapter
@@ -130,11 +137,17 @@ class SearchActivity : AppCompatActivity() {
                 inputEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(
                     ContextCompat.getDrawable(this, R.drawable.baseline_search_24), null, null, null
                 )
+                showHistory()
             } else {
                 inputEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(
                     ContextCompat.getDrawable(this, R.drawable.baseline_search_24), null,
                     ContextCompat.getDrawable(this, R.drawable.baseline_clear_24), null
                 )
+                searchRunnable?.let { handler.removeCallbacks(it) }
+                searchRunnable = Runnable {
+                    performSearch()
+                }
+                handler.postDelayed(searchRunnable!!, debounceDelay)
             }
         }
 
@@ -150,6 +163,7 @@ class SearchActivity : AppCompatActivity() {
 
         inputEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
+                searchRunnable?.let { handler.removeCallbacks(it) }
                 performSearch()
                 hideKeyboard()
                 true
@@ -163,10 +177,7 @@ class SearchActivity : AppCompatActivity() {
         } else {
             showContent()
         }
-
     }
-
-
 
     override fun onResume() {
         super.onResume()
@@ -175,7 +186,13 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        searchRunnable?.let { handler.removeCallbacks(it) }
         unregisterReceiver(networkChangeReceiver)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        searchRunnable?.let { handler.removeCallbacks(it) }
     }
 
     private fun showHistory() {
@@ -196,12 +213,6 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun restoreOriginalState() {
-        adapter.updateTracks(emptyList())
-        recycler.visibility = View.GONE
-        emptyStateContainer.visibility = View.VISIBLE
-        errorStateContainer.visibility = View.GONE
-    }
 
     private fun clearSearchInput() {
         inputEditText.setText("")
@@ -226,8 +237,11 @@ class SearchActivity : AppCompatActivity() {
             return
         }
 
+        showLoading()
+
         RetrofitClient.itunesApi.search(query).enqueue(object : Callback<TrackResponse> {
             override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
+                hideLoading()
                 if (response.isSuccessful) {
                     val tracks = response.body()?.results ?: emptyList()
                     adapter.updateTracks(tracks)
@@ -245,9 +259,22 @@ class SearchActivity : AppCompatActivity() {
                 showErrorState("Ошибка сети", t.message ?: "Неизвестная ошибка")
                 t.printStackTrace()
             }
-
-
         })
+    }
+
+    private fun showLoading() {
+        progressBar.visibility = View.VISIBLE
+        recycler.visibility = View.GONE
+        emptyStateContainer.visibility = View.GONE
+        errorStateContainer.visibility = View.GONE
+        clearHistoryButton.visibility = View.GONE
+        historyTitle.visibility = View.GONE
+
+        progressBar.bringToFront()
+    }
+
+    private fun hideLoading() {
+        progressBar.visibility = View.GONE
     }
 
     private fun showContent() {
@@ -255,7 +282,6 @@ class SearchActivity : AppCompatActivity() {
         emptyStateContainer.visibility = View.GONE
         errorStateContainer.visibility = View.GONE
     }
-
 
     private fun showEmptyState() {
         recycler.visibility = View.GONE
