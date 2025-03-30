@@ -24,7 +24,7 @@
             />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/mySwitch"
+        android:id="@+id/themeSwitcher"
         style="@style/primary_settings_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,6 +37,7 @@
         android:paddingLeft="@dimen/button_corner_radius"
         android:text="@string/dark_theme_button_text"
         app:icon="@drawable/baseline_toggle_off_24" />
+
 
     <Button
 
