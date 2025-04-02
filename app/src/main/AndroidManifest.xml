@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <queries>
         <intent>
@@ -9,7 +10,11 @@
         </intent>
     </queries>
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -19,6 +24,7 @@
         android:supportsRtl="true"
         tools:targetApi="31"
         >
+
         <activity
             android:theme="@style/Base.Theme.PlaylistMaker"
             android:name=".MainActivity"
@@ -32,16 +38,23 @@
         <activity
             android:theme="@style/Base.Theme.PlaylistMakerr"
             android:name=".SettingsActivity"
-            android:exported="false"
+            android:exported="true"
             />
         <activity
             android:theme="@style/Base.Theme.PlaylistMakerr"
             android:name=".MediaLibraryActivity"
-            android:exported="false"/>
+            android:exported="true"/>
         <activity
-            android:theme="@style/Base.Theme.PlaylistMaker"
+            android:theme="@style/Base.Theme.PlaylistMakerr"
             android:name=".SearchActivity"
-            android:exported="false"/>
+            android:exported="true"/>
+        <meta-data
+            android:name="android.app.lib_name"
+            android:value=""/>
+        <activity
+            android:theme="@style/Base.Theme.PlaylistMakerr"
+            android:name=".Track_player"
+            android:exported="true" />
     </application>
 
 </manifest>
