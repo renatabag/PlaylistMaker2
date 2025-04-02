@@ -10,6 +10,11 @@
     <dimen name="activity_search_padding">16dp</dimen>
     <dimen name="zero">0dp</dimen>
     <dimen name="radius">8dp</dimen>
+<<<<<<< HEAD
+=======
+    <dimen name="error_size">120dp</dimen>
+    <dimen name="circular_top">140dp</dimen>
+>>>>>>> d7cd583 (Commit 1)
     <dimen name="margine_top_track">5dp</dimen>
     <color name="rectangle_color">#E6E8EB</color>
     <color name="rectangle_text_color">#AEAFB4</color>
@@ -23,6 +28,11 @@
     <dimen name="very_small_padding">2dp</dimen>
     <dimen name="small_text_track">11sp</dimen>
     <dimen name="four_dp">4dp</dimen>
+<<<<<<< HEAD
+=======
+    <dimen name="circular_size">44dp</dimen>
+    <color name="dark_white">#1A1B22</color>
+>>>>>>> d7cd583 (Commit 1)
     <color name="blue_switch">#3772E7</color>
     <color name="grey_switch">#AEAFB4</color>
     <color name="blue_switch_light">#9FBBF3</color>
