@@ -27,7 +27,7 @@
 
         <activity
             android:theme="@style/Base.Theme.PlaylistMaker"
-            android:name=".presentation.activity.MainActivity"
+            android:name=".presentation.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,23 +37,23 @@
         </activity>
         <activity
             android:theme="@style/Base.Theme.PlaylistMakerr"
-            android:name=".presentation.activity.SettingsActivity"
+            android:name=".presentation.SettingsActivity"
             android:exported="true"
             />
         <activity
             android:theme="@style/Base.Theme.PlaylistMakerr"
-            android:name=".presentation.activity.MediaLibraryActivity"
+            android:name=".presentation.MediaLibraryActivity"
             android:exported="true"/>
         <activity
             android:theme="@style/Base.Theme.PlaylistMakerr"
-            android:name=".presentation.activity.SearchActivity"
+            android:name=".presentation.SearchActivity"
             android:exported="true"/>
         <meta-data
             android:name="android.app.lib_name"
             android:value=""/>
         <activity
             android:theme="@style/Base.Theme.PlaylistMakerr"
-            android:name=".presentation.Track_player"
+            android:name=".presentation.TrackPlayer"
             android:exported="true" />
     </application>
 

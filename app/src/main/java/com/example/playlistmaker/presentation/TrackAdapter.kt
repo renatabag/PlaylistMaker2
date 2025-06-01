@@ -6,7 +6,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
-import com.example.playlistmaker.data.Track
+import com.example.playlistmaker.domain.Track
+import com.example.playlistmaker.domain.TrackUtils
+
 
 class TrackAdapter(
     private var tracks: List<Track>,
@@ -22,9 +24,9 @@ class TrackAdapter(
         fun bind(model: Track) {
             trackNameView.text = model.trackName
             artistNameView.text = model.artistName
-            trackTimeView.text = Track.formatTrackTime(model.trackTimeMillis ?: 0)
+            trackTimeView.text = TrackUtils.formatTrackTime(model.trackTimeMillis)
             Glide.with(itemView.context)
-                .load(model.artworkUrl100)
+                .load(model.artworkUrl)
                 .placeholder(R.drawable.placeholder_track)
                 .error(R.drawable.error)
                 .centerCrop()

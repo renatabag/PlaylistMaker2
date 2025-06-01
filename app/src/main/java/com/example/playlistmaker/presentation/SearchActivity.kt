@@ -1,4 +1,4 @@
-package com.example.playlistmaker.presentation.activity
+package com.example.playlistmaker.presentation
 
 import TrackAdapter
 import android.annotation.SuppressLint
@@ -25,10 +25,10 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
-import com.example.playlistmaker.data.api.RetrofitClient
-import com.example.playlistmaker.domain.SearchHistory
-import com.example.playlistmaker.data.dto.TrackResponseDto
-import com.example.playlistmaker.presentation.Track_player
+import com.example.playlistmaker.data.RetrofitClient
+import com.example.playlistmaker.data.SearchHistory
+import com.example.playlistmaker.data.TrackMapper
+import com.example.playlistmaker.data.TrackResponseDto
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import retrofit2.Call
@@ -37,7 +37,6 @@ import retrofit2.Response
 import java.util.Locale
 
 class SearchActivity : AppCompatActivity() {
-
     private lateinit var inputEditText: EditText
     private lateinit var recycler: RecyclerView
     private lateinit var emptyStateContainer: LinearLayout
@@ -55,6 +54,7 @@ class SearchActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private var searchRunnable: Runnable? = null
     private val debounceDelay = 2000L
+    private val trackMapper = TrackMapper()
 
     private val networkChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -69,6 +69,7 @@ class SearchActivity : AppCompatActivity() {
 
     @SuppressLint("ClickableViewAccessibility", "WrongViewCast", "SoonBlockedPrivateApi")
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_searcch)
 
@@ -82,11 +83,11 @@ class SearchActivity : AppCompatActivity() {
             e.printStackTrace()
         }
 
-        searchHistory = SearchHistory(this)
+        searchHistory = SearchHistory(this, trackMapper)
 
         adapter = TrackAdapter(emptyList()) { track ->
-            val intent = Intent(this, Track_player::class.java).apply {
-                putExtra("TRACK", track)
+            val intent = Intent(this, TrackPlayer::class.java).apply {
+                putExtra("TRACK", track) // Теперь передаем Parcelable объект
             }
             startActivity(intent)
             searchHistory.addTrack(track)
@@ -227,7 +228,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun hideKeyboard() {
-        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(inputEditText.windowToken, 0)
     }
 
@@ -249,7 +250,8 @@ class SearchActivity : AppCompatActivity() {
             override fun onResponse(call: Call<TrackResponseDto>, response: Response<TrackResponseDto>) {
                 hideLoading()
                 if (response.isSuccessful) {
-                    val tracks = response.body()?.results ?: emptyList()
+                    val tracksDto = response.body()?.results ?: emptyList()
+                    val tracks = tracksDto.map { trackMapper.map(it) } // Конвертируем в domain-модель
                     adapter.updateTracks(tracks)
                     if (tracks.isEmpty()) {
                         showEmptyState()
@@ -305,7 +307,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun isNetworkAvailable(): Boolean {
-        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo = connectivityManager.activeNetworkInfo
         return networkInfo != null && networkInfo.isConnected
     }

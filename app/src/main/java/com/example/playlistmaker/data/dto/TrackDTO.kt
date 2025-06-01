@@ -1,9 +1,12 @@
-package com.example.playlistmaker.data
+package com.example.playlistmaker.data.dto
 
+import android.annotation.SuppressLint
 import android.os.Parcel
 import android.os.Parcelable
+import java.util.Locale
 
-data class Track(
+@SuppressLint("ParcelCreator")
+data class TrackDTO(
     val trackId: Int,
     val trackName: String?,
     val artistName: String?,
@@ -41,26 +44,26 @@ data class Track(
         parcel.writeString(previewUrl)
     }
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    override fun describeContents(): Int = 0
 
-    companion object CREATOR : Parcelable.Creator<Track> {
-        override fun createFromParcel(parcel: Parcel): Track {
-            return Track(parcel)
+    fun getReleaseYear(): String {
+        return releaseDate?.take(4) ?: ""
+    }
+    companion object CREATOR : Parcelable.Creator<TrackDTO> {
+        override fun createFromParcel(parcel: Parcel): TrackDTO {
+            return TrackDTO(parcel)
         }
 
-        override fun newArray(size: Int): Array<Track?> {
+        override fun newArray(size: Int): Array<TrackDTO?> {
             return arrayOfNulls(size)
         }
-
         fun formatTrackTime(millis: Long): String {
-            val minutes = millis / 1000 / 60
-            val seconds = millis / 1000 % 60
-            return String.format("%02d:%02d", minutes, seconds)
+            val totalSeconds = millis / 1000
+            val minutes = totalSeconds / 60
+            val seconds = totalSeconds % 60
+            return String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
         }
+
     }
-    fun getReleaseYear(): String? {
-        return releaseDate?.take(4)
-    }
+
 }

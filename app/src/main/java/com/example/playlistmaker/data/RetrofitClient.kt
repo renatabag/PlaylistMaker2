@@ -1,4 +1,4 @@
-package com.example.playlistmaker.data.api
+package com.example.playlistmaker.data
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

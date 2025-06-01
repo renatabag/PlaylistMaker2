@@ -1,4 +1,4 @@
-package com.example.playlistmaker.presentation.activity
+package com.example.playlistmaker.presentation
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.ColorStateList
@@ -101,7 +101,7 @@ class SettingsActivity : AppCompatActivity() {
         linkButton.setOnClickListener{
             val link = getString(R.string.link)
             val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse(link)
+                data = Uri.parse("mailto:")
             }
             startActivity(intent)
         }
