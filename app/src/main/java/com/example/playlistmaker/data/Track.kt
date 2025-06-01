@@ -1,3 +1,5 @@
+package com.example.playlistmaker.data
+
 import android.os.Parcel
 import android.os.Parcelable
 

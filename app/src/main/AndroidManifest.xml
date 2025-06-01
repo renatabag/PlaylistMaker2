@@ -14,7 +14,7 @@
 
 
     <application
-        android:name=".App"
+        android:name=".domain.App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -27,7 +27,7 @@
 
         <activity
             android:theme="@style/Base.Theme.PlaylistMaker"
-            android:name=".MainActivity"
+            android:name=".presentation.activity.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,23 +37,23 @@
         </activity>
         <activity
             android:theme="@style/Base.Theme.PlaylistMakerr"
-            android:name=".SettingsActivity"
+            android:name=".presentation.activity.SettingsActivity"
             android:exported="true"
             />
         <activity
             android:theme="@style/Base.Theme.PlaylistMakerr"
-            android:name=".MediaLibraryActivity"
+            android:name=".presentation.activity.MediaLibraryActivity"
             android:exported="true"/>
         <activity
             android:theme="@style/Base.Theme.PlaylistMakerr"
-            android:name=".SearchActivity"
+            android:name=".presentation.activity.SearchActivity"
             android:exported="true"/>
         <meta-data
             android:name="android.app.lib_name"
             android:value=""/>
         <activity
             android:theme="@style/Base.Theme.PlaylistMakerr"
-            android:name=".Track_player"
+            android:name=".presentation.Track_player"
             android:exported="true" />
     </application>
 

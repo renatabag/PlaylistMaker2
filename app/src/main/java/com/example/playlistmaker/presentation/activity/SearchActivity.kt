@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.presentation.activity
 
 import TrackAdapter
 import android.annotation.SuppressLint
@@ -24,6 +24,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.R
+import com.example.playlistmaker.data.api.RetrofitClient
+import com.example.playlistmaker.domain.SearchHistory
+import com.example.playlistmaker.data.dto.TrackResponseDto
+import com.example.playlistmaker.presentation.Track_player
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import retrofit2.Call
@@ -240,8 +245,8 @@ class SearchActivity : AppCompatActivity() {
 
         showLoading()
 
-        RetrofitClient.itunesApi.search(query).enqueue(object : Callback<TrackResponse> {
-            override fun onResponse(call: Call<TrackResponse>, response: Response<TrackResponse>) {
+        RetrofitClient.itunesApi.search(query).enqueue(object : Callback<TrackResponseDto> {
+            override fun onResponse(call: Call<TrackResponseDto>, response: Response<TrackResponseDto>) {
                 hideLoading()
                 if (response.isSuccessful) {
                     val tracks = response.body()?.results ?: emptyList()
@@ -256,7 +261,7 @@ class SearchActivity : AppCompatActivity() {
                 }
             }
 
-            override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+            override fun onFailure(call: Call<TrackResponseDto>, t: Throwable) {
                 showErrorState("Ошибка сети", t.message ?: "Неизвестная ошибка")
                 t.printStackTrace()
             }
