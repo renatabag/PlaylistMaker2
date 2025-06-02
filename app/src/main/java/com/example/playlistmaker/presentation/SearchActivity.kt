@@ -28,7 +28,7 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.data.RetrofitClient
 import com.example.playlistmaker.data.SearchHistory
 import com.example.playlistmaker.data.TrackMapper
-import com.example.playlistmaker.data.TrackResponseDto
+import com.example.playlistmaker.data.dto.TrackResponseDto
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import retrofit2.Call
