@@ -1,5 +1,8 @@
 package com.example.playlistmaker.domain
 
+import com.example.playlistmaker.domain.models.SearchState
+import com.example.playlistmaker.domain.repositories.SearchHistoryRepository
+import com.example.playlistmaker.domain.repositories.TracksRepository
 import kotlin.collections.isNotEmpty
 
 class SearchTracksUseCase(
