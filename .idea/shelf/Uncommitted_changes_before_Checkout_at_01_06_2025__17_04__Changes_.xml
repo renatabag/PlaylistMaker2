@@ -1,0 +1,37 @@
+<changelist name="Uncommitted_changes_before_Checkout_at_01_06_2025,_17_04_[Changes]" date="1748786704509" recycled="true" deleted="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_01_06_2025,_17_04_[Changes]/shelved.patch" />
+  <option name="DESCRIPTION" value="Uncommitted changes before Checkout at 01.06.2025, 17:04 [Changes]" />
+  <binary>
+    <option name="BEFORE_PATH" value="app/src/main/res/drawable-night/play.png" />
+    <option name="AFTER_PATH" value="app/src/main/res/drawable-night/play.png" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_01_06_2025,_17_04_[Changes]/play.png" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="app/src/main/res/drawable-notnight/play.png" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_01_06_2025,_17_04_[Changes]/play1.png" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="app/src/main/res/drawable/placeholder_track.png" />
+    <option name="AFTER_PATH" value="app/src/main/res/drawable/placeholder_track.png" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_01_06_2025,_17_04_[Changes]/placeholder_track.png" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="app/src/main/res/drawable-notnight/add_to_album.png" />
+    <option name="AFTER_PATH" value="app/src/main/res/drawable-notnight/add_to_album.png" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_01_06_2025,_17_04_[Changes]/add_to_album.png" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="app/src/main/res/drawable/pause.png" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_01_06_2025,_17_04_[Changes]/pause.png" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="app/src/main/res/drawable-notnight/follow.png" />
+    <option name="AFTER_PATH" value="app/src/main/res/drawable-notnight/follow.png" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_01_06_2025,_17_04_[Changes]/follow.png" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="app/src/main/res/drawable-notnight/pause.png" />
+    <option name="AFTER_PATH" value="app/src/main/res/drawable-notnight/pause.png" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_01_06_2025,_17_04_[Changes]/pause1.png" />
+  </binary>
+</changelist>
