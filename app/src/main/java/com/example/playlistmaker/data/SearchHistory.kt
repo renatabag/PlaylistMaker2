@@ -1,21 +1,16 @@
 package com.example.playlistmaker.data
 
-import android.content.Context
-import android.content.SharedPreferences
 import com.example.playlistmaker.data.dto.TrackDTO
 import com.example.playlistmaker.data.mappers.TrackMapper
+import com.example.playlistmaker.data.storage.SharedPrefsStorage
 import com.example.playlistmaker.domain.models.Track
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 
 class SearchHistory(
-    private val context: Context,
-    private val trackMapper: TrackMapper
+    private val sharedPrefsStorage: SharedPrefsStorage,
+    private val trackMapper: TrackMapper,
+    private val maxHistorySize: Int = 10
 ) {
-    private val sharedPreferences: SharedPreferences =
-        context.getSharedPreferences("search_history", Context.MODE_PRIVATE)
-    private val gson = Gson()
-    private val maxHistorySize = 10
+    private val historyKey = "search_history"
 
     fun addTrack(track: Track) {
         val historyDto = getHistoryAsDto().toMutableList()
@@ -29,25 +24,18 @@ class SearchHistory(
     }
 
     fun getHistory(): List<Track> {
-        return getHistoryAsDto().map { trackMapper.mapToDomain(it) } // Исправлено здесь
+        return getHistoryAsDto().map { trackMapper.mapToDomain(it) }
     }
 
     private fun getHistoryAsDto(): List<TrackDTO> {
-        val json = sharedPreferences.getString("history", null)
-        return if (json == null) {
-            emptyList()
-        } else {
-            val type = object : TypeToken<List<TrackDTO>>() {}.type
-            gson.fromJson(json, type) ?: emptyList()
-        }
+        return sharedPrefsStorage.getSearchHistory()
     }
 
     fun clearHistory() {
-        sharedPreferences.edit().remove("history").apply()
+        sharedPrefsStorage.clearSearchHistory()
     }
 
     private fun saveHistory(history: List<TrackDTO>) {
-        val json = gson.toJson(history)
-        sharedPreferences.edit().putString("history", json).apply()
+        sharedPrefsStorage.saveSearchHistory(history)
     }
 }

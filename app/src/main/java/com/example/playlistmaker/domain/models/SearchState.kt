@@ -1,7 +1,6 @@
 package com.example.playlistmaker.domain.models
 
 sealed class SearchState {
-    object Loading : SearchState()
     data class Content(val tracks: List<Track>) : SearchState()
     object Empty : SearchState()
     data class Error(val message: String, val string: String) : SearchState()

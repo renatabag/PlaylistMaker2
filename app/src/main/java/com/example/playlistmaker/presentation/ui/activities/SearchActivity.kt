@@ -1,44 +1,40 @@
 package com.example.playlistmaker.presentation.ui.activities
 
 import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
-import com.example.playlistmaker.data.SearchHistory
-import com.example.playlistmaker.data.dto.TrackResponseDto
-import com.example.playlistmaker.data.mappers.TrackMapper
-import com.example.playlistmaker.data.network.RetrofitClient
 import com.example.playlistmaker.presentation.ui.adapters.TrackAdapter
+import com.example.playlistmaker.presentation.ui.states.SearchState
+import com.example.playlistmaker.presentation.viewmodels.ParcelableTrack
+import com.example.playlistmaker.presentation.viewmodels.SearchViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.util.Locale
 
 class SearchActivity : AppCompatActivity() {
+
+    private val viewModel: SearchViewModel by viewModels()
+
     private lateinit var inputEditText: EditText
     private lateinit var recycler: RecyclerView
     private lateinit var emptyStateContainer: LinearLayout
@@ -46,290 +42,194 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var placeholderMessage: TextView
     private lateinit var connectionErrorMessage: TextView
     private lateinit var adapter: TrackAdapter
-    private var searchText: String = ""
-    private lateinit var searchHistory: SearchHistory
     private lateinit var clearHistoryButton: Button
     private lateinit var historyTitle: TextView
     private lateinit var clearIcon: ImageView
-
     private lateinit var progressBar: CircularProgressIndicator
+
     private val handler = Handler(Looper.getMainLooper())
     private var searchRunnable: Runnable? = null
-    private val debounceDelay = 2000L
-    private val trackMapper = TrackMapper()
+    private val debounceDelay = 1000L
 
-    private val networkChangeReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (isNetworkAvailable()) {
+    private lateinit var connectivityManager: ConnectivityManager
+    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+        override fun onAvailable(network: Network) {
+            runOnUiThread {
                 connectionErrorMessage.text = "Интернет доступен"
-                performSearch()
-            } else {
-                showErrorState("Проблемы со связью", "Загрузка не удалась. Проверьте подключение к интернету")
+                val query = inputEditText.text.toString()
+                if (query.isNotEmpty()) {
+                    viewModel.performSearch(query)
+                }
+            }
+        }
+
+        override fun onLost(network: Network) {
+            runOnUiThread {
+                showErrorState("Проблемы со связью", "Проверьте подключение к интернету")
             }
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility", "WrongViewCast", "SoonBlockedPrivateApi")
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_searcch)
 
-        inputEditText = findViewById(R.id.inputEditText)
+        initViews()
+        setupAdapter()
+        observeViewModel()
+        setupListeners()
+        registerNetworkCallback()
 
-        try {
-            val field = TextView::class.java.getDeclaredField("mCursorDrawableRes")
-            field.isAccessible = true
-            field.set(inputEditText, R.drawable.cursor_blue)
-        } catch (e: Exception) {
-            e.printStackTrace()
+        if (!isNetworkAvailable()) {
+            showErrorState("Нет подключения", "Проверьте интернет")
+        } else {
+            viewModel.getHistory()
         }
+    }
 
-        searchHistory = SearchHistory(this, trackMapper)
-
-        adapter = TrackAdapter(emptyList()) { track ->
-            val intent = Intent(this, TrackPlayer::class.java).apply {
-                putExtra("TRACK", track) // Теперь передаем Parcelable объект
-            }
-            startActivity(intent)
-            searchHistory.addTrack(track)
-        }
-
-        clearHistoryButton = findViewById(R.id.clearHistoryButton)
-        clearHistoryButton.setOnClickListener {
-            clearHistory()
-        }
-
-        historyTitle = findViewById(R.id.historyTitle)
-        clearIcon = findViewById(R.id.clearIcon)
-
-        progressBar = findViewById(R.id.progressBar)
-        val backButton = findViewById<MaterialButton>(R.id.button_back)
+    private fun initViews() {
         inputEditText = findViewById(R.id.inputEditText)
         recycler = findViewById(R.id.tracksList)
         emptyStateContainer = findViewById(R.id.emptyStateContainer)
         errorStateContainer = findViewById(R.id.errorStateContainer)
         placeholderMessage = findViewById(R.id.placeholderMessage)
         connectionErrorMessage = findViewById(R.id.connectionErrorMessage)
-        val retryButton = findViewById<Button>(R.id.retryButton)
-        retryButton.setOnClickListener {
-            performSearch()
-        }
+        clearHistoryButton = findViewById(R.id.clearHistoryButton)
+        historyTitle = findViewById(R.id.historyTitle)
+        clearIcon = findViewById(R.id.clearIcon)
+        progressBar = findViewById(R.id.progressBar)
+    }
 
-        recycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+    private fun setupAdapter() {
+        adapter = TrackAdapter(emptyList()) { parcelableTrack ->
+            startActivity(Intent(this, TrackPlayer::class.java).apply {
+                putExtra("TRACK", parcelableTrack)
+            })
+            viewModel.addToHistory(parcelableTrack.track)
+        }
+        recycler.layoutManager = LinearLayoutManager(this)
         recycler.adapter = adapter
+    }
 
-        recycler.visibility = View.GONE
-        emptyStateContainer.visibility = View.VISIBLE
-
-        backButton.setOnClickListener {
-            finish()
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.searchState.collect { state ->
+                    when (state) {
+                        is SearchState.Content -> showContent(state.tracks)
+                        is SearchState.Empty -> showEmptyState()
+                        is SearchState.Error -> showErrorState("Ошибка", state.message)
+                        is SearchState.History -> showHistory(state.tracks)
+                        SearchState.Loading -> showLoading()
+                    }
+                }
+            }
         }
+    }
+
+    private fun setupListeners() {
+        findViewById<MaterialButton>(R.id.button_back).setOnClickListener { finish() }
 
         clearIcon.setOnClickListener {
             clearSearchInput()
         }
 
-        if (inputEditText.text.isNullOrEmpty()) {
-            showHistory()
-        }
-
-        if (savedInstanceState != null) {
-            searchText = savedInstanceState.getString(SEARCH_TEXT, "")
-            inputEditText.setText(searchText)
+        clearHistoryButton.setOnClickListener {
+            viewModel.clearHistory()
         }
 
         inputEditText.doAfterTextChanged { text ->
-            searchText = text?.toString() ?: ""
-            if (text.isNullOrEmpty()) {
-                inputEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                    ContextCompat.getDrawable(this, R.drawable.baseline_search_24), null, null, null
-                )
-                showHistory()
-            } else {
-                inputEditText.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                    ContextCompat.getDrawable(this, R.drawable.baseline_search_24), null,
-                    ContextCompat.getDrawable(this, R.drawable.baseline_clear_24), null
-                )
-                searchRunnable?.let { handler.removeCallbacks(it) }
-                searchRunnable = Runnable {
-                    performSearch()
-                }
-                handler.postDelayed(searchRunnable!!, debounceDelay)
+            searchRunnable?.let(handler::removeCallbacks)
+            searchRunnable = Runnable {
+                viewModel.performSearch(text?.toString().orEmpty())
             }
-        }
-
-        inputEditText.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_UP) {
-                if (event.rawX >= (inputEditText.right - inputEditText.compoundPaddingEnd)) {
-                    clearSearchInput()
-                    return@setOnTouchListener true
-                }
-            }
-            return@setOnTouchListener false
+            handler.postDelayed(searchRunnable!!, debounceDelay)
         }
 
         inputEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                searchRunnable?.let { handler.removeCallbacks(it) }
-                performSearch()
+                searchRunnable?.let(handler::removeCallbacks)
+                viewModel.performSearch(inputEditText.text.toString())
                 hideKeyboard()
                 true
-            } else {
-                false
-            }
-        }
-
-        if (!isNetworkAvailable()) {
-            historyTitle.visibility = View.GONE
-            showErrorState("Нет подключения к интернету", "Загрузка не удалась. Проверьте подключение к интернету")
-        } else {
-            showContent()
+            } else false
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        registerReceiver(networkChangeReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
+    private fun showHistory(tracks: List<ParcelableTrack>) {
+        adapter.updateTracks(tracks)
+        toggleViews(showRecycler = tracks.isNotEmpty(), showHistory = true)
     }
 
-    override fun onPause() {
-        super.onPause()
-        searchRunnable?.let { handler.removeCallbacks(it) }
-        unregisterReceiver(networkChangeReceiver)
+    private fun showContent(tracks: List<ParcelableTrack>) {
+        adapter.updateTracks(tracks)
+        toggleViews(showRecycler = true)
+    }
+
+    private fun showLoading() {
+        toggleViews(showProgress = true)
+    }
+
+    private fun showEmptyState() {
+        toggleViews(showEmpty = true)
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun showErrorState(title: String, message: String) {
+        connectionErrorMessage.text = "$title\n$message"
+        toggleViews(showError = true)
+    }
+
+    private fun toggleViews(
+        showRecycler: Boolean = false,
+        showEmpty: Boolean = false,
+        showError: Boolean = false,
+        showProgress: Boolean = false,
+        showHistory: Boolean = false
+    ) {
+        recycler.visibility = if (showRecycler) View.VISIBLE else View.GONE
+        emptyStateContainer.visibility = if (showEmpty) View.VISIBLE else View.GONE
+        errorStateContainer.visibility = if (showError) View.VISIBLE else View.GONE
+        progressBar.visibility = if (showProgress) View.VISIBLE else View.GONE
+        clearHistoryButton.visibility = if (showHistory) View.VISIBLE else View.GONE
+        historyTitle.visibility = if (showHistory) View.VISIBLE else View.GONE
+    }
+
+    private fun clearSearchInput() {
+        inputEditText.text.clear()
+        hideKeyboard()
+        viewModel.getHistory()
+    }
+
+    private fun hideKeyboard() {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        currentFocus?.let {
+            imm.hideSoftInputFromWindow(it.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        }
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = cm.activeNetwork
+        val capabilities = cm.getNetworkCapabilities(network)
+        return capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+    }
+
+    private fun registerNetworkCallback() {
+        connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val request = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+        connectivityManager.registerNetworkCallback(request, networkCallback)
+    }
+
+    private fun unregisterNetworkCallback() {
+        connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        searchRunnable?.let { handler.removeCallbacks(it) }
-    }
-
-    private fun showHistory() {
-        val history = searchHistory.getHistory()
-        if (history.isNotEmpty()) {
-            adapter.updateTracks(history)
-            recycler.visibility = View.VISIBLE
-            emptyStateContainer.visibility = View.GONE
-            errorStateContainer.visibility = View.GONE
-            clearHistoryButton.visibility = View.VISIBLE
-            historyTitle.visibility = View.VISIBLE
-        } else {
-            recycler.visibility = View.GONE
-            emptyStateContainer.visibility = View.GONE
-            errorStateContainer.visibility = View.GONE
-            clearHistoryButton.visibility = View.GONE
-            historyTitle.visibility = View.GONE
-        }
-    }
-
-
-    private fun clearSearchInput() {
-        inputEditText.setText("")
-        hideKeyboard()
-        showHistory()
-    }
-
-    private fun hideKeyboard() {
-        val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(inputEditText.windowToken, 0)
-    }
-
-    private fun performSearch() {
-        if (!isNetworkAvailable()) {
-            showErrorState("Проблемы со связью", "Загрузка не удалась. Проверьте подключение к интернету")
-            return
-        }
-
-        val query = searchText.trim().lowercase(Locale.getDefault())
-        if (query.isEmpty()) {
-            showHistory()
-            return
-        }
-
-        showLoading()
-
-        lifecycleScope.launch {
-            try {
-                val response = RetrofitClient.itunesApi.search(query) // Response<TrackResponseDto>
-                if (response.isSuccessful) {
-                    val trackResponseDto = response.body()
-                    val tracksDto = trackResponseDto?.tracks ?: emptyList()  // <-- Здесь tracks, а не results
-                    val tracks = tracksDto.map { trackMapper.mapToDomain(it) }
-                    hideLoading()
-
-                    if (tracks.isEmpty()) {
-                        showEmptyState()
-                    } else {
-                        adapter.updateTracks(tracks)
-                        showContent()
-                    }
-                } else {
-                    hideLoading()
-                    showErrorState("Ошибка сети", "Код ошибки: ${response.code()}")
-                }
-            } catch (e: Exception) {
-                hideLoading()
-                showErrorState("Ошибка сети", e.message ?: "Неизвестная ошибка")
-                e.printStackTrace()
-            }
-        }
-    }
-
-
-
-    private fun showLoading() {
-        progressBar.visibility = View.VISIBLE
-        recycler.visibility = View.GONE
-        emptyStateContainer.visibility = View.GONE
-        errorStateContainer.visibility = View.GONE
-        clearHistoryButton.visibility = View.GONE
-        historyTitle.visibility = View.GONE
-
-        progressBar.bringToFront()
-    }
-
-    private fun hideLoading() {
-        progressBar.visibility = View.GONE
-    }
-
-    private fun showContent() {
-        recycler.visibility = View.VISIBLE
-        emptyStateContainer.visibility = View.GONE
-        errorStateContainer.visibility = View.GONE
-    }
-
-    private fun showEmptyState() {
-        recycler.visibility = View.GONE
-        emptyStateContainer.visibility = View.VISIBLE
-        errorStateContainer.visibility = View.GONE
-        clearHistoryButton.visibility = View.GONE
-        historyTitle.visibility = View.GONE
-    }
-
-    private fun showErrorState(title: String, message: String) {
-        recycler.visibility = View.GONE
-        emptyStateContainer.visibility = View.GONE
-        errorStateContainer.visibility = View.VISIBLE
-        connectionErrorMessage.text = "$title\n$message"
-    }
-
-    private fun isNetworkAvailable(): Boolean {
-        val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkInfo = connectivityManager.activeNetworkInfo
-        return networkInfo != null && networkInfo.isConnected
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString(SEARCH_TEXT, searchText)
-    }
-
-    private fun clearHistory() {
-        searchHistory.clearHistory()
-        showHistory()
-    }
-
-    companion object {
-        private const val SEARCH_TEXT = "SEARCH_TEXT"
+        searchRunnable?.let(handler::removeCallbacks)
+        unregisterNetworkCallback()
     }
 }

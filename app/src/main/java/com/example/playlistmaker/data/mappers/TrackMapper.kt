@@ -2,6 +2,7 @@ package com.example.playlistmaker.data.mappers
 
 import com.example.playlistmaker.data.dto.TrackDTO
 import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.presentation.viewmodels.ParcelableTrack
 
 class TrackMapper {
 
@@ -34,4 +35,6 @@ class TrackMapper {
             previewUrl = track.previewUrl
         )
     }
+    fun mapToParcelable(track: Track): ParcelableTrack = ParcelableTrack(track)
+    fun mapToDomain(parcelableTrack: ParcelableTrack): Track = parcelableTrack.track
 }

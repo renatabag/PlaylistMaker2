@@ -23,7 +23,7 @@ class SearchInteractorImpl(
                 else SearchState.Content(tracks)
             }
         } catch (e: Exception) {
-            SearchState.Error(e.message ?: "Неизвестная ошибка", e.message ?: "Неизвестная ошибка")
+            SearchState.Error("Ошибка", e.message ?: "Неизвестная ошибка")
         }
     }
 
