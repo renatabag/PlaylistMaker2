@@ -23,4 +23,5 @@ data class TrackDTO(
     val country: String?,
     @SerializedName("previewUrl")
     val previewUrl: String?
+
 )
