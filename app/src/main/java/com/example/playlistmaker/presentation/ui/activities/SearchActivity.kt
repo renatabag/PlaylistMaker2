@@ -14,15 +14,17 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
+import com.example.playlistmaker.presentation.App
 import com.example.playlistmaker.presentation.ui.adapters.TrackAdapter
 import com.example.playlistmaker.presentation.ui.states.SearchState
 import com.example.playlistmaker.presentation.viewmodels.ParcelableTrack
@@ -33,7 +35,8 @@ import kotlinx.coroutines.launch
 
 class SearchActivity : AppCompatActivity() {
 
-    private val viewModel: SearchViewModel by viewModels()
+    private lateinit var viewModel: SearchViewModel
+    private var isSearchPerformed = false // Флаг выполнения поиска (вынесен на уровень класса)
 
     private lateinit var inputEditText: EditText
     private lateinit var recycler: RecyclerView
@@ -73,6 +76,17 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_searcch)
+
+        val app = application as App
+        viewModel = ViewModelProvider(
+            this,
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return SearchViewModel(app.searchInteractor) as T
+                }
+            }
+        )[SearchViewModel::class.java]
 
         initViews()
         setupAdapter()
@@ -117,14 +131,31 @@ class SearchActivity : AppCompatActivity() {
                 viewModel.searchState.collect { state ->
                     when (state) {
                         is SearchState.Content -> showContent(state.tracks)
-                        is SearchState.Empty -> showEmptyState()
+                        is SearchState.Empty -> {
+                            if (isSearchPerformed) {
+                                showEmptyState()
+                            } else {
+                                showInitialState()
+                            }
+                        }
                         is SearchState.Error -> showErrorState("Ошибка", state.message)
                         is SearchState.History -> showHistory(state.tracks)
+                        is SearchState.Initial -> showInitialState() // Обработка начального состояния
                         SearchState.Loading -> showLoading()
                     }
                 }
             }
         }
+    }
+
+    private fun showInitialState() {
+        // Скрываем все элементы - пустой экран
+        recycler.visibility = View.GONE
+        emptyStateContainer.visibility = View.GONE
+        errorStateContainer.visibility = View.GONE
+        progressBar.visibility = View.GONE
+        clearHistoryButton.visibility = View.GONE
+        historyTitle.visibility = View.GONE
     }
 
     private fun setupListeners() {
@@ -141,6 +172,7 @@ class SearchActivity : AppCompatActivity() {
         inputEditText.doAfterTextChanged { text ->
             searchRunnable?.let(handler::removeCallbacks)
             searchRunnable = Runnable {
+                isSearchPerformed = true // Помечаем, что поиск выполнен
                 viewModel.performSearch(text?.toString().orEmpty())
             }
             handler.postDelayed(searchRunnable!!, debounceDelay)
@@ -149,6 +181,7 @@ class SearchActivity : AppCompatActivity() {
         inputEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 searchRunnable?.let(handler::removeCallbacks)
+                isSearchPerformed = true // Помечаем, что поиск выполнен
                 viewModel.performSearch(inputEditText.text.toString())
                 hideKeyboard()
                 true
@@ -198,7 +231,8 @@ class SearchActivity : AppCompatActivity() {
     private fun clearSearchInput() {
         inputEditText.text.clear()
         hideKeyboard()
-        viewModel.getHistory()
+        isSearchPerformed = false // Сбрасываем флаг при очистке
+        viewModel.getHistory() // Возвращаемся к истории/начальному состоянию
     }
 
     private fun hideKeyboard() {

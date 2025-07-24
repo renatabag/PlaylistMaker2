@@ -14,7 +14,7 @@ class SearchHistory(
 
     fun addTrack(track: Track) {
         val historyDto = getHistoryAsDto().toMutableList()
-        historyDto.removeAll { it.trackId == track.trackId }
+        historyDto.removeAll { it.trackId.toInt() == track.trackId }
         historyDto.add(0, trackMapper.mapToDto(track))
 
         if (historyDto.size > maxHistorySize) {
