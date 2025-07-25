@@ -9,11 +9,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.TrackUtils
-import com.example.playlistmaker.presentation.viewmodels.ParcelableTrack
+import com.example.playlistmaker.domain.models.Track
 
 class TrackAdapter(
-    private var tracks: List<ParcelableTrack>,
-    private val onTrackClick: (ParcelableTrack) -> Unit
+    private var tracks: List<Track>,
+    private val onTrackClick: (Track) -> Unit = {}
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -22,12 +22,12 @@ class TrackAdapter(
         private val trackTimeView: TextView = itemView.findViewById(R.id.track_time)
         private val artworkUrl100View: ImageView = itemView.findViewById(R.id.item_image)
 
-        fun bind(model: ParcelableTrack) {
-            trackNameView.text = model.track.trackName
-            artistNameView.text = model.track.artistName
-            trackTimeView.text = TrackUtils.formatTrackTime(model.track.trackTimeMillis)
+        fun bind(model: Track) {
+            trackNameView.text = model.trackName
+            artistNameView.text = model.artistName
+            trackTimeView.text = TrackUtils.formatTrackTime(model.trackTimeMillis)
             Glide.with(itemView.context)
-                .load(model.track.artworkUrl)
+                .load(model.artworkUrl)
                 .placeholder(R.drawable.placeholder_track)
                 .error(R.drawable.error)
                 .centerCrop()
@@ -50,7 +50,7 @@ class TrackAdapter(
 
     override fun getItemCount(): Int = tracks.size
 
-    fun updateTracks(newTracks: List<ParcelableTrack>) {
+    fun updateTracks(newTracks: List<Track>) {
         tracks = newTracks
         notifyDataSetChanged()
     }

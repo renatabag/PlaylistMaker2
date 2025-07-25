@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.interactors.SearchInteractor
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.presentation.ui.states.SearchState
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -13,57 +15,50 @@ class SearchViewModel(
     private val searchInteractor: SearchInteractor
 ) : ViewModel() {
 
-    private val _searchState = MutableStateFlow<SearchState>(SearchState.Loading)
+    private val _searchState = MutableStateFlow<SearchState>(SearchState.Empty)
     val searchState: StateFlow<SearchState> = _searchState
 
-    fun performSearch(query: String) {
-        viewModelScope.launch {
+    private var searchJob: Job? = null
+
+    fun searchTracks(query: String) {
+        searchJob?.cancel()
+        searchJob = viewModelScope.launch {
             _searchState.value = SearchState.Loading
+            delay(SEARCH_DEBOUNCE_DELAY)
+
             try {
-                val tracks = searchInteractor.searchTracks(query)
-                _searchState.value = if (tracks.isNotEmpty()) {
-                    SearchState.Content(tracks.map { ParcelableTrack(it) })
-                } else {
-                    SearchState.Empty
+                val result = searchInteractor.searchTracks(query)
+                _searchState.value = when (result) {
+                    is com.example.playlistmaker.domain.models.SearchState.Content ->
+                        SearchState.Content(result.tracks)
+                    is com.example.playlistmaker.domain.models.SearchState.Empty ->
+                        SearchState.Empty
+                    is com.example.playlistmaker.domain.models.SearchState.Error ->
+                        SearchState.Error(result.message)
+                    is com.example.playlistmaker.domain.models.SearchState.History ->
+                        SearchState.History(result.tracks)
+                    else -> SearchState.Empty
                 }
             } catch (e: Exception) {
-                _searchState.value = SearchState.Error(
-                    "Ошибка",
-                    e.message ?: "Неизвестная ошибка"
-                )
+                _searchState.value = SearchState.Error(e.message ?: "Unknown error")
             }
         }
     }
 
-    fun getHistory() {
-        viewModelScope.launch {
-            _searchState.value = SearchState.Loading
-            try {
-                val history = searchInteractor.getSearchHistory()
-                _searchState.value = if (history.isNotEmpty()) {
-                    SearchState.History(history.map(::ParcelableTrack))
-                } else {
-                    SearchState.Initial // Возвращаем начальное состояние при отсутствии истории
-                }
-            } catch (e: Exception) {
-                _searchState.value = SearchState.Error(
-                    "Ошибка истории",
-                    e.message ?: "Не удалось загрузить историю"
-                )
-            }
-        }
-    }
-
-    fun addToHistory(track: Track) {
+    fun addTrackToHistory(track: Track) {
         viewModelScope.launch {
             searchInteractor.addTrackToHistory(track)
         }
     }
 
-    fun clearHistory() {
+    fun clearSearchHistory() {
         viewModelScope.launch {
             searchInteractor.clearSearchHistory()
-            getHistory()
+            _searchState.value = SearchState.Empty
         }
+    }
+
+    companion object {
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 }

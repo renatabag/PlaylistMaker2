@@ -6,16 +6,15 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.PlayerController
 import com.example.playlistmaker.domain.PlayerController.Companion.STATE_DEFAULT
+import com.example.playlistmaker.domain.PlayerController.Companion.STATE_PLAYING
 import com.example.playlistmaker.domain.PlayerController.PlayerStateListener
 import com.example.playlistmaker.domain.TrackUtils
 import com.example.playlistmaker.domain.models.Track
-import com.example.playlistmaker.presentation.viewmodels.ParcelableTrack
 
 class TrackPlayer : AppCompatActivity(), PlayerController.PlayerStateListener {
     private lateinit var playerController: PlayerController
@@ -32,14 +31,16 @@ class TrackPlayer : AppCompatActivity(), PlayerController.PlayerStateListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.track_player)
 
-        val parcelableTrack = intent.getParcelableExtra<ParcelableTrack>("TRACK")
-        track = parcelableTrack?.track ?: run {
-            Toast.makeText(this, "Ошибка: трек не найден", Toast.LENGTH_SHORT).show()
+        playerController = PlayerController()
+        track = intent.getParcelableExtra<Track>("TRACK") ?: run {
             finish()
             return
         }
 
-        playerController = PlayerController()
+        fun isPlaying(): Boolean {
+            return playerState == STATE_PLAYING
+        }
+
         displayTrackDetails(track)
 
         findViewById<ImageButton>(R.id.menu_button).setOnClickListener {
@@ -60,7 +61,6 @@ class TrackPlayer : AppCompatActivity(), PlayerController.PlayerStateListener {
             playerController.prepare(url, this)
         } ?: run {
             playButton.isEnabled = false
-            Toast.makeText(this, "Превью трека недоступно", Toast.LENGTH_SHORT).show()
         }
     }
 

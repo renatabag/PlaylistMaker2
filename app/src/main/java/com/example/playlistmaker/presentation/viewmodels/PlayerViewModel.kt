@@ -1,10 +1,10 @@
+package com.example.playlistmaker.presentation.viewmodels
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.interactors.PlayerInteractor
 import com.example.playlistmaker.domain.models.PlayerState
 import com.example.playlistmaker.domain.models.Track
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -18,8 +18,6 @@ class PlayerViewModel(
 
     private val _currentPosition = MutableStateFlow(0L)
     val currentPosition: StateFlow<Long> = _currentPosition
-
-    private var progressJob: Job? = null
 
     fun preparePlayer(track: Track) {
         track.previewUrl?.let { url ->
@@ -45,22 +43,19 @@ class PlayerViewModel(
 
     private fun pausePlayer() {
         playerInteractor.pause()
-        progressJob?.cancel()
     }
 
     private fun startProgressUpdates() {
-        progressJob?.cancel()
-        progressJob = viewModelScope.launch {
+        viewModelScope.launch {
             while (playerInteractor.isPlaying()) {
                 _currentPosition.value = playerInteractor.getCurrentPosition()
-                delay(PROGRESS_UPDATE_DELAY)
+                kotlinx.coroutines.delay(PROGRESS_UPDATE_DELAY)
             }
         }
     }
 
     fun releasePlayer() {
         playerInteractor.release()
-        progressJob?.cancel()
     }
 
     companion object {
