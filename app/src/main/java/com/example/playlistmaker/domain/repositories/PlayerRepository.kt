@@ -10,4 +10,5 @@ interface PlayerRepository {
     fun release()
     fun getCurrentPosition(): Long
     fun isPlaying(): Boolean
+    fun playbackControl()
 }

@@ -7,5 +7,5 @@ sealed class PlayerState {
     object Paused : PlayerState()
     data class Progress(val position: Long) : PlayerState()
     object Complete : PlayerState()
-    data class Error(val message: String) : PlayerState()
+    data class Error(val message: String, val extra: Int) : PlayerState()
 }

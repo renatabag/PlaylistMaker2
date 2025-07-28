@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.playlistmaker.R
 import com.example.playlistmaker.presentation.App
-import com.example.playlistmaker.presentation.ui.activities.MainActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.switchmaterial.SwitchMaterial
 

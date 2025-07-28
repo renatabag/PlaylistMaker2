@@ -3,6 +3,7 @@ package com.example.playlistmaker.domain.models
 import android.os.Parcel
 import android.os.Parcelable
 
+
 data class Track(
     val trackId: Int,
     val trackName: String,

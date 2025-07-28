@@ -22,8 +22,15 @@ class SearchViewModel(
 
     fun searchTracks(query: String) {
         searchJob?.cancel()
+        if (query.isEmpty()) {
+            searchJob = viewModelScope.launch {
+                val history = searchInteractor.getSearchHistory()
+                _searchState.value = SearchState.History(history)
+            }
+            return
+        }
+        _searchState.value = SearchState.Loading
         searchJob = viewModelScope.launch {
-            _searchState.value = SearchState.Loading
             delay(SEARCH_DEBOUNCE_DELAY)
 
             try {
@@ -37,7 +44,8 @@ class SearchViewModel(
                         SearchState.Error(result.message)
                     is com.example.playlistmaker.domain.models.SearchState.History ->
                         SearchState.History(result.tracks)
-                    else -> SearchState.Empty
+                    is com.example.playlistmaker.domain.models.SearchState.Loading->
+                        SearchState.Loading
                 }
             } catch (e: Exception) {
                 _searchState.value = SearchState.Error(e.message ?: "Unknown error")

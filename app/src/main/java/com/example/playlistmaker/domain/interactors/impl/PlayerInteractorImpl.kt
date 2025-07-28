@@ -32,4 +32,7 @@ class PlayerInteractorImpl(
     override fun isPlaying(): Boolean {
         return playerRepository.isPlaying()
     }
+    fun playbackControl() {
+        playerRepository.playbackControl()
+    }
 }

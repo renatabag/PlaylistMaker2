@@ -38,4 +38,5 @@ class SearchInteractorImpl(
     override suspend fun clearSearchHistory() {
         searchHistoryRepository.clearHistory()
     }
+
 }
