@@ -10,10 +10,11 @@ import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.TrackUtils
 import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.presentation.ui.states.TrackUi
 
 class TrackAdapter(
-    private var tracks: List<Track>,
-    private val onTrackClick: (Track) -> Unit = {}
+    private var tracks: List<TrackUi>,
+    private val onTrackClick: (TrackUi) -> Unit = {}
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -22,7 +23,7 @@ class TrackAdapter(
         private val trackTimeView: TextView = itemView.findViewById(R.id.track_time)
         private val artworkUrl100View: ImageView = itemView.findViewById(R.id.item_image)
 
-        fun bind(model: Track) {
+        fun bind(model: TrackUi) {
             trackNameView.text = model.trackName
             artistNameView.text = model.artistName
             trackTimeView.text = TrackUtils.formatTrackTime(model.trackTimeMillis)
@@ -50,7 +51,7 @@ class TrackAdapter(
 
     override fun getItemCount(): Int = tracks.size
 
-    fun updateTracks(newTracks: List<Track>) {
+    fun updateTracks(newTracks: List<TrackUi>) {
         tracks = newTracks
         notifyDataSetChanged()
     }

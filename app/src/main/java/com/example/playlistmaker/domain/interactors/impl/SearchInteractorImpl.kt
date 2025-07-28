@@ -11,24 +11,29 @@ class SearchInteractorImpl(
     private val searchHistoryRepository: SearchHistoryRepository
 ) : SearchInteractor {
 
-    override suspend fun searchTracks(query: String): SearchState {
+    override suspend fun searchTracks(query: String): SearchInteractor.SearchResult {
         return try {
-            if (query.isEmpty()) {
-                val history = searchHistoryRepository.getHistory()
-                if (history.isNotEmpty()) SearchState.History(history)
-                else SearchState.Empty
-            } else {
-                val tracks = tracksRepository.searchTracks(query)
-                if (tracks.isEmpty()) SearchState.Empty
-                else SearchState.Content(tracks)
+            when {
+                query.isEmpty() -> {
+                    val history = getSearchHistory()
+                    if (history.isNotEmpty()) SearchInteractor.SearchResult.History(history)
+                    else SearchInteractor.SearchResult.Empty
+                }
+                else -> {
+                    val tracks = tracksRepository.searchTracks(query)
+                    when {
+                        tracks.isEmpty() -> SearchInteractor.SearchResult.Empty
+                        else -> SearchInteractor.SearchResult.Content(tracks)
+                    }
+                }
             }
         } catch (e: Exception) {
-            SearchState.Error(e.message ?: "Неизвестная ошибка", e.message ?: "Неизвестная ошибка")
+            SearchInteractor.SearchResult.Error(e.message ?: "Неизвестная ошибка")
         }
     }
 
     override suspend fun getSearchHistory(): List<Track> {
-        return searchHistoryRepository.getHistory()
+        return searchHistoryRepository.getHistory().distinctBy { it.trackId }
     }
 
     override suspend fun addTrackToHistory(track: Track) {
@@ -38,5 +43,4 @@ class SearchInteractorImpl(
     override suspend fun clearSearchHistory() {
         searchHistoryRepository.clearHistory()
     }
-
 }

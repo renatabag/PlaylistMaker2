@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.interactors.SearchInteractor
 import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.presentation.mappers.TrackUiMapper
 import com.example.playlistmaker.presentation.ui.states.SearchState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -25,7 +26,11 @@ class SearchViewModel(
         if (query.isEmpty()) {
             searchJob = viewModelScope.launch {
                 val history = searchInteractor.getSearchHistory()
-                _searchState.value = SearchState.History(history)
+                if (history.isEmpty()) {
+                    _searchState.value = SearchState.EmptyHistory // Используем новое состояние
+                } else {
+                    _searchState.value = SearchState.History(history)
+                }
             }
             return
         }
@@ -34,18 +39,17 @@ class SearchViewModel(
             delay(SEARCH_DEBOUNCE_DELAY)
 
             try {
-                val result = searchInteractor.searchTracks(query)
-                _searchState.value = when (result) {
-                    is com.example.playlistmaker.domain.models.SearchState.Content ->
-                        SearchState.Content(result.tracks)
-                    is com.example.playlistmaker.domain.models.SearchState.Empty ->
-                        SearchState.Empty
-                    is com.example.playlistmaker.domain.models.SearchState.Error ->
-                        SearchState.Error(result.message)
-                    is com.example.playlistmaker.domain.models.SearchState.History ->
-                        SearchState.History(result.tracks)
-                    is com.example.playlistmaker.domain.models.SearchState.Loading->
-                        SearchState.Loading
+                when (val result = searchInteractor.searchTracks(query)) {
+                    is SearchInteractor.SearchResult.Content -> {
+                        _searchState.value = SearchState.Content(TrackUiMapper.mapListToUi(result.tracks))
+                    }
+                    SearchInteractor.SearchResult.Empty -> {
+                        _searchState.value = SearchState.Empty // Используем новое состояние
+                    }
+                    is SearchInteractor.SearchResult.Error -> {
+                        _searchState.value = SearchState.Error(result.message)
+                    }
+                    else -> Unit
                 }
             } catch (e: Exception) {
                 _searchState.value = SearchState.Error(e.message ?: "Unknown error")
@@ -62,7 +66,7 @@ class SearchViewModel(
     fun clearSearchHistory() {
         viewModelScope.launch {
             searchInteractor.clearSearchHistory()
-            _searchState.value = SearchState.Empty
+            _searchState.value = SearchState.EmptyHistory
         }
     }
 

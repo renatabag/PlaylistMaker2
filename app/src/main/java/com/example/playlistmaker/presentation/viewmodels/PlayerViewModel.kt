@@ -2,12 +2,9 @@ package com.example.playlistmaker.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.playlistmaker.domain.interactors.PlayerInteractor
-import com.example.playlistmaker.domain.interactors.impl.PlayerInteractorImpl
 import com.example.playlistmaker.domain.models.PlayerState
-import com.example.playlistmaker.domain.models.Track
-import com.example.playlistmaker.domain.repositories.PlayerRepository
 import com.example.playlistmaker.domain.repositories.impl.PlayerRepositoryImpl
+import com.example.playlistmaker.presentation.ui.states.TrackUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,7 +23,7 @@ class PlayerViewModel(
     private val _isPlaying = MutableStateFlow(false)
     val isPlaying: StateFlow<Boolean> = _isPlaying.asStateFlow()
 
-    fun preparePlayer(track: Track) {
+    fun preparePlayer(track: TrackUi) {
         track.previewUrl?.let { url ->
             viewModelScope.launch {
                 playerInteractor.prepare(url).collect { state ->

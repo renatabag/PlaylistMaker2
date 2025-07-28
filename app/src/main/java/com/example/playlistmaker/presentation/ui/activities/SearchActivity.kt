@@ -6,6 +6,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -30,8 +32,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.domain.models.Track
+import com.example.playlistmaker.presentation.mappers.TrackMapper
+import com.example.playlistmaker.presentation.mappers.TrackUiMapper
 import com.example.playlistmaker.presentation.ui.adapters.TrackAdapter
 import com.example.playlistmaker.presentation.ui.states.SearchState
+import com.example.playlistmaker.presentation.ui.states.TrackUi
 import com.example.playlistmaker.presentation.viewmodels.SearchViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
@@ -65,6 +70,17 @@ class SearchActivity : AppCompatActivity() {
             } else {
                 showErrorState("Проблемы со связью")
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            registerReceiver(networkChangeReceiver, filter, RECEIVER_NOT_EXPORTED)
+        } else {
+            @Suppress("DEPRECATION")
+            registerReceiver(networkChangeReceiver, filter)
         }
     }
 
@@ -103,13 +119,15 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupAdapter() {
-        adapter = TrackAdapter(emptyList()) { track ->
+        adapter = TrackAdapter(emptyList()) { trackUi ->
+            val track = TrackUi.toDomain(trackUi) // Конвертируем в domain для истории
             viewModel.addTrackToHistory(track)
-            startActivity(TrackPlayer.getIntent(this, track))
+            startActivity(TrackPlayer.getIntent(this, trackUi)) // Передаем оригинальный TrackUi
         }
         recycler.layoutManager = LinearLayoutManager(this)
         recycler.adapter = adapter
     }
+
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupListeners() {
@@ -167,21 +185,20 @@ class SearchActivity : AppCompatActivity() {
                 viewModel.searchState.collect { state ->
                     when (state) {
                         is SearchState.Loading -> {
-                            // Показываем загрузку только если есть текст в поиске
                             if (!inputEditText.text.isNullOrEmpty()) {
                                 showLoading()
                             }
                         }
                         is SearchState.Content -> showContent(state.tracks)
-                        is SearchState.Empty -> {
-                            if (inputEditText.text.isNullOrEmpty()) {
-                                showCleanHistoryState()
-                            } else {
-                                showEmptyState()
-                            }
+                        SearchState.Empty -> showEmptyState()
+
+                        is SearchState.History -> {
+                            val uiTracks = TrackUiMapper.mapListToUi(state.tracks)
+                            showHistory(uiTracks)
                         }
-                        is SearchState.Error -> showErrorState(state.message)
-                        is SearchState.History -> showHistory(state.tracks)
+                        is SearchState.Error -> showErrorState(state.message, isNetworkError = true)
+                        is SearchState.EmptyError -> showErrorState(state.message, isNetworkError = false)
+                        SearchState.EmptyHistory -> showEmptyHistoryState()
                     }
                 }
             }
@@ -206,8 +223,18 @@ class SearchActivity : AppCompatActivity() {
         historyTitle.visibility = View.GONE
         progressBar.bringToFront()
     }
+    private fun showEmptyHistoryState() {
+        progressBar.visibility = View.GONE
+        recycler.visibility = View.GONE
+        emptyStateContainer.visibility = View.GONE
+        errorStateContainer.visibility = View.GONE
+        clearHistoryButton.visibility = View.GONE
+        historyTitle.visibility = View.GONE
+        adapter.updateTracks(emptyList())
+    }
 
-    private fun showContent(tracks: List<Track>) {
+
+    private fun showContent(tracks: List<TrackUi>) {
         adapter.updateTracks(tracks)
         progressBar.visibility = View.GONE
         recycler.visibility = View.VISIBLE
@@ -234,9 +261,10 @@ class SearchActivity : AppCompatActivity() {
         connectionErrorMessage.text = message
     }
 
-    private fun showHistory(tracks: List<Track>) {
-        if (tracks.isNotEmpty()) {
-            adapter.updateTracks(tracks)
+    private fun showHistory(tracks: List<TrackUi>) {
+        val uiTracks = TrackMapper.mapListToUi(tracks)
+        if (uiTracks.isNotEmpty()) {
+            adapter.updateTracks(uiTracks)
             recycler.visibility = View.VISIBLE
             emptyStateContainer.visibility = View.GONE
             errorStateContainer.visibility = View.GONE
@@ -276,19 +304,46 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun isNetworkAvailable(): Boolean {
-        val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-        return connectivityManager.activeNetworkInfo?.isConnected ?: false
-    }
-
-    override fun onResume() {
-        super.onResume()
-        registerReceiver(networkChangeReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
-    }
-
     override fun onPause() {
         super.onPause()
         searchRunnable?.let { handler.removeCallbacks(it) }
         unregisterReceiver(networkChangeReceiver)
     }
+    private fun showErrorState(message: String, isNetworkError: Boolean) {
+        progressBar.visibility = View.GONE
+        recycler.visibility = View.GONE
+        emptyStateContainer.visibility = View.GONE
+        errorStateContainer.visibility = View.VISIBLE
+
+        val errorImage = errorStateContainer.findViewById<ImageView>(R.id.errorImageView)
+        val errorText = errorStateContainer.findViewById<TextView>(R.id.connectionErrorMessage)
+        val retryButton = errorStateContainer.findViewById<Button>(R.id.retryButton)
+
+        errorImage.setImageResource(
+            if (isNetworkError) R.drawable.error else R.drawable.empty
+        )
+        errorText.text = message
+
+        retryButton.visibility = if (isNetworkError) View.VISIBLE else View.GONE
+        retryButton.setOnClickListener {
+            inputEditText.text?.toString()?.let { query ->
+                viewModel.searchTracks(query)
+            }
+        }
+    }
+    @SuppressLint("MissingPermission")
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val network = connectivityManager.activeNetwork
+            val capabilities = connectivityManager.getNetworkCapabilities(network)
+            return capabilities != null &&
+                    (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
+        } else {
+            @Suppress("DEPRECATION")
+            return connectivityManager.activeNetworkInfo?.isConnected == true
+        }
+    }
+
 }
