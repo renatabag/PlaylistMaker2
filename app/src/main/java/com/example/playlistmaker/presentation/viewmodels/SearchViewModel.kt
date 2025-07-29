@@ -21,16 +21,20 @@ class SearchViewModel(
     val searchState: StateFlow<SearchState> = _searchState
 
     private var searchJob: Job? = null
+    private var isHistoryLoaded = false
 
     fun searchTracks(query: String) {
         searchJob?.cancel()
         if (query.isEmpty()) {
-            searchJob = viewModelScope.launch {
-                val history = searchInteractor.getSearchHistory()
-                if (history.isEmpty()) {
-                    _searchState.value = SearchState.EmptyHistory
-                } else {
-                    _searchState.value = SearchState.History(TrackUiMapper.mapListToUi(history))
+            if (!isHistoryLoaded) {
+                searchJob = viewModelScope.launch {
+                    val history = searchInteractor.getSearchHistory()
+                    isHistoryLoaded = true // Устанавливаем флаг
+                    if (history.isEmpty()) {
+                        _searchState.value = SearchState.EmptyHistory
+                    } else {
+                        _searchState.value = SearchState.History(TrackUiMapper.mapListToUi(history))
+                    }
                 }
             }
             return
@@ -77,12 +81,31 @@ class SearchViewModel(
         }
     }
 
+    fun restoreState(state: SearchState) {
+        _searchState.value = state
+    }
+
     fun clearSearchHistory() {
         viewModelScope.launch {
             searchInteractor.clearSearchHistory()
             _searchState.value = SearchState.EmptyHistory
+            isHistoryLoaded = false
         }
     }
+    fun clearSearch() {
+        searchJob?.cancel()
+        _searchState.value = SearchState.Empty
+        searchJob = viewModelScope.launch {
+            val history = searchInteractor.getSearchHistory()
+            if (history.isEmpty()) {
+                _searchState.value = SearchState.EmptyHistory
+            } else {
+                _searchState.value = SearchState.History(TrackUiMapper.mapListToUi(history))
+            }
+            isHistoryLoaded = true
+        }
+    }
+
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L

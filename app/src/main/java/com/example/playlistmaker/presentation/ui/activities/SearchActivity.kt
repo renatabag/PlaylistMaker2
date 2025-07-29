@@ -31,8 +31,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
-import com.example.playlistmaker.presentation.mappers.TrackMapper
-import com.example.playlistmaker.presentation.mappers.TrackUiMapper
 import com.example.playlistmaker.presentation.ui.adapters.TrackAdapter
 import com.example.playlistmaker.presentation.ui.states.SearchState
 import com.example.playlistmaker.presentation.ui.states.TrackUi
@@ -119,9 +117,11 @@ class SearchActivity : AppCompatActivity() {
 
     private fun setupAdapter() {
         adapter = TrackAdapter(emptyList()) { trackUi ->
-            val track = TrackUi.toDomain(trackUi) // Конвертируем в domain для истории
+            val track = TrackUi.toDomain(trackUi)
             viewModel.addTrackToHistory(track)
-            startActivity(TrackPlayer.getIntent(this, trackUi)) // Передаем оригинальный TrackUi
+            val currentState = viewModel.searchState.value
+            startActivity(TrackPlayer.getIntent(this, trackUi))
+
         }
         recycler.layoutManager = LinearLayoutManager(this)
         recycler.adapter = adapter
@@ -131,8 +131,10 @@ class SearchActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     private fun setupListeners() {
         findViewById<MaterialButton>(R.id.button_back).setOnClickListener { finish() }
+        clearIcon.setOnClickListener {
+            clearSearchInput()
+        }
 
-        clearIcon.setOnClickListener { clearSearchInput() }
         clearHistoryButton.setOnClickListener { viewModel.clearSearchHistory() }
 
         inputEditText.doAfterTextChanged { text ->
@@ -287,7 +289,7 @@ class SearchActivity : AppCompatActivity() {
     private fun clearSearchInput() {
         inputEditText.setText("")
         hideKeyboard()
-        viewModel.searchTracks("")
+        viewModel.clearSearch()
     }
 
     private fun hideKeyboard() {
