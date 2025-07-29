@@ -45,4 +45,5 @@ class SharedPrefsStorage(context: Context) {
         private const val SEARCH_HISTORY_KEY = "search_history"
         private const val THEME_KEY = "theme_setting"
     }
+
 }

@@ -1,5 +1,6 @@
 package com.example.playlistmaker.presentation.ui.activities
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -14,6 +15,10 @@ import com.example.playlistmaker.presentation.viewmodels.PlayerViewModel
 import kotlinx.coroutines.launch
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.presentation.ui.states.PlayerState
@@ -24,9 +29,19 @@ class TrackPlayer : AppCompatActivity() {
     private val viewModel by lazy { PlayerViewModel(playerInteractor) }
     private lateinit var track: TrackUi
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.track_player)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.track_player)) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(
+                top = systemBars.top,
+                bottom = systemBars.bottom
+            )
+            insets
+        }
 
         track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra("TRACK", TrackUi::class.java)

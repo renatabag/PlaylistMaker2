@@ -4,10 +4,14 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Observer
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.presentation.viewmodels.SettingsViewModel
@@ -21,17 +25,26 @@ class SettingsActivity : AppCompatActivity() {
     @SuppressLint("WrongViewCast", "MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.settings)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.settings)) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(
+                top = systemBars.top,
+                bottom = systemBars.bottom
+            )
+            insets
+        }
 
         val switchMaterial: SwitchMaterial = findViewById(R.id.themeSwitcher)
-
-        viewModel.isDarkTheme.observe(this, Observer { isDarkTheme ->
+        viewModel.isDarkTheme.observe(this) { isDarkTheme ->
             switchMaterial.isChecked = isDarkTheme
-        })
-
-        switchMaterial.setOnCheckedChangeListener { _, checked ->
-            viewModel.updateThemeSettings(checked)
+            applyTheme(isDarkTheme)
         }
+        switchMaterial.setOnCheckedChangeListener { _, checked ->
+            viewModel.switchTheme(checked)
+        }
+
 
         val states = arrayOf(
             intArrayOf(android.R.attr.state_checked),
@@ -96,5 +109,14 @@ class SettingsActivity : AppCompatActivity() {
             putExtra(Intent.EXTRA_TEXT, shareText)
             type = "text/plain"
         }
+    }
+    private fun applyTheme(isDarkTheme: Boolean) {
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDarkTheme) {
+                AppCompatDelegate.MODE_NIGHT_YES
+            } else {
+                AppCompatDelegate.MODE_NIGHT_NO
+            }
+        )
     }
 }

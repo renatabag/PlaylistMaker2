@@ -20,14 +20,14 @@ class SettingsViewModel(
 
     private fun loadThemeSettings() {
         viewModelScope.launch {
-            _isDarkTheme.value = settingsInteractor.getThemeSettings()
+            _isDarkTheme.postValue(settingsInteractor.getThemeSettings())
         }
     }
 
-    fun updateThemeSettings(isDarkTheme: Boolean) {
+    fun switchTheme(isDarkTheme: Boolean) {
         viewModelScope.launch {
             settingsInteractor.updateThemeSettings(isDarkTheme)
-            _isDarkTheme.value = isDarkTheme
+            _isDarkTheme.postValue(isDarkTheme)
         }
     }
 }

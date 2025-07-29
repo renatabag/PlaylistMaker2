@@ -20,9 +20,13 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -81,10 +85,20 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility", "SoonBlockedPrivateApi")
+    @SuppressLint("ClickableViewAccessibility", "SoonBlockedPrivateApi", "MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_searcch)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.search)) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(
+                top = systemBars.top,
+                bottom = systemBars.bottom
+            )
+            insets
+        }
+
 
         initViews()
         setupAdapter()

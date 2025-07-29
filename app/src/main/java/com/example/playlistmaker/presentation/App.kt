@@ -7,10 +7,7 @@ import com.example.playlistmaker.domain.interactors.SettingsInteractor
 import kotlinx.coroutines.runBlocking
 
 class App : Application() {
-
     private lateinit var settingsInteractor: SettingsInteractor
-    var darkTheme = false
-        private set
 
     override fun onCreate() {
         super.onCreate()
@@ -18,23 +15,11 @@ class App : Application() {
         settingsInteractor = Creator.provideSettingsInteractor()
 
         runBlocking {
-            darkTheme = settingsInteractor.getThemeSettings()
-            switchTheme(darkTheme)
-        }
-    }
-
-    fun switchTheme(darkThemeEnabled: Boolean) {
-        darkTheme = darkThemeEnabled
-        AppCompatDelegate.setDefaultNightMode(
-            if (darkThemeEnabled) {
-                AppCompatDelegate.MODE_NIGHT_YES
-            } else {
-                AppCompatDelegate.MODE_NIGHT_NO
-            }
-        )
-
-        runBlocking {
-            settingsInteractor.updateThemeSettings(darkThemeEnabled)
+            val darkTheme = settingsInteractor.getThemeSettings()
+            AppCompatDelegate.setDefaultNightMode(
+                if (darkTheme) AppCompatDelegate.MODE_NIGHT_YES
+                else AppCompatDelegate.MODE_NIGHT_NO
+            )
         }
     }
 }
