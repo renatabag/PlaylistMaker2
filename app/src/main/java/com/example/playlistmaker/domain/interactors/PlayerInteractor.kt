@@ -1,6 +1,6 @@
 package com.example.playlistmaker.domain.interactors
 
-import com.example.playlistmaker.domain.models.PlayerState
+import com.example.playlistmaker.presentation.ui.states.PlayerState
 import kotlinx.coroutines.flow.Flow
 
 interface PlayerInteractor {
@@ -10,4 +10,5 @@ interface PlayerInteractor {
     fun release()
     fun getCurrentPosition(): Long
     fun isPlaying(): Boolean
+    fun playbackControl()
 }

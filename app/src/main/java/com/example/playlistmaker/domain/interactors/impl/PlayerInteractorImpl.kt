@@ -1,7 +1,7 @@
 package com.example.playlistmaker.domain.interactors.impl
 
 import com.example.playlistmaker.domain.interactors.PlayerInteractor
-import com.example.playlistmaker.domain.models.PlayerState
+import com.example.playlistmaker.presentation.ui.states.PlayerState
 import com.example.playlistmaker.domain.repositories.PlayerRepository
 import kotlinx.coroutines.flow.Flow
 
@@ -32,7 +32,11 @@ class PlayerInteractorImpl(
     override fun isPlaying(): Boolean {
         return playerRepository.isPlaying()
     }
-    fun playbackControl() {
-        playerRepository.playbackControl()
+    override fun playbackControl() {
+        if (playerRepository.isPlaying()) {
+            pause()
+        } else {
+            play()
+        }
     }
 }

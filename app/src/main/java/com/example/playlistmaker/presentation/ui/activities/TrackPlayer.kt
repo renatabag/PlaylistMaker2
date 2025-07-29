@@ -15,17 +15,13 @@ import kotlinx.coroutines.launch
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.lifecycle.Lifecycle
-import com.example.playlistmaker.domain.models.PlayerState
-import com.example.playlistmaker.domain.models.Track
-import com.example.playlistmaker.domain.repositories.impl.PlayerRepositoryImpl
+import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.presentation.ui.states.PlayerState
 import com.example.playlistmaker.presentation.ui.states.TrackUi
 
 class TrackPlayer : AppCompatActivity() {
-    private val playerRepository by lazy { PlayerRepositoryImpl() }
-    private val viewModel by lazy {
-        PlayerViewModel(playerRepository)
-    }
-
+    private val playerInteractor by lazy { Creator.providePlayerInteractor() }
+    private val viewModel by lazy { PlayerViewModel(playerInteractor) }
     private lateinit var track: TrackUi
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,8 +69,9 @@ class TrackPlayer : AppCompatActivity() {
 
     private fun setupButtonListeners() {
         findViewById<ImageButton>(R.id.menu_button).setOnClickListener {
-            if (viewModel.isPlaying.value == true) {
-                viewModel.pausePlayer()
+            when (val state = viewModel.playerState.value) {
+                is PlayerState.Playing -> viewModel.pausePlayer()
+                else -> {} // Ничего не делаем для других состояний
             }
             finish()
         }
@@ -90,39 +87,40 @@ class TrackPlayer : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.playerState.collect { state ->
                     when (state) {
-                        PlayerState.Prepared -> {
+                        is PlayerState.Prepared -> {
                             findViewById<ImageButton>(R.id.pause).isEnabled = true
-                            findViewById<TextView>(R.id.track_time_now).text = "00:00"
-                        }
-                        PlayerState.Playing -> {
-                            findViewById<ImageButton>(R.id.pause).setImageResource(R.drawable.play)
-                        }
-                        PlayerState.Paused -> {
+                            findViewById<TextView>(R.id.track_time_now).text =
+                                TrackUtils.formatTrackTime(state.position)
                             findViewById<ImageButton>(R.id.pause).setImageResource(R.drawable.pause)
+                        }
+                        is PlayerState.Playing -> {
+                            findViewById<ImageButton>(R.id.pause).isEnabled = true
+                            findViewById<ImageButton>(R.id.pause).setImageResource(R.drawable.play)
+                            findViewById<TextView>(R.id.track_time_now).text =
+                                TrackUtils.formatTrackTime(state.position)
+                        }
+                        is PlayerState.Paused -> {
+                            findViewById<ImageButton>(R.id.pause).isEnabled = true
+                            findViewById<ImageButton>(R.id.pause).setImageResource(R.drawable.pause)
+                            findViewById<TextView>(R.id.track_time_now).text =
+                                TrackUtils.formatTrackTime(state.position)
                         }
                         is PlayerState.Error -> {
                             findViewById<ImageButton>(R.id.pause).isEnabled = false
                         }
-                        PlayerState.Default -> {
+                        is PlayerState.Default -> {
                             findViewById<ImageButton>(R.id.pause).isEnabled = false
+                            findViewById<TextView>(R.id.track_time_now).text = "00:00"
                         }
                         is PlayerState.Progress -> {
                             findViewById<ImageButton>(R.id.pause).isEnabled = false
+                            findViewById<TextView>(R.id.track_time_now).text =
+                                TrackUtils.formatTrackTime(state.position)
                         }
-                        PlayerState.Complete -> {
+                        is PlayerState.Complete -> {
                             findViewById<ImageButton>(R.id.pause).isEnabled = false
                         }
-
                     }
-                }
-            }
-        }
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.currentPosition.collect { position ->
-                    findViewById<TextView>(R.id.track_time_now).text =
-                        TrackUtils.formatTrackTime(position)
                 }
             }
         }
@@ -130,13 +128,17 @@ class TrackPlayer : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        viewModel.pausePlayer()
+        when (viewModel.playerState.value) {
+            is PlayerState.Playing -> viewModel.pausePlayer()
+            else -> {}
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         viewModel.releasePlayer()
     }
+
     companion object {
         fun getIntent(context: Context, track: TrackUi): Intent {
             return Intent(context, TrackPlayer::class.java).apply {

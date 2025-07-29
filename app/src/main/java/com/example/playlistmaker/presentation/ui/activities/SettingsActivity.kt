@@ -4,35 +4,33 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.net.Uri
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.widget.EditText
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
 import com.example.playlistmaker.R
-import com.example.playlistmaker.presentation.App
+import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.presentation.viewmodels.SettingsViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.switchmaterial.SwitchMaterial
 
+
 class SettingsActivity : AppCompatActivity() {
+    private val viewModel: SettingsViewModel by viewModels { Creator.provideSettingsViewModelFactory() }
+
     @SuppressLint("WrongViewCast", "MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings)
 
-
         val switchMaterial: SwitchMaterial = findViewById(R.id.themeSwitcher)
 
-        switchMaterial.isChecked = (applicationContext as App).darkTheme
+        viewModel.isDarkTheme.observe(this, Observer { isDarkTheme ->
+            switchMaterial.isChecked = isDarkTheme
+        })
 
-        switchMaterial.setOnCheckedChangeListener { switcher, checked ->
-            (applicationContext as App).switchTheme(checked)
-        }
-
-        switchMaterial.isChecked = (applicationContext as App).darkTheme
-
-        switchMaterial.setOnCheckedChangeListener { switcher, checked ->
-            (applicationContext as App).switchTheme(checked)
+        switchMaterial.setOnCheckedChangeListener { _, checked ->
+            viewModel.updateThemeSettings(checked)
         }
 
         val states = arrayOf(
@@ -54,24 +52,8 @@ class SettingsActivity : AppCompatActivity() {
         switchMaterial.thumbTintList = thumbColorStateList
         switchMaterial.trackTintList = trackColorStateList
 
-
-        lateinit var inputEditText: EditText
-        var searchText: String = ""
-        val textWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                searchText = s.toString()
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        }
-
         val backButton = findViewById<MaterialButton>(R.id.button_back)
-
         backButton?.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
             finish()
         }
 
@@ -97,8 +79,8 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-        val linkButton=findViewById<MaterialButton>(R.id.link_button)
-        linkButton.setOnClickListener{
+        val linkButton = findViewById<MaterialButton>(R.id.link_button)
+        linkButton.setOnClickListener {
             val link = getString(R.string.link)
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 data = Uri.parse("mailto:")
@@ -106,6 +88,7 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+
     private fun shareApp(): Intent {
         val shareText = getString(R.string.adress_practicum)
         return Intent().apply {
@@ -114,5 +97,4 @@ class SettingsActivity : AppCompatActivity() {
             type = "text/plain"
         }
     }
-
 }

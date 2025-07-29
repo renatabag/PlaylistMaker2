@@ -1,5 +1,6 @@
 package com.example.playlistmaker.presentation.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.interactors.SearchInteractor
@@ -27,9 +28,9 @@ class SearchViewModel(
             searchJob = viewModelScope.launch {
                 val history = searchInteractor.getSearchHistory()
                 if (history.isEmpty()) {
-                    _searchState.value = SearchState.EmptyHistory // Используем новое состояние
+                    _searchState.value = SearchState.EmptyHistory
                 } else {
-                    _searchState.value = SearchState.History(history)
+                    _searchState.value = SearchState.History(TrackUiMapper.mapListToUi(history))
                 }
             }
             return
@@ -44,18 +45,31 @@ class SearchViewModel(
                         _searchState.value = SearchState.Content(TrackUiMapper.mapListToUi(result.tracks))
                     }
                     SearchInteractor.SearchResult.Empty -> {
-                        _searchState.value = SearchState.Empty // Используем новое состояние
+                        _searchState.value = SearchState.Empty
                     }
                     is SearchInteractor.SearchResult.Error -> {
-                        _searchState.value = SearchState.Error(result.message)
+                        _searchState.value = SearchState.Error(
+                            result.message ?: "Неизвестная ошибка",
+                            result.message ?: "Неизвестная ошибка"
+                        )
                     }
-                    else -> Unit
+                    else -> {
+                        _searchState.value = SearchState.Error(
+                            "Неизвестный результат поиска",
+                            "Неизвестный результат поиска"
+                        )
+                    }
                 }
             } catch (e: Exception) {
-                _searchState.value = SearchState.Error(e.message ?: "Unknown error")
+                _searchState.value = SearchState.Error(
+                    e.message ?: "Неизвестная ошибка",
+                    e.message ?: "Неизвестная ошибка"
+                )
+                Log.e("SearchViewModel", "Search error", e)
             }
         }
     }
+
 
     fun addTrackToHistory(track: Track) {
         viewModelScope.launch {

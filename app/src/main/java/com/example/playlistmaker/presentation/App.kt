@@ -3,17 +3,24 @@ package com.example.playlistmaker.presentation
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.domain.interactors.SettingsInteractor
+import kotlinx.coroutines.runBlocking
 
 class App : Application() {
 
+    private lateinit var settingsInteractor: SettingsInteractor
     var darkTheme = false
+        private set
 
     override fun onCreate() {
         super.onCreate()
-        val sharedPreferences = getSharedPreferences("app_settings", MODE_PRIVATE)
-        darkTheme = sharedPreferences.getBoolean("dark_theme", false)
-        switchTheme(darkTheme)
         Creator.init(this)
+        settingsInteractor = Creator.provideSettingsInteractor()
+
+        runBlocking {
+            darkTheme = settingsInteractor.getThemeSettings()
+            switchTheme(darkTheme)
+        }
     }
 
     fun switchTheme(darkThemeEnabled: Boolean) {
@@ -25,9 +32,9 @@ class App : Application() {
                 AppCompatDelegate.MODE_NIGHT_NO
             }
         )
-        val sharedPreferences = getSharedPreferences("app_settings", MODE_PRIVATE)
-        sharedPreferences.edit().putBoolean("dark_theme", darkThemeEnabled).apply()
+
+        runBlocking {
+            settingsInteractor.updateThemeSettings(darkThemeEnabled)
+        }
     }
-
-
 }

@@ -1,6 +1,6 @@
 package com.example.playlistmaker.domain.repositories
 
-import com.example.playlistmaker.domain.models.PlayerState
+import com.example.playlistmaker.presentation.ui.states.PlayerState
 import kotlinx.coroutines.flow.Flow
 
 interface PlayerRepository {

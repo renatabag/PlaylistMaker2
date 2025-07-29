@@ -31,7 +31,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
-import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.presentation.mappers.TrackMapper
 import com.example.playlistmaker.presentation.mappers.TrackUiMapper
 import com.example.playlistmaker.presentation.ui.adapters.TrackAdapter
@@ -193,8 +192,7 @@ class SearchActivity : AppCompatActivity() {
                         SearchState.Empty -> showEmptyState()
 
                         is SearchState.History -> {
-                            val uiTracks = TrackUiMapper.mapListToUi(state.tracks)
-                            showHistory(uiTracks)
+                            showHistory(state.tracks)
                         }
                         is SearchState.Error -> showErrorState(state.message, isNetworkError = true)
                         is SearchState.EmptyError -> showErrorState(state.message, isNetworkError = false)
@@ -262,9 +260,8 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showHistory(tracks: List<TrackUi>) {
-        val uiTracks = TrackMapper.mapListToUi(tracks)
-        if (uiTracks.isNotEmpty()) {
-            adapter.updateTracks(uiTracks)
+        if (tracks.isNotEmpty()) {
+            adapter.updateTracks(tracks) // Просто используем tracks как есть
             recycler.visibility = View.VISIBLE
             emptyStateContainer.visibility = View.GONE
             errorStateContainer.visibility = View.GONE
