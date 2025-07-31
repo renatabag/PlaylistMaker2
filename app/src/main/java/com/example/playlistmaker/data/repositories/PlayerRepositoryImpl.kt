@@ -1,4 +1,4 @@
-package com.example.playlistmaker.domain.repositories.impl
+package com.example.playlistmaker.data.repositories
 
 import android.media.MediaPlayer
 import com.example.playlistmaker.presentation.ui.states.PlayerState

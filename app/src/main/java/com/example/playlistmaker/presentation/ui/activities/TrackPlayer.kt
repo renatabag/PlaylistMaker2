@@ -20,13 +20,15 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
-import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.domain.interactors.PlayerInteractor
 import com.example.playlistmaker.presentation.ui.states.PlayerState
 import com.example.playlistmaker.presentation.ui.states.TrackUi
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TrackPlayer : AppCompatActivity() {
-    private val playerInteractor by lazy { Creator.providePlayerInteractor() }
-    private val viewModel by lazy { PlayerViewModel(playerInteractor) }
+    private val playerInteractor: PlayerInteractor by inject()
+    private val viewModel: PlayerViewModel by viewModel()
     private lateinit var track: TrackUi
 
     @SuppressLint("MissingInflatedId")

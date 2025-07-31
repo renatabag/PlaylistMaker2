@@ -34,7 +34,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.presentation.ui.adapters.TrackAdapter
 import com.example.playlistmaker.presentation.ui.states.SearchState
 import com.example.playlistmaker.presentation.ui.states.TrackUi
@@ -42,10 +41,11 @@ import com.example.playlistmaker.presentation.viewmodels.SearchViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
 
-    private val viewModel: SearchViewModel by viewModels { Creator.provideSearchViewModelFactory() }
+    private val viewModel: SearchViewModel by viewModel()
 
     private lateinit var inputEditText: EditText
     private lateinit var recycler: RecyclerView
