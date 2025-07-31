@@ -1,0 +1,228 @@
+Index: app/src/main/java/com/example/playlistmaker/creator/Creator.kt
+===================================================================
+diff --git a/app/src/main/java/com/example/playlistmaker/creator/Creator.kt b/app/src/main/java/com/example/playlistmaker/creator/Creator.kt
+deleted file mode 100644
+--- a/app/src/main/java/com/example/playlistmaker/creator/Creator.kt	(revision 85341f49f551c005f0326bd5e38756e9b64522fd)
++++ /dev/null	(revision 85341f49f551c005f0326bd5e38756e9b64522fd)
+@@ -1,88 +0,0 @@
+-package com.example.playlistmaker.creator
+-
+-import SearchHistoryRepositoryImpl
+-import android.content.Context
+-import android.media.MediaPlayer
+-import androidx.core.content.ContentProviderCompat.requireContext
+-import androidx.lifecycle.ViewModel
+-import androidx.lifecycle.ViewModelProvider
+-import com.example.playlistmaker.data.mappers.TrackMapper
+-import com.example.playlistmaker.data.network.ItunesApi
+-import com.example.playlistmaker.data.network.RetrofitClient
+-import com.example.playlistmaker.data.repositories.SettingsRepositoryImpl
+-import com.example.playlistmaker.data.repositories.TracksRepositoryImpl
+-import com.example.playlistmaker.data.storage.SharedPrefsStorage
+-import com.example.playlistmaker.domain.interactors.PlayerInteractor
+-import com.example.playlistmaker.domain.interactors.SearchInteractor
+-import com.example.playlistmaker.domain.interactors.SettingsInteractor
+-import com.example.playlistmaker.domain.interactors.impl.PlayerInteractorImpl
+-import com.example.playlistmaker.domain.interactors.impl.SearchInteractorImpl
+-import com.example.playlistmaker.domain.interactors.impl.SettingsInteractorImpl
+-import com.example.playlistmaker.domain.repositories.PlayerRepository
+-import com.example.playlistmaker.domain.repositories.SearchHistoryRepository
+-import com.example.playlistmaker.domain.repositories.SettingsRepository
+-import com.example.playlistmaker.domain.repositories.TracksRepository
+-import com.example.playlistmaker.domain.repositories.impl.PlayerRepositoryImpl
+-import com.example.playlistmaker.presentation.viewmodels.SearchViewModel
+-import com.example.playlistmaker.presentation.viewmodels.SettingsViewModel
+-
+-object Creator {
+-    private var context: Context? = null
+-
+-    fun init(context: Context) {
+-        this.context = context.applicationContext
+-    }
+-    internal const val BASE_URL = "https://itunes.apple.com/"
+-
+-    fun provideSearchViewModelFactory(): ViewModelProvider.Factory {
+-        return object : ViewModelProvider.Factory {
+-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+-                val api = provideItunesApi()
+-                val repository = provideTracksRepository(api)
+-                val searchInteractor = provideSearchInteractor(repository)
+-                return SearchViewModel(searchInteractor) as T
+-            }
+-        }
+-    }
+-
+-    private fun provideItunesApi(): ItunesApi = RetrofitClient.itunesApi
+-
+-    private fun provideTracksRepository(api: ItunesApi): TracksRepository {
+-        return TracksRepositoryImpl(api, TrackMapper())
+-    }
+-
+-    private fun provideSearchInteractor(repository: TracksRepository): SearchInteractor {
+-        return SearchInteractorImpl(repository, provideSearchHistoryRepository())
+-    }
+-
+-    private fun provideSearchHistoryRepository(): SearchHistoryRepository {
+-        return SearchHistoryRepositoryImpl(
+-            SharedPrefsStorage(requireContext()),
+-            TrackMapper()
+-        )
+-    }
+-    private fun requireContext(): Context {
+-        return context ?: throw IllegalStateException("Context not initialized. Call Creator.init() first.")
+-    }
+-    fun providePlayerInteractor(): PlayerInteractor {
+-        return PlayerInteractorImpl(providePlayerRepository())
+-    }
+-
+-    fun providePlayerRepository(): PlayerRepository {
+-        return PlayerRepositoryImpl(MediaPlayer())
+-    }
+-    fun provideSettingsInteractor(): SettingsInteractor {
+-        return SettingsInteractorImpl(provideSettingsRepository())
+-    }
+-
+-    private fun provideSettingsRepository(): SettingsRepository {
+-        return SettingsRepositoryImpl(SharedPrefsStorage(requireContext()))
+-    }
+-    fun provideSettingsViewModelFactory(): ViewModelProvider.Factory {
+-        return object : ViewModelProvider.Factory {
+-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+-                return SettingsViewModel(provideSettingsInteractor()) as T
+-            }
+-        }
+-    }
+-}
+\ No newline at end of file
+Index: app/src/main/java/com/example/playlistmaker/DI/ViewModelModule.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/playlistmaker/DI/ViewModelModule.kt b/app/src/main/java/com/example/playlistmaker/DI/ViewModelModule.kt
+new file mode 100644
+--- /dev/null	(date 1753955897422)
++++ b/app/src/main/java/com/example/playlistmaker/DI/ViewModelModule.kt	(date 1753955897422)
+@@ -0,0 +1,19 @@
++package com.example.playlistmaker.DI
++
++import com.example.playlistmaker.presentation.viewmodels.PlayerViewModel
++import com.example.playlistmaker.presentation.viewmodels.SearchViewModel
++import com.example.playlistmaker.presentation.viewmodels.SettingsViewModel
++import org.koin.androidx.viewmodel.dsl.viewModel
++import org.koin.dsl.module
++
++val viewModelModule = module {
++    viewModel{
++        PlayerViewModel(get())
++    }
++    viewModel{
++        SearchViewModel(get())
++    }
++    viewModel{
++        SettingsViewModel(get())
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/example/playlistmaker/DI/RepositoryModule.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/playlistmaker/DI/RepositoryModule.kt b/app/src/main/java/com/example/playlistmaker/DI/RepositoryModule.kt
+new file mode 100644
+--- /dev/null	(date 1753954943887)
++++ b/app/src/main/java/com/example/playlistmaker/DI/RepositoryModule.kt	(date 1753954943887)
+@@ -0,0 +1,18 @@
++package com.example.playlistmaker.DI
++
++import com.example.playlistmaker.data.repositories.PlayerRepositoryImpl
++import com.example.playlistmaker.data.repositories.SearchHistoryRepositoryImpl
++import com.example.playlistmaker.data.repositories.SettingsRepositoryImpl
++import com.example.playlistmaker.data.repositories.TracksRepositoryImpl
++import com.example.playlistmaker.domain.repositories.PlayerRepository
++import com.example.playlistmaker.domain.repositories.SearchHistoryRepository
++import com.example.playlistmaker.domain.repositories.SettingsRepository
++import com.example.playlistmaker.domain.repositories.TracksRepository
++import org.koin.dsl.module
++
++val repositoryModule = module {
++    single<PlayerRepository> { PlayerRepositoryImpl(get()) }
++    single<SearchHistoryRepository>{ SearchHistoryRepositoryImpl(get(),get()) }
++    single<SettingsRepository> { SettingsRepositoryImpl(get()) }
++    single<TracksRepository>{ TracksRepositoryImpl(get(),get()) }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/example/playlistmaker/DI/InteractorModule.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/playlistmaker/DI/InteractorModule.kt b/app/src/main/java/com/example/playlistmaker/DI/InteractorModule.kt
+new file mode 100644
+--- /dev/null	(date 1753957026123)
++++ b/app/src/main/java/com/example/playlistmaker/DI/InteractorModule.kt	(date 1753957026123)
+@@ -0,0 +1,26 @@
++package com.example.playlistmaker.DI
++
++import com.example.playlistmaker.domain.SearchTracksUseCase
++import com.example.playlistmaker.domain.TrackUtils
++import com.example.playlistmaker.domain.interactors.PlayerInteractor
++import com.example.playlistmaker.domain.interactors.SearchInteractor
++import com.example.playlistmaker.domain.interactors.SettingsInteractor
++import com.example.playlistmaker.domain.interactors.impl.PlayerInteractorImpl
++import com.example.playlistmaker.domain.interactors.impl.SearchInteractorImpl
++import com.example.playlistmaker.domain.interactors.impl.SettingsInteractorImpl
++import org.koin.dsl.module
++
++val interactorModule = module {
++    single<PlayerInteractor> { PlayerInteractorImpl(get()) }
++    single<SearchInteractor>{ SearchInteractorImpl(get(),get()) }
++    single<SettingsInteractor> { SettingsInteractorImpl(get()) }
++    single { TrackUtils }
++
++    factory {
++        SearchTracksUseCase(
++            tracksRepository = get(),
++            searchHistoryRepository = get(),
++            trackUiMapper = get()
++        )
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/example/playlistmaker/DI/DataModule.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/playlistmaker/DI/DataModule.kt b/app/src/main/java/com/example/playlistmaker/DI/DataModule.kt
+new file mode 100644
+--- /dev/null	(date 1753956461186)
++++ b/app/src/main/java/com/example/playlistmaker/DI/DataModule.kt	(date 1753956461186)
+@@ -0,0 +1,25 @@
++package com.example.playlistmaker.DI
++
++import android.media.MediaPlayer
++import com.example.playlistmaker.data.NetworkMonitor
++import com.example.playlistmaker.data.SearchHistory
++import com.example.playlistmaker.data.mappers.TrackMapper
++import com.example.playlistmaker.data.network.RetrofitClient
++import com.example.playlistmaker.data.storage.SharedPrefsStorage
++import com.google.gson.Gson
++import org.koin.android.ext.koin.androidContext
++import org.koin.dsl.module
++
++val dataModule = module {
++    single{ RetrofitClient.itunesApi }
++
++    single{ SharedPrefsStorage(androidContext()) }
++
++    single{ TrackMapper() }
++
++    single { NetworkMonitor(androidContext()) }
++    single { SearchHistory(androidContext(), get()) }
++    factory { Gson() }
++
++    factory { MediaPlayer() }
++}
+\ No newline at end of file
