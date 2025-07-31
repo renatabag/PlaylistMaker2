@@ -3,10 +3,10 @@ package com.example.playlistmaker.data
 import android.content.Context
 import android.content.SharedPreferences
 import com.example.playlistmaker.data.dto.TrackDTO
-import com.example.playlistmaker.domain.Track
+import com.example.playlistmaker.data.mappers.TrackMapper
+import com.example.playlistmaker.domain.models.Track
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlin.collections.map
 
 class SearchHistory(
     private val context: Context,
@@ -29,7 +29,7 @@ class SearchHistory(
     }
 
     fun getHistory(): List<Track> {
-        return getHistoryAsDto().map { trackMapper.map(it) }
+        return getHistoryAsDto().map { trackMapper.mapToDomain(it) } // Исправлено здесь
     }
 
     private fun getHistoryAsDto(): List<TrackDTO> {
