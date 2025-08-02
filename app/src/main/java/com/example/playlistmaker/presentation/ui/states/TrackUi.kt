@@ -53,35 +53,35 @@ data class TrackUi(
 
         override fun newArray(size: Int): Array<TrackUi?> = arrayOfNulls(size)
 
-            fun fromDomain(track: TrackUi): TrackUi {
-                return TrackUi(
-                    track.trackId,
-                    track.trackName,
-                    track.artistName,
-                    track.trackTimeMillis,
-                    track.artworkUrl,
-                    track.collectionName,
-                    track.releaseDate,
-                    track.genre,
-                    track.country,
-                    track.previewUrl
-                )
-            }
+        fun fromDomain(track: TrackUi): TrackUi {
+            return TrackUi(
+                track.trackId,
+                track.trackName,
+                track.artistName,
+                track.trackTimeMillis,
+                track.artworkUrl,
+                track.collectionName,
+                track.releaseDate,
+                track.genre,
+                track.country,
+                track.previewUrl
+            )
+        }
 
-            fun toDomain(trackUi: TrackUi): Track {
-                return Track(
-                    trackUi.trackId,
-                    trackUi.trackName,
-                    trackUi.artistName,
-                    trackUi.trackTimeMillis,
-                    trackUi.artworkUrl,
-                    trackUi.collectionName,
-                    trackUi.releaseDate,
-                    trackUi.genre,
-                    trackUi.country,
-                    trackUi.previewUrl
-                )
-            }
+        fun toDomain(trackUi: TrackUi): Track {
+            return Track(
+                trackUi.trackId,
+                trackUi.trackName,
+                trackUi.artistName,
+                trackUi.trackTimeMillis,
+                trackUi.artworkUrl,
+                trackUi.collectionName,
+                trackUi.releaseDate,
+                trackUi.genre,
+                trackUi.country,
+                trackUi.previewUrl
+            )
+        }
 
     }
 }
