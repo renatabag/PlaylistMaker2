@@ -12,4 +12,5 @@ class NetworkMonitor constructor(
         val networkInfo = connectivityManager.activeNetworkInfo
         return networkInfo != null && networkInfo.isConnected
     }
+
 }
