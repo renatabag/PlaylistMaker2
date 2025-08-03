@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    style="@style/Base.Theme.PlaylistMakerr"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/fragment_list">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/playlists_recycler"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/create_playlist_button"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/layoutHeighButton"
+        android:text="@string/new_playlist"
+        android:textColor="@color/background"
+        android:textSize="@dimen/textSizeButton"
+        android:textAllCaps="false"
+        app:backgroundTint="@color/track_text_color"
+        app:cornerRadius="@dimen/radiusButton"
+        android:fontFamily="@font/ys_display_medium"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="@dimen/layoutMarginTopBytton"/>
+
+    <ImageView
+        android:id="@+id/empty_media_state_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/empty"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="@dimen/layoutMarginTopImage"/>
+
+    <TextView
+        android:id="@+id/empty_list_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/empty_playlist"
+        android:fontFamily="@font/ys_display_medium"
+        android:textSize="@dimen/textSizeEmpty"
+        android:textColor="@color/track_text_color"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/empty_media_state_image"
+        android:layout_marginTop="@dimen/layoutMarginTopText"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
