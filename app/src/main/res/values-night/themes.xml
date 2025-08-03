@@ -60,12 +60,8 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:fontFamily">@font/ys_display_medium</item>
     </style>
-    <style name="MyTabTextAppearance" parent="TextAppearance.Design.Tab">
-        <item name="android:textSize">16sp</item> <!-- Нужный размер -->
-        <item name="android:textColor">@color/track_text_color</item>
-    </style>
 
-    <style name="Base.Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Base.Theme.PlaylistMaker" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:background">@color/dark</item>
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
@@ -73,6 +69,8 @@
 
 
     <style name="Base.Theme.PlaylistMakerr" parent="Theme.Material3.DayNight.NoActionBar">
+
+        <item name="android:background">@color/dark</item>
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>

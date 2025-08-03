@@ -39,34 +39,13 @@
     <dimen name="track_icons">51dp</dimen>
     <dimen name="margine_track">16dp</dimen>
     <dimen name="small_text_track">11sp</dimen>
-    <dimen name="tab">14sp</dimen>
     <dimen name="four_dp">4dp</dimen>
-    <dimen name="margin_medium">16dp</dimen>
-    <dimen name="margin_large">24dp</dimen>
     <dimen name="circular_size">44dp</dimen>
     <color name="dark_white">#1A1B22</color>
     <color name="blue_switch">#3772E7</color>
     <color name="grey_switch">#AEAFB4</color>
     <color name="blue_switch_light">#9FBBF3</color>
     <color name="grey_switch_light">#E6E8EB</color>
-
-
-    //размеры для медиа
-    <dimen name="tabIndicatorHeight">2dp</dimen>
-    <dimen name="layoutHeighButton">48dp</dimen>
-    <dimen name="textSizeButton">14sp</dimen>
-    <dimen name="radiusButton">54dp</dimen>
-    <dimen name="layoutMarginTopBytton">24dp</dimen>
-    <dimen name="layoutMarginTopImage">110dp</dimen>
-    <dimen name="textSizeEmpty">16sp</dimen>
-    <dimen name="layoutMarginTopText">16dp</dimen>
-
-    <style name="TabTextAppearance" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:textSize">14sp</item>
-        <item name="android:paddingStart">16dp</item>
-        <item name="android:paddingEnd">16dp</item>
-        <item name="android:gravity">center</item>
-    </style>
 
 
     <style name="primary_settings_back_button" parent="Widget.MaterialComponents.Button">
@@ -112,13 +91,8 @@
         <item name="android:fontFamily">@font/ys_display_medium</item>
     </style>
 
-    <style name="MyTabTextAppearance" parent="TextAppearance.Design.Tab">
-        <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/track_text_color</item>
-    </style>
 
-
-    <style name="Base.Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Base.Theme.PlaylistMaker" parent="Theme.Material3.DayNight.NoActionBar">
 
         <item name="android:background">@color/blue</item>
         <!-- Customize your light theme here. -->
@@ -127,6 +101,9 @@
 
     <style name="Base.Theme.PlaylistMakerr" parent="Theme.Material3.DayNight.NoActionBar">
 
+        <item name="android:background">@color/white</item>
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
 
