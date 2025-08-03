@@ -8,8 +8,8 @@
         android:orientation="vertical"
         tools:context=".presentation.ui.activities.SettingsActivity"
         android:paddingVertical="@dimen/padding_vertical_settings"
-        android:layout_marginTop="@dimen/zero"
-        android:background="@color/background">
+
+        android:layout_marginTop="@dimen/zero">
 
         <Button
             android:layout_width="wrap_content"

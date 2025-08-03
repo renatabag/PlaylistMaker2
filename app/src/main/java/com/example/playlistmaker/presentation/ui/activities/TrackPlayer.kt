@@ -20,15 +20,13 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
-import com.example.playlistmaker.domain.interactors.PlayerInteractor
+import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.presentation.ui.states.PlayerState
 import com.example.playlistmaker.presentation.ui.states.TrackUi
-import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TrackPlayer : AppCompatActivity() {
-    private val playerInteractor: PlayerInteractor by inject()
-    private val viewModel: PlayerViewModel by viewModel()
+    private val playerInteractor by lazy { Creator.providePlayerInteractor() }
+    private val viewModel by lazy { PlayerViewModel(playerInteractor) }
     private lateinit var track: TrackUi
 
     @SuppressLint("MissingInflatedId")
@@ -45,7 +43,6 @@ class TrackPlayer : AppCompatActivity() {
             insets
         }
 
-        viewModel.resetPlayer()
         track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra("TRACK", TrackUi::class.java)
         } else {
@@ -55,7 +52,6 @@ class TrackPlayer : AppCompatActivity() {
             finish()
             return
         }
-
 
         displayTrackDetails(track)
         setupButtonListeners()
@@ -90,7 +86,7 @@ class TrackPlayer : AppCompatActivity() {
         findViewById<ImageButton>(R.id.menu_button).setOnClickListener {
             when (val state = viewModel.playerState.value) {
                 is PlayerState.Playing -> viewModel.pausePlayer()
-                else -> {}
+                else -> {} // Ничего не делаем для других состояний
             }
             finish()
         }

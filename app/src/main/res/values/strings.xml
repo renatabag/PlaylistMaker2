@@ -4,7 +4,6 @@
     <string name="search_button_text">Поиск</string>
     <string name="media_library_button_text">Медиатека</string>
     <string name="settings_button_text">Настройки</string>
-    <string name="medialab_button_text">Медиатека</string>
     <string name="back_button_text">Назад</string>
     <string name="dark_theme_button_text">Темная тема</string>
     <string name="share_app_button_text">Поделиться приложением</string>
@@ -45,12 +44,5 @@
     <string name="text_retry">Обновить</string>
     <string name="text_time">0:30</string>
     <string name="text_track">Yesterday (Remastered 2009)</string>
-
-    <string name="empty_medialab">Ваша медиатека пуста</string>
-    <string name="tab_favorites">Избранные треки</string>
-    <string name="tab_playlists">Плейлисты</string>
-    <string name="new_playlist">Новый плейлист</string>
-    <string name="empty_playlist">Вы не создали ни одного плейлиста</string>
-
 
 </resources>

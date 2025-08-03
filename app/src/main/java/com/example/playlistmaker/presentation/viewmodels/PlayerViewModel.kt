@@ -65,8 +65,4 @@ class PlayerViewModel(
     companion object {
         private const val PROGRESS_UPDATE_DELAY = 300L
     }
-    fun resetPlayer() {
-        playerInteractor.release()
-        _playerState.value = PlayerState.Default(0L)
-    }
 }
