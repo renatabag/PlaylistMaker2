@@ -45,7 +45,6 @@ class TrackPlayer : AppCompatActivity() {
             insets
         }
 
-        viewModel.resetPlayer()
         track = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra("TRACK", TrackUi::class.java)
         } else {
@@ -55,7 +54,6 @@ class TrackPlayer : AppCompatActivity() {
             finish()
             return
         }
-
 
         displayTrackDetails(track)
         setupButtonListeners()
@@ -90,7 +88,7 @@ class TrackPlayer : AppCompatActivity() {
         findViewById<ImageButton>(R.id.menu_button).setOnClickListener {
             when (val state = viewModel.playerState.value) {
                 is PlayerState.Playing -> viewModel.pausePlayer()
-                else -> {}
+                else -> {} // Ничего не делаем для других состояний
             }
             finish()
         }
