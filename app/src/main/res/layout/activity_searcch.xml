@@ -6,7 +6,8 @@
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/background">
+    android:background="@color/background"
+    >
 
     <Button
         android:id="@+id/button_back"
@@ -30,17 +31,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/rectangle"
-            android:textColor="@color/black"
             android:drawableStart="@drawable/baseline_search_24"
             android:drawablePadding="@dimen/radius"
             android:drawableTint="@color/rectangle_text_color"
             android:hint="@string/input_hint"
-            android:textColorHint="@color/rectangle_text_color"
+            android:imeOptions="actionDone"
             android:inputType="text"
             android:padding="@dimen/radius"
-            android:textCursorDrawable="@color/blue"
-            android:imeOptions="actionDone"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textColorHint="@color/rectangle_text_color"
+            android:textCursorDrawable="@color/blue" />
 
         <ImageView
             android:id="@+id/clearIcon"
