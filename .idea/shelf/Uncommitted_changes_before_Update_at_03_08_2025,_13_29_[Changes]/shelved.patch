@@ -1,0 +1,46 @@
+Index: app/src/main/java/com/example/playlistmaker/presentation/ui/activities/MediaLibraryActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.playlistmaker.presentation.ui.activities\n\nimport android.os.Bundle\nimport androidx.appcompat.app.AppCompatActivity\nimport com.example.playlistmaker.R\nimport androidx.activity.enableEdgeToEdge\nimport androidx.core.view.ViewCompat\nimport androidx.core.view.WindowInsetsCompat\nimport androidx.core.view.updatePadding\nimport com.example.playlistmaker.R.id.medialb\n\n\nclass MediaLibraryActivity : AppCompatActivity() {\n    override fun onCreate(savedInstanceState: Bundle?) {\n        super.onCreate(savedInstanceState)\n        enableEdgeToEdge()\n        setContentView(R.layout.activity_media_library)\n        ViewCompat.setOnApplyWindowInsetsListener(findViewById(medialb)) { view, insets ->\n            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())\n            view.updatePadding(\n                top = systemBars.top,\n                bottom = systemBars.bottom\n            )\n            insets\n        }\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/playlistmaker/presentation/ui/activities/MediaLibraryActivity.kt b/app/src/main/java/com/example/playlistmaker/presentation/ui/activities/MediaLibraryActivity.kt
+--- a/app/src/main/java/com/example/playlistmaker/presentation/ui/activities/MediaLibraryActivity.kt	(revision 94846011141c9fcc5e7a32f3cb1a99e2bd169742)
++++ b/app/src/main/java/com/example/playlistmaker/presentation/ui/activities/MediaLibraryActivity.kt	(date 1754216845180)
+@@ -7,7 +7,6 @@
+ import androidx.core.view.ViewCompat
+ import androidx.core.view.WindowInsetsCompat
+ import androidx.core.view.updatePadding
+-import com.example.playlistmaker.R.id.medialb
+ 
+ 
+ class MediaLibraryActivity : AppCompatActivity() {
+@@ -15,7 +14,7 @@
+         super.onCreate(savedInstanceState)
+         enableEdgeToEdge()
+         setContentView(R.layout.activity_media_library)
+-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(medialb)) { view, insets ->
++        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.medialab)) { view, insets ->
+             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+             view.updatePadding(
+                 top = systemBars.top,
+Index: .idea/deploymentTargetSelector.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"deploymentTargetSelector\">\n    <selectionStates>\n      <SelectionState runConfigName=\"Track_player\">\n        <option name=\"selectionMode\" value=\"DROPDOWN\" />\n      </SelectionState>\n    </selectionStates>\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/deploymentTargetSelector.xml b/.idea/deploymentTargetSelector.xml
+--- a/.idea/deploymentTargetSelector.xml	(revision 94846011141c9fcc5e7a32f3cb1a99e2bd169742)
++++ b/.idea/deploymentTargetSelector.xml	(date 1754216845298)
+@@ -2,7 +2,7 @@
+ <project version="4">
+   <component name="deploymentTargetSelector">
+     <selectionStates>
+-      <SelectionState runConfigName="Track_player">
++      <SelectionState runConfigName="Run">
+         <option name="selectionMode" value="DROPDOWN" />
+       </SelectionState>
+     </selectionStates>
