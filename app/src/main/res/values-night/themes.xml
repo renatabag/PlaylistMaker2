@@ -15,6 +15,7 @@
     <dimen name="very_small_padding">2dp</dimen>
     <dimen name="small_track_text_size">16sp</dimen>
     <color name="dark_white">#FFFFFF</color>
+    <color name="white_dark">#1A1B22</color>
     <dimen name="small_text_track">11sp</dimen>
     <dimen name="four_dp">4dp</dimen>
 
@@ -63,6 +64,15 @@
     <style name="MyTabTextAppearance" parent="TextAppearance.Design.Tab">
         <item name="android:textSize">16sp</item> <!-- Нужный размер -->
         <item name="android:textColor">@color/track_text_color</item>
+    </style>
+
+    <style name="BottomNavTheme" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemBackground">@android:color/transparent</item>
+        <item name="itemRippleColor">@android:color/transparent</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:outlineProvider">none</item>
+
     </style>
 
     <style name="Base.Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">

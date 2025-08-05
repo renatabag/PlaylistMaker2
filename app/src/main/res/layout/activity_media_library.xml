@@ -1,32 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/medialab"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".presentation.ui.activities.MediaLibraryActivity"
-    android:paddingVertical="@dimen/padding_vertical_settings"
-    android:layout_marginTop="@dimen/zero"
-    style="@style/Base.Theme.PlaylistMakerr"
-    android:background="@color/background">
+    android:background="@color/background"
+    tools:context=".presentation.ui.fragments.MediaLibraryFragment">
 
-    <Button
-        android:id="@+id/button_back"
+    <TextView
+        android:id="@+id/backButton"
         style="@style/primary_settings_back_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/media_library_button_text"
-        app:icon="@drawable/baseline_arrow_back_24"
-        app:iconSize="@dimen/button_size"
         android:background="@android:color/transparent"
-        app:iconPadding="@dimen/button_size" />
-
+        android:text="@string/media_library_button_text"
+        android:layout_marginLeft="@dimen/margine_track"
+        android:layout_marginTop="@dimen/time_size"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/zero"
         android:layout_height="wrap_content"
         android:background="@color/background"
         app:tabGravity="fill"
@@ -37,13 +33,19 @@
         app:tabMode="fixed"
         app:tabRippleColor="@android:color/transparent"
         app:tabSelectedTextColor="@color/track_text_color"
-        app:tabTextColor="@color/track_text_color" />
+        app:tabTextColor="@color/track_text_color"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/backButton" />
 
-
+    <!-- ViewPager2 -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
-        android:layout_width="match_parent"
+        android:layout_width="@dimen/zero"
         android:layout_height="@dimen/zero"
-        android:layout_weight="1"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tabLayout"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

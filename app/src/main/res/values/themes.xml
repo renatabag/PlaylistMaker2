@@ -45,10 +45,17 @@
     <dimen name="margin_large">24dp</dimen>
     <dimen name="circular_size">44dp</dimen>
     <color name="dark_white">#1A1B22</color>
+    <color name="white_dark">#FFFFFF</color>
     <color name="blue_switch">#3772E7</color>
     <color name="grey_switch">#AEAFB4</color>
     <color name="blue_switch_light">#9FBBF3</color>
     <color name="grey_switch_light">#E6E8EB</color>
+
+
+    <color name="active_tab_color">#3772E7</color>
+    <color name="inactive_tab_color">@color/dark_white</color>
+    <dimen name="len">0.5dp</dimen>
+
 
 
     //размеры для медиа
@@ -117,10 +124,43 @@
         <item name="android:textColor">@color/track_text_color</item>
     </style>
 
+    <style name="BottomNavButton" parent="Widget.AppCompat.Button.Borderless">
+
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@color/dark_white</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:drawablePadding">2dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+
+        <item name="layout_constraintWidth_percent">0.333</item>
+        <item name="layout_constraintTop_toTopOf">parent</item>
+        <item name="layout_constraintBottom_toBottomOf">parent</item>
+
+        <item name="android:textColor">@color/white_dark</item>
+        <item name="android:drawableTint">@color/dark_white</item>
+    </style>
+
+    <style name="BottomNavTheme" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemBackground">@android:color/transparent</item>
+        <item name="itemRippleColor">@android:color/transparent</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:outlineProvider">none</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textSize">12sp</item>
+        <item name="itemPaddingTop">8dp</item>
+        <item name="itemPaddingBottom">8dp</item>
+        <item name="itemIconSize">24dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">0dp</item>
+    </style>
+
 
     <style name="Base.Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-
-        <item name="android:background">@color/blue</item>
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
