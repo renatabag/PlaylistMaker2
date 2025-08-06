@@ -23,6 +23,7 @@
         app:itemTextColor="@drawable/bottom_nav_text_color_selector"
         android:background="@color/white_dark"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:fontFamily="@font/ys_display_regular"
         >
 
         <View
