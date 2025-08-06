@@ -22,7 +22,8 @@
         app:itemIconTint="@drawable/bottom_nav_icon_color_selector"
         app:itemTextColor="@drawable/bottom_nav_text_color_selector"
         android:background="@color/white_dark"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        >
 
         <View
             android:layout_width="match_parent"

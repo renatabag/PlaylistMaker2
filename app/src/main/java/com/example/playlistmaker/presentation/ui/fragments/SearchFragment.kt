@@ -1,5 +1,6 @@
 package com.example.playlistmaker.presentation.ui.fragments
 
+import android.R.id.message
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -53,10 +54,11 @@ class SearchFragment : Fragment() {
     private val networkChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (isNetworkAvailable()) {
-                binding.connectionErrorMessage.text = "Интернет доступен"
                 binding.inputEditText.text?.toString()?.let { viewModel.searchTracks(it) }
             } else {
-                showErrorState("Проблемы со связью")
+                showErrorState(
+                    message = getString(R.string.network_error_message),
+                )
             }
         }
     }
@@ -108,7 +110,6 @@ class SearchFragment : Fragment() {
         try {
             requireActivity().unregisterReceiver(networkChangeReceiver)
         } catch (e: IllegalArgumentException) {
-            // Receiver was not registered
         }
     }
 
@@ -315,7 +316,7 @@ class SearchFragment : Fragment() {
 
     private fun checkNetworkState() {
         if (!isNetworkAvailable()) {
-            showErrorState("Нет подключения к интернету")
+            showErrorState(message = getString(R.string.network_error_message))
         }
     }
 

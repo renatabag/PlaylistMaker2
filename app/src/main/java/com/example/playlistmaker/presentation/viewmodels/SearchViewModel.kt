@@ -29,7 +29,7 @@ class SearchViewModel(
             if (!isHistoryLoaded) {
                 searchJob = viewModelScope.launch {
                     val history = searchInteractor.getSearchHistory()
-                    isHistoryLoaded = true // Устанавливаем флаг
+                    isHistoryLoaded = true
                     if (history.isEmpty()) {
                         _searchState.value = SearchState.EmptyHistory
                     } else {

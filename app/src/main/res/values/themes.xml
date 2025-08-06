@@ -144,6 +144,8 @@
         <item name="android:drawableTint">@color/dark_white</item>
     </style>
 
+
+
     <style name="BottomNavTheme" parent="Widget.MaterialComponents.BottomNavigationView">
         <item name="itemBackground">@android:color/transparent</item>
         <item name="itemRippleColor">@android:color/transparent</item>
@@ -157,6 +159,7 @@
         <item name="itemIconSize">24dp</item>
         <item name="android:paddingTop">0dp</item>
         <item name="android:paddingBottom">0dp</item>
+        <item name="android:textStyle">normal</item>
     </style>
 
 
