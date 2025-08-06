@@ -6,18 +6,20 @@
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/background">
+    android:background="@color/background"
+    >
 
-    <Button
-        android:id="@+id/button_back"
+
+    <TextView
+        android:id="@+id/text_back"
         style="@style/primary_settings_back_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/search_button_text"
-        app:icon="@drawable/baseline_arrow_back_24"
-        app:iconSize="@dimen/button_size"
+        android:layout_marginTop="@dimen/time_size"
+        android:layout_marginLeft="@dimen/margine_track"
         android:background="@android:color/transparent"
-        app:iconPadding="@dimen/button_size" />
+        android:foreground="?attr/selectableItemBackgroundBorderless"/>
 
     <FrameLayout
         android:padding="@dimen/activity_search_padding"
@@ -30,17 +32,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/rectangle"
-            android:textColor="@color/black"
             android:drawableStart="@drawable/baseline_search_24"
             android:drawablePadding="@dimen/radius"
             android:drawableTint="@color/rectangle_text_color"
             android:hint="@string/input_hint"
-            android:textColorHint="@color/rectangle_text_color"
+            android:imeOptions="actionDone"
             android:inputType="text"
             android:padding="@dimen/radius"
-            android:textCursorDrawable="@color/blue"
-            android:imeOptions="actionDone"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:textColorHint="@color/rectangle_text_color"
+            android:textCursorDrawable="@color/blue" />
 
         <ImageView
             android:id="@+id/clearIcon"
