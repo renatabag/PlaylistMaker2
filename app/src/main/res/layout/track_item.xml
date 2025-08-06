@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/background"
-    tools:context=".presentation.ui.activities.SettingsActivity"
+    tools:context=".presentation.ui.fragments.TrackPlayerFragment"
     style="@style/Base.Theme.PlaylistMakerr">
 
     <ImageView
