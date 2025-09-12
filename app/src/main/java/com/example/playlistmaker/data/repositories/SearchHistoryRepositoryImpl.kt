@@ -4,14 +4,17 @@ import com.example.playlistmaker.data.mappers.TrackMapper
 import com.example.playlistmaker.data.storage.SharedPrefsStorage
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.domain.repositories.SearchHistoryRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class SearchHistoryRepositoryImpl(
     private val sharedPrefsStorage: SharedPrefsStorage,
     private val mapper: TrackMapper
 ) : SearchHistoryRepository {
 
-    override suspend fun getHistory(): List<Track> {
-        return sharedPrefsStorage.getSearchHistory().map { mapper.mapToDomain(it) }
+    override fun getHistory(): Flow<List<Track>> = flow {
+        val history = sharedPrefsStorage.getSearchHistory().map { mapper.mapToDomain(it) }
+        emit(history.distinctBy { it.trackId })
     }
 
     override suspend fun addTrack(track: Track) {

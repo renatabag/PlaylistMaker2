@@ -1,6 +1,6 @@
 package com.example.playlistmaker.presentation.ui.fragments
 
-import android.R.id.message
+import com.example.playlistmaker.utils.Debouncer
 import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -47,7 +47,7 @@ class SearchFragment : Fragment() {
     private val viewModel: SearchViewModel by viewModel()
     private lateinit var adapter: TrackAdapter
 
-    private val handler = Handler(Looper.getMainLooper())
+    private lateinit var debouncer: Debouncer
     private var searchRunnable: Runnable? = null
     private val debounceDelay = 2000L
 
@@ -75,6 +75,8 @@ class SearchFragment : Fragment() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        debouncer = Debouncer(viewLifecycleOwner.lifecycleScope)
 
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
@@ -106,15 +108,12 @@ class SearchFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        searchRunnable?.let { handler.removeCallbacks(it) }
-        try {
-            requireActivity().unregisterReceiver(networkChangeReceiver)
-        } catch (e: IllegalArgumentException) {
-        }
+        debouncer.cancel()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        debouncer.cancel()
         _binding = null
     }
 
@@ -130,14 +129,17 @@ class SearchFragment : Fragment() {
     }
 
     private fun setupAdapter() {
-        adapter = TrackAdapter(emptyList()) { trackUi ->
-            val track = TrackUi.CREATOR.toDomain(trackUi)
-            viewModel.addTrackToHistory(track)
+        adapter = TrackAdapter(
+            tracks = emptyList(),
+            scope = viewLifecycleOwner.lifecycleScope, // Передаем scope для debounce кликов
+            onTrackClick = { trackUi ->
+                val track = TrackUi.CREATOR.toDomain(trackUi)
+                viewModel.addTrackToHistory(track)
 
-            val bundle = bundleOf("track" to trackUi)
-            findNavController().navigate(R.id.track_player, bundle)
-
-        }
+                val bundle = bundleOf("track" to trackUi)
+                findNavController().navigate(R.id.track_player, bundle)
+            }
+        )
         binding.tracksList.layoutManager = LinearLayoutManager(requireContext())
         binding.tracksList.adapter = adapter
     }
@@ -292,14 +294,19 @@ class SearchFragment : Fragment() {
     }
 
     private fun scheduleSearch(query: String) {
-        searchRunnable?.let { handler.removeCallbacks(it) }
-        searchRunnable = Runnable { viewModel.searchTracks(query) }
-        handler.postDelayed(searchRunnable!!, debounceDelay)
+        debouncer.debounce(DEBOUNCE_DELAY) {
+            viewModel.searchTracks(query)
+        }
     }
 
     private fun performSearch() {
-        searchRunnable?.let { handler.removeCallbacks(it) }
-        binding.inputEditText.text?.toString()?.let { viewModel.searchTracks(it) }
+        // Отменяем отложенный поиск (если был)
+        debouncer.cancel()
+
+        // Немедленно выполняем поиск
+        binding.inputEditText.text?.toString()?.let { query ->
+            viewModel.searchTracks(query)
+        }
         hideKeyboard()
     }
 
@@ -354,6 +361,7 @@ class SearchFragment : Fragment() {
         }
     }
     companion object {
+        private const val DEBOUNCE_DELAY = 2000L
         fun newInstance() = SearchFragment()
     }
 }

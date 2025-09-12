@@ -8,5 +8,4 @@ sealed class SearchState {
     data class Error(val message: String, val string: String) : SearchState()
     data class History(val tracks: List<TrackUi>) : SearchState()
     object EmptyHistory : SearchState()
-
 }

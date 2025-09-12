@@ -2,7 +2,7 @@ package com.example.playlistmaker.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.playlistmaker.domain.interactors.PlayerInteractor
+import com.example.playlistmaker.domain.repositories.PlayerRepository
 import com.example.playlistmaker.presentation.ui.states.PlayerState
 import com.example.playlistmaker.presentation.ui.states.TrackUi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,62 +11,44 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class PlayerViewModel(
-    private val playerInteractor: PlayerInteractor
+    private val playerRepository: PlayerRepository
 ) : ViewModel() {
 
-    private val _playerState = MutableStateFlow<PlayerState>(PlayerState.Default(0L))
+    private val _playerState = MutableStateFlow<PlayerState>(PlayerState.Default)
     val playerState: StateFlow<PlayerState> = _playerState.asStateFlow()
 
     fun preparePlayer(track: TrackUi) {
-        track.previewUrl?.let { url ->
-            viewModelScope.launch {
-                playerInteractor.prepare(url).collect { state ->
+        viewModelScope.launch {
+            track.previewUrl?.let { url ->
+                playerRepository.prepare(url).collect { state ->
                     _playerState.value = state
                 }
             }
         }
     }
 
-    fun playbackControl() {
-        when (val currentState = _playerState.value) {
-            is PlayerState.Prepared -> playPlayer()
-            is PlayerState.Playing -> pausePlayer()
-            is PlayerState.Paused -> playPlayer()
-            else -> {} // Для других состояний ничего не делаем
-        }
-    }
-
-    private fun playPlayer() {
-        playerInteractor.play()
-        _playerState.value = PlayerState.Playing(playerInteractor.getCurrentPosition())
-        startProgressUpdates()
+    fun playPlayer() {
+        playerRepository.play()
     }
 
     fun pausePlayer() {
-        playerInteractor.pause()
-        _playerState.value = PlayerState.Paused(playerInteractor.getCurrentPosition())
+        playerRepository.pause()
     }
 
-    private fun startProgressUpdates() {
-        viewModelScope.launch {
-            while (_playerState.value is PlayerState.Playing) {
-                val currentPos = playerInteractor.getCurrentPosition()
-                _playerState.value = PlayerState.Playing(currentPos)
-                kotlinx.coroutines.delay(PROGRESS_UPDATE_DELAY)
-            }
-        }
+    fun playbackControl() {
+        playerRepository.playbackControl()
     }
 
     fun releasePlayer() {
-        playerInteractor.release()
-        _playerState.value = PlayerState.Default(0L)
+        playerRepository.release()
     }
 
-    companion object {
-        private const val PROGRESS_UPDATE_DELAY = 300L
-    }
     fun resetPlayer() {
-        playerInteractor.release()
-        _playerState.value = PlayerState.Default(0L)
+        releasePlayer()
+        _playerState.value = PlayerState.Default
+    }
+
+    fun getCurrentPosition(): Long {
+        return playerRepository.getCurrentPosition()
     }
 }

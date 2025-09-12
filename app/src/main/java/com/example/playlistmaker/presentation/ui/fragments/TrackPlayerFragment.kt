@@ -1,6 +1,7 @@
 package com.example.playlistmaker.presentation.ui.fragments
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -36,7 +37,7 @@ class TrackPlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val track = arguments?.getParcelable<TrackUi>(ARG_TRACK) ?: run {
+        val track = getTrackFromArguments() ?: run {
             parentFragmentManager.popBackStack()
             return
         }
@@ -53,6 +54,17 @@ class TrackPlayerFragment : Fragment() {
         }
     }
 
+    @Suppress("DEPRECATION")
+    private fun getTrackFromArguments(): TrackUi? {
+        return arguments?.let { bundle ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                bundle.getParcelable(ARG_TRACK, TrackUi::class.java)
+            } else {
+                bundle.getParcelable(ARG_TRACK)
+            }
+        }
+    }
+
     private fun displayTrackDetails(track: TrackUi) {
         binding.trackName.text = track.trackName
         binding.artistName.text = track.artistName
@@ -62,7 +74,7 @@ class TrackPlayerFragment : Fragment() {
         binding.genreLabelText.text = track.genre
         binding.countryLabelText.text = track.country
 
-        val artworkUrl = track.artworkUrl?.replace("100x100bb.jpg", "512x512bb.jpg")
+        val artworkUrl = track.artworkUrl.replace("100x100bb.jpg", "512x512bb.jpg")
         Glide.with(requireContext())
             .load(artworkUrl)
             .placeholder(R.drawable.placeholder_track)
@@ -92,44 +104,56 @@ class TrackPlayerFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.playerState.collect { state ->
-                    when (state) {
-                        is PlayerState.Prepared -> {
-                            binding.pause.isEnabled = true
-                            binding.trackTimeNow.text = TrackUtils.formatTrackTime(state.position)
-                            binding.pause.setImageResource(R.drawable.pause)
-                        }
-                        is PlayerState.Playing -> {
-                            binding.pause.isEnabled = true
-                            binding.pause.setImageResource(R.drawable.play)
-                            binding.trackTimeNow.text = TrackUtils.formatTrackTime(state.position)
-                        }
-                        is PlayerState.Paused -> {
-                            binding.pause.isEnabled = true
-                            binding.pause.setImageResource(R.drawable.pause)
-                            binding.trackTimeNow.text = TrackUtils.formatTrackTime(state.position)
-                        }
-                        is PlayerState.Error -> {
-                            binding.pause.isEnabled = false
-                            binding.pause.setImageResource(R.drawable.pause)
-                        }
-                        is PlayerState.Default -> {
-                            binding.pause.isEnabled = false
-                            binding.pause.setImageResource(R.drawable.pause)
-                            binding.trackTimeNow.text = "00:00"
-                        }
-                        is PlayerState.Progress -> {
-                            binding.pause.isEnabled = false
-                            binding.trackTimeNow.text = TrackUtils.formatTrackTime(state.position)
-                        }
-                        is PlayerState.Complete -> {
-                            binding.pause.isEnabled = true
-                            binding.pause.setImageResource(R.drawable.play)
-                            binding.trackTimeNow.text = "00:00"
-                        }
-                    }
+                    updatePlayerUI(state)
                 }
             }
         }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun updatePlayerUI(state: PlayerState) {
+        when (state) {
+            is PlayerState.Prepared -> {
+                binding.pause.isEnabled = true
+                binding.trackTimeNow.text = formatTime(state.position)
+                binding.pause.setImageResource(R.drawable.pause)
+            }
+            is PlayerState.Playing -> {
+                binding.pause.isEnabled = true
+                binding.pause.setImageResource(R.drawable.play)
+                binding.trackTimeNow.text = formatTime(state.position)
+            }
+            is PlayerState.Paused -> {
+                binding.pause.isEnabled = true
+                binding.pause.setImageResource(R.drawable.pause)
+                binding.trackTimeNow.text = formatTime(state.position)
+            }
+            is PlayerState.Progress -> {
+                binding.pause.isEnabled = true
+                binding.trackTimeNow.text = formatTime(state.position)
+            }
+            is PlayerState.Complete -> {
+                binding.pause.isEnabled = true
+                binding.pause.setImageResource(R.drawable.pause)
+                binding.trackTimeNow.text = "00:00"
+            }
+            is PlayerState.Error -> {
+                binding.pause.isEnabled = false
+                binding.pause.setImageResource(R.drawable.pause)
+                binding.trackTimeNow.text = "00:00"
+            }
+            is PlayerState.Default -> {
+                binding.pause.isEnabled = false
+                binding.pause.setImageResource(R.drawable.pause)
+                binding.trackTimeNow.text = "00:00"
+            }
+        }
+    }
+
+    private fun formatTime(milliseconds: Long): String {
+        val seconds = (milliseconds / 1000) % 60
+        val minutes = (milliseconds / (1000 * 60)) % 60
+        return String.format("%02d:%02d", minutes, seconds)
     }
 
     override fun onPause() {
