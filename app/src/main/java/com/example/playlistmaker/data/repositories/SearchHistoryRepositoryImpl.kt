@@ -1,38 +1,47 @@
 package com.example.playlistmaker.data.repositories
 
-import com.example.playlistmaker.data.mappers.TrackMapper
 import com.example.playlistmaker.data.storage.SharedPrefsStorage
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.domain.repositories.SearchHistoryRepository
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import java.lang.reflect.Type
 
 class SearchHistoryRepositoryImpl(
-    private val sharedPrefsStorage: SharedPrefsStorage,
-    private val mapper: TrackMapper
+    private val storage: SharedPrefsStorage,
+    private val gson: Gson
 ) : SearchHistoryRepository {
 
-    override suspend fun getHistory(): List<Track> {
-        return sharedPrefsStorage.getSearchHistory().map { mapper.mapToDomain(it) }
+    private val trackListType: Type = object : TypeToken<List<Track>>() {}.type
+
+    override fun getHistory(): Flow<List<Track>> = flow {
+        val historyJson = storage.getSearchHistory()
+        val history = parseHistoryFromJson(historyJson)
+        emit(history)
     }
 
     override suspend fun addTrack(track: Track) {
-        val currentHistory = sharedPrefsStorage.getSearchHistory().toMutableList()
-        val trackDto = mapper.mapToDto(track)
-
-        currentHistory.removeAll { it.trackId == track.trackId }
-        currentHistory.add(0, trackDto)
-
-        if (currentHistory.size > MAX_HISTORY_SIZE) {
-            currentHistory.subList(MAX_HISTORY_SIZE, currentHistory.size).clear()
-        }
-
-        sharedPrefsStorage.saveSearchHistory(currentHistory)
+        val currentHistory = parseHistoryFromJson(storage.getSearchHistory())
+        val updatedHistory = (listOf(track) + currentHistory.filter { it.trackId != track.trackId })
+            .take(10)
+        storage.saveSearchHistory(updatedHistory)
     }
 
     override suspend fun clearHistory() {
-        sharedPrefsStorage.clearSearchHistory()
+        storage.clearSearchHistory()
     }
 
-    companion object {
-        private const val MAX_HISTORY_SIZE = 10
+    private fun parseHistoryFromJson(json: String): List<Track> {
+        return if (json.isNotEmpty()) {
+            try {
+                gson.fromJson(json, trackListType) ?: emptyList()
+            } catch (e: Exception) {
+                emptyList()
+            }
+        } else {
+            emptyList()
+        }
     }
 }

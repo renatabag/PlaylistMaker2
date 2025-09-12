@@ -1,18 +1,19 @@
 package com.example.playlistmaker.domain.interactors
 
 import com.example.playlistmaker.domain.models.Track
+import kotlinx.coroutines.flow.Flow
 
 interface SearchInteractor {
-    suspend fun searchTracks(query: String): SearchResult
+    fun searchTracks(query: String): Flow<SearchResult>
     suspend fun addTrackToHistory(track: Track)
+    fun getSearchHistory(): Flow<List<Track>>
     suspend fun clearSearchHistory()
-    suspend fun getSearchHistory(): List<Track>
 
-    sealed class SearchResult {
-        data class Content(val tracks: List<Track>) : SearchResult()
-        object Empty : SearchResult()
-        data class EmptyError(val message: String) : SearchResult()
-        data class Error(val message: String) : SearchResult()
-        data class History(val tracks: List<Track>) : SearchResult()
+    sealed interface SearchResult {
+        data class Content(val tracks: List<Track>) : SearchResult
+        data class History(val tracks: List<Track>) : SearchResult
+        data class Error(val message: String, val string: String) : SearchResult
+        object Empty : SearchResult
+        object EmptyHistory : SearchResult
     }
 }

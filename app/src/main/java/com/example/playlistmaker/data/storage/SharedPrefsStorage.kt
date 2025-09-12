@@ -2,7 +2,7 @@ package com.example.playlistmaker.data.storage
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.playlistmaker.data.dto.TrackDTO
+import com.example.playlistmaker.domain.models.Track
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -13,18 +13,13 @@ class SharedPrefsStorage(context: Context) {
     )
     private val gson = Gson()
 
-    fun getSearchHistory(): List<TrackDTO> {
-        val json = sharedPrefs.getString(SEARCH_HISTORY_KEY, null)
-        return if (json != null) {
-            val type = object : TypeToken<List<TrackDTO>>() {}.type
-            gson.fromJson(json, type) ?: emptyList()
-        } else {
-            emptyList()
-        }
+    fun getSearchHistory(): String {
+        return sharedPrefs.getString(SEARCH_HISTORY_KEY, "") ?: ""
     }
 
-    fun saveSearchHistory(tracks: List<TrackDTO>) {
-        val json = gson.toJson(tracks)
+    fun saveSearchHistory(tracks: List<Track>) {
+        val type = object : TypeToken<List<Track>>() {}.type
+        val json = gson.toJson(tracks, type)
         sharedPrefs.edit().putString(SEARCH_HISTORY_KEY, json).apply()
     }
 
@@ -45,5 +40,4 @@ class SharedPrefsStorage(context: Context) {
         private const val SEARCH_HISTORY_KEY = "search_history"
         private const val THEME_KEY = "theme_setting"
     }
-
 }

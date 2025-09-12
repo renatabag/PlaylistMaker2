@@ -1,6 +1,5 @@
 package com.example.playlistmaker.presentation.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.domain.interactors.SearchInteractor
@@ -11,10 +10,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class SearchViewModel(
-    private val searchInteractor: SearchInteractor
+    private val searchInteractor: SearchInteractor,
+    private val trackUiMapper: TrackUiMapper
 ) : ViewModel() {
 
     private val _searchState = MutableStateFlow<SearchState>(SearchState.Empty)
@@ -27,53 +29,44 @@ class SearchViewModel(
         searchJob?.cancel()
         if (query.isEmpty()) {
             if (!isHistoryLoaded) {
-                searchJob = viewModelScope.launch {
-                    val history = searchInteractor.getSearchHistory()
-                    isHistoryLoaded = true
-                    if (history.isEmpty()) {
-                        _searchState.value = SearchState.EmptyHistory
-                    } else {
-                        _searchState.value = SearchState.History(TrackUiMapper.mapListToUi(history))
-                    }
-                }
+                loadSearchHistory()
             }
             return
         }
+
         _searchState.value = SearchState.Loading
         searchJob = viewModelScope.launch {
             delay(SEARCH_DEBOUNCE_DELAY)
 
-            try {
-                when (val result = searchInteractor.searchTracks(query)) {
-                    is SearchInteractor.SearchResult.Content -> {
-                        _searchState.value = SearchState.Content(TrackUiMapper.mapListToUi(result.tracks))
-                    }
-                    SearchInteractor.SearchResult.Empty -> {
-                        _searchState.value = SearchState.Empty
-                    }
-                    is SearchInteractor.SearchResult.Error -> {
-                        _searchState.value = SearchState.Error(
+            searchInteractor.searchTracks(query).collect { result ->
+                _searchState.value = when (result) {
+                    is SearchInteractor.SearchResult.Content ->
+                        SearchState.Content(trackUiMapper.mapListToUi(result.tracks))
+                    is SearchInteractor.SearchResult.History ->
+                        SearchState.History(trackUiMapper.mapListToUi(result.tracks))
+                    is SearchInteractor.SearchResult.Error ->
+                        SearchState.Error(
                             result.message ?: "Неизвестная ошибка",
                             result.message ?: "Неизвестная ошибка"
                         )
-                    }
-                    else -> {
-                        _searchState.value = SearchState.Error(
-                            "Неизвестный результат поиска",
-                            "Неизвестный результат поиска"
-                        )
-                    }
+                    SearchInteractor.SearchResult.Empty -> SearchState.Empty
+                    SearchInteractor.SearchResult.EmptyHistory -> SearchState.EmptyHistory
                 }
-            } catch (e: Exception) {
-                _searchState.value = SearchState.Error(
-                    e.message ?: "Неизвестная ошибка",
-                    e.message ?: "Неизвестная ошибка"
-                )
-                Log.e("SearchViewModel", "Search error", e)
             }
         }
     }
 
+    private fun loadSearchHistory() {
+        searchJob = viewModelScope.launch {
+            val history = searchInteractor.getSearchHistory().first()
+            isHistoryLoaded = true
+            if (history.isEmpty()) {
+                _searchState.value = SearchState.EmptyHistory
+            } else {
+                _searchState.value = SearchState.History(trackUiMapper.mapListToUi(history))
+            }
+        }
+    }
 
     fun addTrackToHistory(track: Track) {
         viewModelScope.launch {
@@ -92,20 +85,20 @@ class SearchViewModel(
             isHistoryLoaded = false
         }
     }
+
     fun clearSearch() {
         searchJob?.cancel()
         _searchState.value = SearchState.Empty
         searchJob = viewModelScope.launch {
-            val history = searchInteractor.getSearchHistory()
+            val history = searchInteractor.getSearchHistory().first()
             if (history.isEmpty()) {
                 _searchState.value = SearchState.EmptyHistory
             } else {
-                _searchState.value = SearchState.History(TrackUiMapper.mapListToUi(history))
+                _searchState.value = SearchState.History(trackUiMapper.mapListToUi(history))
             }
             isHistoryLoaded = true
         }
     }
-
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
