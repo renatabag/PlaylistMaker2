@@ -1,0 +1,8 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true">
+        <color android:color="@color/active_tab_color"/>
+    </item>
+    <item>
+        <color android:color="@color/inactive_tab_color"/>
+    </item>
+</selector>

@@ -24,37 +24,18 @@
         android:supportsRtl="true"
         tools:targetApi="31"
         >
-
-        <activity
-            android:theme="@style/Base.Theme.PlaylistMaker"
-            android:name=".presentation.ui.activities.MainActivity"
-            android:exported="true">
+        <activity android:name=".presentation.ui.root.RootActivity"
+            android:theme="@style/Base.Theme.PlaylistMakerr"
+            android:exported="true"
+            android:windowSoftInputMode="adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:theme="@style/Base.Theme.PlaylistMakerr"
-            android:name=".presentation.ui.activities.SettingsActivity"
-            android:exported="true"
-            />
-        <activity
-            android:theme="@style/Base.Theme.PlaylistMakerr"
-            android:name=".presentation.ui.activities.MediaLibraryActivity"
-            android:exported="true"/>
-        <activity
-            android:theme="@style/Base.Theme.PlaylistMakerr"
-            android:name=".presentation.ui.activities.SearchActivity"
-            android:exported="true"/>
-        <meta-data
-            android:name="android.app.lib_name"
-            android:value=""/>
-        <activity
-            android:theme="@style/Base.Theme.PlaylistMakerr"
-            android:name=".presentation.ui.activities.TrackPlayer"
-            android:exported="true" />
+
+
     </application>
 
 </manifest>

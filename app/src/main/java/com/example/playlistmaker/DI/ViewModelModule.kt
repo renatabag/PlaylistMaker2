@@ -11,7 +11,7 @@ val viewModelModule = module {
         PlayerViewModel(get())
     }
     viewModel{
-        SearchViewModel(get())
+        SearchViewModel(get(), get())
     }
     viewModel{
         SettingsViewModel(get())

@@ -4,39 +4,64 @@ import android.media.AudioAttributes
 import android.media.MediaPlayer
 import com.example.playlistmaker.presentation.ui.states.PlayerState
 import com.example.playlistmaker.domain.repositories.PlayerRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 
-class PlayerRepositoryImpl(
-    private var mediaPlayer: MediaPlayer
+class PlayerRepositoryImpl (
+    private val coroutineScope: CoroutineScope
 ) : PlayerRepository {
-    private val _playerState = MutableStateFlow<PlayerState>(PlayerState.Default(0L))
+    private var mediaPlayer: MediaPlayer? = null
+    private val _playerState = MutableStateFlow<PlayerState>(PlayerState.Default)
     private val playerStateFlow = _playerState.asStateFlow()
 
-    init {
-        setupMediaPlayerListeners()
-    }
+    private var progressJob: Job? = null
+    private var isTracking = false
 
     private fun setupMediaPlayerListeners() {
-        mediaPlayer.apply {
+        mediaPlayer?.apply {
             setOnPreparedListener {
                 _playerState.value = PlayerState.Prepared(0L)
+                startProgressUpdates()
             }
             setOnCompletionListener {
-                _playerState.value = PlayerState.Prepared(mediaPlayer.currentPosition.toLong())
+                stopProgressUpdates()
+                _playerState.value = PlayerState.Complete(0L)
             }
             setOnErrorListener { _, what, extra ->
-                _playerState.value = PlayerState.Error(what.toString(), extra, mediaPlayer.currentPosition.toLong())
+                stopProgressUpdates()
+                _playerState.value = PlayerState.Error(what.toString(), extra, currentPosition.toLong())
                 true
             }
         }
     }
 
+    private fun startProgressUpdates() {
+        stopProgressUpdates() // Останавливаем предыдущие обновления
+
+        progressJob = coroutineScope.launch {
+            while (mediaPlayer?.isPlaying == true && !isTracking) {
+                val currentPosition = mediaPlayer?.currentPosition?.toLong() ?: 0L
+                _playerState.value = PlayerState.Progress(currentPosition)
+                delay(1000) // Обновляем каждую секунду
+            }
+        }
+    }
+
+    private fun stopProgressUpdates() {
+        progressJob?.cancel()
+        progressJob = null
+    }
+
     override fun prepare(url: String): Flow<PlayerState> = flow {
         try {
             mediaPlayer?.release()
+            mediaPlayer = null
 
             mediaPlayer = MediaPlayer().apply {
                 setAudioAttributes(
@@ -50,9 +75,11 @@ class PlayerRepositoryImpl(
                     _playerState.value = PlayerState.Prepared(0L)
                 }
                 setOnCompletionListener {
-                    _playerState.value = PlayerState.Prepared(currentPosition.toLong())
+                    stopProgressUpdates()
+                    _playerState.value = PlayerState.Complete(0L)
                 }
                 setOnErrorListener { _, what, extra ->
+                    stopProgressUpdates()
                     _playerState.value = PlayerState.Error(what.toString(), extra, currentPosition.toLong())
                     true
                 }
@@ -70,35 +97,61 @@ class PlayerRepositoryImpl(
         }
     }
 
-
     override fun play() {
-        mediaPlayer.start()
-        _playerState.value = PlayerState.Playing(mediaPlayer.currentPosition.toLong())
+        mediaPlayer?.let { mp ->
+            if (!mp.isPlaying) {
+                mp.start()
+                _playerState.value = PlayerState.Playing(mp.currentPosition.toLong())
+                startProgressUpdates()
+            }
+        }
     }
 
     override fun pause() {
-        mediaPlayer.pause()
-        _playerState.value = PlayerState.Paused(mediaPlayer.currentPosition.toLong())
+        mediaPlayer?.let { mp ->
+            if (mp.isPlaying) {
+                mp.pause()
+                stopProgressUpdates()
+                _playerState.value = PlayerState.Paused(mp.currentPosition.toLong())
+            }
+        }
     }
 
     override fun release() {
-        mediaPlayer.release()
-        _playerState.value = PlayerState.Default(0L)
+        stopProgressUpdates()
+        mediaPlayer?.release()
+        mediaPlayer = null
+        _playerState.value = PlayerState.Default
     }
 
     override fun getCurrentPosition(): Long {
-        return mediaPlayer.currentPosition.toLong()
+        return mediaPlayer?.currentPosition?.toLong() ?: 0L
     }
 
     override fun isPlaying(): Boolean {
-        return mediaPlayer.isPlaying
+        return mediaPlayer?.isPlaying ?: false
     }
 
     override fun playbackControl() {
-        if (mediaPlayer.isPlaying) {
+        if (isPlaying()) {
             pause()
         } else {
             play()
+        }
+    }
+
+    override fun seekTo(position: Long) {
+        isTracking = true
+        mediaPlayer?.seekTo(position.toInt())
+        _playerState.value = PlayerState.Progress(position)
+
+        // После завершения перемотки возобновляем обновления
+        coroutineScope.launch {
+            delay(300)
+            isTracking = false
+            if (mediaPlayer?.isPlaying == true) {
+                startProgressUpdates()
+            }
         }
     }
 }

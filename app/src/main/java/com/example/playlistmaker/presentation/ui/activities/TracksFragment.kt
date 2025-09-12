@@ -31,7 +31,6 @@ class TracksFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Настройка состояния пустого списка
         binding.emptyMediaState.text = getString(R.string.empty_medialab) // Используем строковый ресурс
         binding.emptyMediaStateImage.setImageResource(R.drawable.empty)
 
