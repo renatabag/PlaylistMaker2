@@ -1,17 +1,13 @@
 package com.example.playlistmaker.presentation.ui.fragments
 
-import android.R.id.message
 import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.net.ConnectivityManager
+import android.net.Network
 import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -33,10 +29,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivitySearcchBinding
+import com.example.playlistmaker.presentation.mappers.TrackUiMapper
 import com.example.playlistmaker.presentation.ui.adapters.TrackAdapter
 import com.example.playlistmaker.presentation.ui.states.SearchState
 import com.example.playlistmaker.presentation.ui.states.TrackUi
 import com.example.playlistmaker.presentation.viewmodels.SearchViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -47,18 +47,31 @@ class SearchFragment : Fragment() {
     private val viewModel: SearchViewModel by viewModel()
     private lateinit var adapter: TrackAdapter
 
-    private val handler = Handler(Looper.getMainLooper())
-    private var searchRunnable: Runnable? = null
+    private var searchJob: Job? = null
     private val debounceDelay = 2000L
 
-    private val networkChangeReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (isNetworkAvailable()) {
+    private lateinit var connectivityManager: ConnectivityManager
+    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+        override fun onAvailable(network: Network) {
+            activity?.runOnUiThread {
                 binding.inputEditText.text?.toString()?.let { viewModel.searchTracks(it) }
-            } else {
+            }
+        }
+
+        override fun onLost(network: Network) {
+            activity?.runOnUiThread {
                 showErrorState(
                     message = getString(R.string.network_error_message),
+                    isNetworkError = true
                 )
+            }
+        }
+
+        override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
+            activity?.runOnUiThread {
+                if (networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                    binding.inputEditText.text?.toString()?.let { viewModel.searchTracks(it) }
+                }
             }
         }
     }
@@ -76,6 +89,7 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -95,22 +109,17 @@ class SearchFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            requireActivity().registerReceiver(networkChangeReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
-        } else {
-            @Suppress("DEPRECATION")
-            requireActivity().registerReceiver(networkChangeReceiver, filter)
-        }
+        // Регистрируем NetworkCallback для отслеживания состояния сети
+        val networkRequest = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+        connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
     }
 
     override fun onPause() {
         super.onPause()
-        searchRunnable?.let { handler.removeCallbacks(it) }
-        try {
-            requireActivity().unregisterReceiver(networkChangeReceiver)
-        } catch (e: IllegalArgumentException) {
-        }
+        searchJob?.cancel() // Отменяем корутину при паузе
+        connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 
     override fun onDestroyView() {
@@ -131,12 +140,11 @@ class SearchFragment : Fragment() {
 
     private fun setupAdapter() {
         adapter = TrackAdapter(emptyList()) { trackUi ->
-            val track = TrackUi.CREATOR.toDomain(trackUi)
+            val track = TrackUiMapper.mapToDomain(trackUi)
             viewModel.addTrackToHistory(track)
 
             val bundle = bundleOf("track" to trackUi)
             findNavController().navigate(R.id.track_player, bundle)
-
         }
         binding.tracksList.layoutManager = LinearLayoutManager(requireContext())
         binding.tracksList.adapter = adapter
@@ -154,12 +162,19 @@ class SearchFragment : Fragment() {
         }
 
         binding.inputEditText.doAfterTextChanged { text ->
+            searchJob?.cancel() // Отменяем предыдущий поиск
             if (text.isNullOrEmpty()) {
                 showSearchIcon()
                 viewModel.searchTracks("")
             } else {
                 showClearIcon()
-                scheduleSearch(text.toString())
+                // Используем корутины вместо Handler для дебаунса
+                searchJob = viewLifecycleOwner.lifecycleScope.launch {
+                    delay(debounceDelay)
+                    if (isActive) {
+                        viewModel.searchTracks(text.toString())
+                    }
+                }
             }
         }
 
@@ -214,8 +229,8 @@ class SearchFragment : Fragment() {
                         SearchState.Empty -> showEmptyState()
                         is SearchState.History -> showHistory(state.tracks)
                         is SearchState.Error -> showErrorState(state.message, isNetworkError = true)
-                        is SearchState.EmptyError -> showErrorState(state.message, isNetworkError = false)
                         SearchState.EmptyHistory -> showEmptyHistoryState()
+                        is SearchState.EmptyError -> showEmptyState()
                     }
                 }
             }
@@ -255,18 +270,10 @@ class SearchFragment : Fragment() {
     private fun showEmptyState() {
         binding.progressBar.visibility = View.GONE
         binding.tracksList.visibility = View.GONE
-        binding.emptyStateContainer.visibility = View.VISIBLE
+        binding.emptyStateContainer.visibility = View.VISIBLE // Показываем пустое состояние
         binding.errorStateContainer.visibility = View.GONE
         binding.clearHistoryButton.visibility = View.GONE
         binding.historyTitle.visibility = View.GONE
-    }
-
-    private fun showErrorState(message: String) {
-        binding.progressBar.visibility = View.GONE
-        binding.tracksList.visibility = View.GONE
-        binding.emptyStateContainer.visibility = View.GONE
-        binding.errorStateContainer.visibility = View.VISIBLE
-        binding.connectionErrorMessage.text = message
     }
 
     private fun showHistory(tracks: List<TrackUi>) {
@@ -278,27 +285,12 @@ class SearchFragment : Fragment() {
             binding.clearHistoryButton.visibility = View.VISIBLE
             binding.historyTitle.visibility = View.VISIBLE
         } else {
-            showCleanHistoryState()
+            showEmptyHistoryState()
         }
     }
 
-    private fun showCleanHistoryState() {
-        binding.progressBar.visibility = View.GONE
-        binding.tracksList.visibility = View.GONE
-        binding.emptyStateContainer.visibility = View.GONE
-        binding.errorStateContainer.visibility = View.GONE
-        binding.clearHistoryButton.visibility = View.GONE
-        binding.historyTitle.visibility = View.GONE
-    }
-
-    private fun scheduleSearch(query: String) {
-        searchRunnable?.let { handler.removeCallbacks(it) }
-        searchRunnable = Runnable { viewModel.searchTracks(query) }
-        handler.postDelayed(searchRunnable!!, debounceDelay)
-    }
-
     private fun performSearch() {
-        searchRunnable?.let { handler.removeCallbacks(it) }
+        searchJob?.cancel() // Отменяем отложенный поиск
         binding.inputEditText.text?.toString()?.let { viewModel.searchTracks(it) }
         hideKeyboard()
     }
@@ -316,13 +308,15 @@ class SearchFragment : Fragment() {
 
     private fun checkNetworkState() {
         if (!isNetworkAvailable()) {
-            showErrorState(message = getString(R.string.network_error_message))
+            showErrorState(
+                message = getString(R.string.network_error_message),
+                isNetworkError = true
+            )
         }
     }
 
     @SuppressLint("MissingPermission")
     private fun isNetworkAvailable(): Boolean {
-        val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val network = connectivityManager.activeNetwork
             val capabilities = connectivityManager.getNetworkCapabilities(network)
@@ -348,11 +342,14 @@ class SearchFragment : Fragment() {
 
         binding.retryButton.visibility = if (isNetworkError) View.VISIBLE else View.GONE
         binding.retryButton.setOnClickListener {
-            binding.inputEditText.text?.toString()?.let { query ->
-                viewModel.searchTracks(query)
+            if (isNetworkAvailable()) {
+                performSearch()
+            } else {
+                showErrorState(getString(R.string.network_error_message), true)
             }
         }
     }
+
     companion object {
         fun newInstance() = SearchFragment()
     }

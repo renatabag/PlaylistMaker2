@@ -4,8 +4,6 @@ import com.example.playlistmaker.data.repositories.PlayerRepositoryImpl
 import com.example.playlistmaker.data.repositories.SearchHistoryRepositoryImpl
 import com.example.playlistmaker.data.repositories.SettingsRepositoryImpl
 import com.example.playlistmaker.data.repositories.TracksRepositoryImpl
-import com.example.playlistmaker.domain.interactors.PlayerInteractor
-import com.example.playlistmaker.domain.interactors.impl.PlayerInteractorImpl
 import com.example.playlistmaker.domain.repositories.PlayerRepository
 import com.example.playlistmaker.domain.repositories.SearchHistoryRepository
 import com.example.playlistmaker.domain.repositories.SettingsRepository

@@ -97,6 +97,7 @@ class TrackPlayerFragment : Fragment() {
                             binding.pause.isEnabled = true
                             binding.trackTimeNow.text = TrackUtils.formatTrackTime(state.position)
                             binding.pause.setImageResource(R.drawable.pause)
+                            binding.trackTimeNow.text = "00:00"
                         }
                         is PlayerState.Playing -> {
                             binding.pause.isEnabled = true
