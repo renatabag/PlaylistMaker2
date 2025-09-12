@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlistmaker.DI.dataModule
 import com.example.playlistmaker.DI.interactorModule
 import com.example.playlistmaker.DI.repositoryModule
-import com.example.playlistmaker.DI.utilsModule
 import com.example.playlistmaker.DI.viewModelModule
 import com.example.playlistmaker.domain.interactors.SettingsInteractor
 import kotlinx.coroutines.runBlocking
@@ -25,8 +24,7 @@ class App : Application() {
                 dataModule,
                 repositoryModule,
                 interactorModule,
-                viewModelModule,
-                utilsModule
+                viewModelModule
             )
         }
 

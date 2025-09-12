@@ -6,18 +6,17 @@ import com.example.playlistmaker.data.SearchHistory
 import com.example.playlistmaker.data.mappers.TrackMapper
 import com.example.playlistmaker.data.network.RetrofitClient
 import com.example.playlistmaker.data.storage.SharedPrefsStorage
-import com.example.playlistmaker.presentation.mappers.TrackUiMapper
 import com.google.gson.Gson
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val dataModule = module {
-    single { RetrofitClient.itunesApi }
+    single{ RetrofitClient.itunesApi }
 
-    single { SharedPrefsStorage(androidContext()) }
+    single{ SharedPrefsStorage(androidContext()) }
 
-    single { TrackMapper() }
-    single { TrackUiMapper }
+    single{ TrackMapper() }
+
     single { NetworkMonitor(androidContext()) }
     single { SearchHistory(androidContext(), get()) }
     factory { Gson() }
