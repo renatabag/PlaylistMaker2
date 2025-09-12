@@ -11,5 +11,4 @@ interface PlayerRepository {
     fun getCurrentPosition(): Long
     fun isPlaying(): Boolean
     fun playbackControl()
-    fun seekTo(position: Long)
 }

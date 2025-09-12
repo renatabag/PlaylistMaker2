@@ -11,19 +11,11 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.TrackUtils
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.presentation.ui.states.TrackUi
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class TrackAdapter(
     private var tracks: List<TrackUi>,
-    private val scope: CoroutineScope,
     private val onTrackClick: (TrackUi) -> Unit = {}
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
-
-    private var lastClickTime = 0L
-    private var clickJob: Job? = null
 
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val trackNameView: TextView = itemView.findViewById(R.id.track_name)
@@ -52,23 +44,7 @@ class TrackAdapter(
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         val track = tracks[position]
         holder.bind(track)
-
         holder.itemView.setOnClickListener {
-            handleTrackClick(track)
-        }
-    }
-
-    private fun handleTrackClick(track: TrackUi) {
-        val currentTime = System.currentTimeMillis()
-
-        // Debounce для предотвращения двойных кликов
-        if (currentTime - lastClickTime < CLICK_DEBOUNCE_DELAY) {
-            return
-        }
-        lastClickTime = currentTime
-
-        clickJob?.cancel()
-        clickJob = scope.launch {
             onTrackClick(track)
         }
     }
@@ -79,8 +55,5 @@ class TrackAdapter(
         tracks = newTracks
         notifyDataSetChanged()
     }
-
-    companion object {
-        private const val CLICK_DEBOUNCE_DELAY = 300L
-    }
 }
+

@@ -1,9 +1,7 @@
 package com.example.playlistmaker.data.network
 
-import com.example.playlistmaker.data.dto.TrackResponseDto
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
 
 
 object RetrofitClient {
@@ -18,4 +16,5 @@ object RetrofitClient {
     val itunesApi: ItunesApi by lazy {
         retrofit.create(ItunesApi::class.java)
     }
+
 }
