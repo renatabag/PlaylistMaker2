@@ -116,7 +116,6 @@ class SettingsFragment : Fragment() {
     }
 
     private fun applyTheme(isDarkTheme: Boolean) {
-        binding.themeSwitcher.jumpDrawablesToCurrentState()
         AppCompatDelegate.setDefaultNightMode(
             if (isDarkTheme) {
                 AppCompatDelegate.MODE_NIGHT_YES
