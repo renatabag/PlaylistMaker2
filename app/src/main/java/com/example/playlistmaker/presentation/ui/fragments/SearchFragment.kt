@@ -341,27 +341,10 @@ class SearchFragment : Fragment() {
         binding.connectionErrorMessage.text = message
 
         binding.retryButton.visibility = if (isNetworkError) View.VISIBLE else View.GONE
-
-        // Исправляем обработчик клика для кнопки "Обновить"
         binding.retryButton.setOnClickListener {
-            // Проверяем доступность сети
             if (isNetworkAvailable()) {
-                // Если сеть доступна, скрываем состояние ошибки
-                binding.errorStateContainer.visibility = View.GONE
-
-                // Получаем текущий запрос
-                val currentQuery = binding.inputEditText.text?.toString() ?: ""
-
-                if (currentQuery.isNotEmpty()) {
-                    // Если есть текст для поиска, показываем загрузку и выполняем поиск
-                    showLoading()
-                    viewModel.searchTracks(currentQuery)
-                } else {
-                    // Если поле пустое, просто обновляем состояние (показываем историю)
-                    viewModel.searchTracks("")
-                }
+                performSearch()
             } else {
-                // Если сеть все еще недоступна, обновляем сообщение об ошибке
                 showErrorState(getString(R.string.network_error_message), true)
             }
         }
