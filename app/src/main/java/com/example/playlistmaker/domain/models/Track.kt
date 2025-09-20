@@ -12,8 +12,7 @@ data class Track(
     val releaseDate: String?,
     val genre: String?,
     val country: String?,
-    val previewUrl: String?,
-    val isFavorite: Boolean = false
+    val previewUrl: String?
 ) : Serializable {
     fun getReleaseYear(): String? = releaseDate?.take(4)
 }

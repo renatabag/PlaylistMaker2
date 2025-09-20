@@ -3,7 +3,6 @@ package com.example.playlistmaker.DI
 import android.media.MediaPlayer
 import com.example.playlistmaker.data.NetworkMonitor
 import com.example.playlistmaker.data.SearchHistory
-import com.example.playlistmaker.data.db.databaseModule
 import com.example.playlistmaker.data.mappers.TrackMapper
 import com.example.playlistmaker.data.network.RetrofitClient
 import com.example.playlistmaker.data.storage.SharedPrefsStorage
@@ -23,7 +22,5 @@ val dataModule = module {
     factory { Gson() }
 
     factory { MediaPlayer() }
-
-    includes(databaseModule)
 
 }

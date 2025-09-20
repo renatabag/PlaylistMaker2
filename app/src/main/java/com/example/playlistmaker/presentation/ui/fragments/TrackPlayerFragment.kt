@@ -86,9 +86,6 @@ class TrackPlayerFragment : Fragment() {
                 viewModel.playbackControl()
             }
         }
-        binding.follow.setOnClickListener {
-            viewModel.toggleFavorite()
-        }
     }
 
     private fun setupObservers() {
@@ -133,20 +130,6 @@ class TrackPlayerFragment : Fragment() {
                     }
                 }
             }
-        }
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.isFavorite.collect { isFavorite ->
-                    updateFavoriteButton(isFavorite)
-                }
-            }
-        }
-    }
-    private fun updateFavoriteButton(isFavorite: Boolean) {
-        if (isFavorite) {
-            binding.follow.setImageResource(R.drawable.infollow) // Иконка заполненного сердца
-        } else {
-            binding.follow.setImageResource(R.drawable.follow) // Иконка пустого сердца
         }
     }
 

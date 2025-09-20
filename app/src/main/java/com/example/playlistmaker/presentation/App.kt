@@ -27,8 +27,7 @@ class App : Application() {
                 repositoryModule,
                 interactorModule,
                 mapperModule,
-                viewModelModule,
-                useCaseModule
+                viewModelModule
             )
         }
 
