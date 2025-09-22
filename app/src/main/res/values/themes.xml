@@ -39,6 +39,7 @@
     <dimen name="track_icons">51dp</dimen>
     <dimen name="margine_track">16dp</dimen>
     <dimen name="small_text_track">11sp</dimen>
+    <dimen name="four">4dp</dimen>
     <dimen name="tab">14sp</dimen>
     <dimen name="four_dp">4dp</dimen>
     <dimen name="margin_medium">16dp</dimen>
