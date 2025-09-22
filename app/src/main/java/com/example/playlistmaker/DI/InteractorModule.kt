@@ -1,11 +1,9 @@
 package com.example.playlistmaker.DI
 
 import com.example.playlistmaker.domain.SearchTracksUseCase
-import com.example.playlistmaker.domain.interactors.FavoriteTracksInteractor
 import com.example.playlistmaker.domain.interactors.PlayerInteractor
 import com.example.playlistmaker.domain.interactors.SearchInteractor
 import com.example.playlistmaker.domain.interactors.SettingsInteractor
-import com.example.playlistmaker.domain.interactors.impl.FavoriteTracksInteractorImpl
 import com.example.playlistmaker.domain.interactors.impl.PlayerInteractorImpl
 import com.example.playlistmaker.domain.interactors.impl.SearchInteractorImpl
 import com.example.playlistmaker.domain.interactors.impl.SettingsInteractorImpl
@@ -16,5 +14,6 @@ val interactorModule = module {
     factory<SearchInteractor> { SearchInteractorImpl(get(), get()) }
     factory<SettingsInteractor> { SettingsInteractorImpl(get()) }
 
-    factory<FavoriteTracksInteractor> { FavoriteTracksInteractorImpl(get()) }
+    // UseCase должен быть в domain слое, а не здесь
+    // Перенесем его в отдельный модуль
 }

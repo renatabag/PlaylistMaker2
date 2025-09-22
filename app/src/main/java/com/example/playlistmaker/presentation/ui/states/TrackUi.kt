@@ -14,30 +14,13 @@ data class TrackUi(
     val releaseDate: String?,
     val genre: String?,
     val country: String?,
-    val previewUrl: String?,
-    val isFavorite: Boolean = false
+    val previewUrl: String?
 ) : Parcelable {
     fun getReleaseYear(): String? = releaseDate?.take(4)
 
     fun getArtworkUrl512(): String = artworkUrl.replaceAfterLast('/', "512x512bb.jpg")
 
     override fun describeContents(): Int = 0
-
-    fun toDomain(): Track {
-        return Track(
-            trackId = this.trackId,
-            trackName = this.trackName,
-            artistName = this.artistName,
-            trackTimeMillis = this.trackTimeMillis,
-            artworkUrl = this.artworkUrl,
-            collectionName = this.collectionName,
-            releaseDate = this.releaseDate,
-            genre = this.genre,
-            country = this.country,
-            previewUrl = this.previewUrl,
-            isFavorite = this.isFavorite
-        )
-    }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
         dest.writeInt(trackId)
