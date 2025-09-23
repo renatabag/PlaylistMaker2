@@ -39,6 +39,8 @@
     <dimen name="track_icons">51dp</dimen>
     <dimen name="margine_track">16dp</dimen>
     <dimen name="small_text_track">11sp</dimen>
+    <dimen name="four">4dp</dimen>
+    <dimen name="image_left">13dp</dimen>
     <dimen name="tab">14sp</dimen>
     <dimen name="four_dp">4dp</dimen>
     <dimen name="margin_medium">16dp</dimen>
@@ -50,8 +52,7 @@
     <color name="grey_switch">#AEAFB4</color>
     <color name="blue_switch_light">#9FBBF3</color>
     <color name="grey_switch_light">#E6E8EB</color>
-
-
+    <dimen name="one">1dp</dimen>
     <color name="active_tab_color">#3772E7</color>
     <color name="inactive_tab_color">@color/dark_white</color>
     <dimen name="len">0.5dp</dimen>

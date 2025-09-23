@@ -56,4 +56,3 @@ class TrackAdapter(
         notifyDataSetChanged()
     }
 }
-
