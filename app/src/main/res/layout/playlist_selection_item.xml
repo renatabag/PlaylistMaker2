@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bottom_sheet_background">
+
+    <View
+        android:layout_width="@dimen/f0"
+        android:layout_height="@dimen/four"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/activity_search_padding"
+        android:background="@drawable/buttom_sheet_rectangle" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/ys_display_medium"
+        android:layout_marginTop="@dimen/o2"
+        android:text="@string/add_to_album"
+        android:textAlignment="center"
+        android:textColor="@color/dark_white"
+        android:textSize="@dimen/o9"
+        android:padding="@dimen/o6"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/add_to_album_"
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:layout_gravity="center"
+        android:text="@string/new_album"
+        android:textAllCaps="false"
+        android:textSize="@dimen/tab"
+        android:textColor="@color/white_dark"
+        android:backgroundTint="@color/dark_white"
+        app:cornerRadius="@dimen/o6"
+        android:layout_marginTop="@dimen/o6"/>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginTop="@dimen/button_size"
+        android:id="@+id/playlists_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
