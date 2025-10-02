@@ -20,6 +20,8 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -65,21 +67,29 @@ class NewPlaylistFragment : Fragment() {
     // Флаг для отслеживания наличия несохраненных данных
     private var hasUnsavedChanges: Boolean = false
 
-    // Универсальный способ выбора изображения
-    private val pickImageLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            result.data?.data?.let { uri ->
-                Log.d("PhotoPicker", "Selected URI: $uri")
-                coverImageButton.setImageURI(uri)
-                coverImageButton.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
-                selectedImageUri = uri
-                savedImagePath = saveImageToPrivateStorage(uri)
-                hasUnsavedChanges = true
+    
+
+    private lateinit var pickImageLauncher: ActivityResultLauncher<Intent>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        track = arguments?.getParcelable(ARG_TRACK)
+
+        // Восстановление состояния ДО создания View
+        savedInstanceState?.let {
+            savedImagePath = it.getString("saved_image_path")
+            hasUnsavedChanges = it.getBoolean("has_unsaved_changes", false)
+            // НЕ восстанавливаем текстовые поля здесь - они еще не созданы!
+        }
+
+        pickImageLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.data?.let { uri ->
+                    handleImageSelection(uri)
+                }
             }
-        } else {
-            Log.d("PhotoPicker", "No media selected")
         }
     }
 
@@ -94,12 +104,6 @@ class NewPlaylistFragment : Fragment() {
             }
         }
     }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        track = arguments?.getParcelable(ARG_TRACK)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -108,14 +112,27 @@ class NewPlaylistFragment : Fragment() {
         return inflater.inflate(R.layout.new_playlist, container, false)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("playlist_name", nameEditText.text.toString())
+        outState.putString("playlist_description", descriptionEditText.text.toString())
+        outState.putString("saved_image_path", savedImagePath)
+        outState.putBoolean("has_unsaved_changes", hasUnsavedChanges)
+        selectedImageUri?.let { uri ->
+            outState.putString("selected_image_uri", uri.toString())
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Инициализация Drawable
         blueButtonDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.blue_frame)!!
         grayButtonDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.gray_frame)!!
         blueFrameDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.frame_border_blue)!!
         grayFrameDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.frame_border_grey)!!
 
+        // Инициализация View
         createButton = view.findViewById(R.id.create_playlist_button)
         nameEditText = view.findViewById(R.id.name_playlist)
         descriptionEditText = view.findViewById(R.id.description_playlist)
@@ -125,6 +142,43 @@ class NewPlaylistFragment : Fragment() {
         descriptionLabel = view.findViewById(R.id.description_label)
         coverImageButton = view.findViewById(R.id.add_picture)
 
+        // ВОССТАНОВЛЕНИЕ СОСТОЯНИЯ - ТОЛЬКО ОДИН РАЗ
+        savedInstanceState?.let { bundle ->
+            // Восстанавливаем текстовые поля
+            bundle.getString("playlist_name")?.let { name ->
+                nameEditText.setText(name)
+            }
+            bundle.getString("playlist_description")?.let { description ->
+                descriptionEditText.setText(description)
+            }
+
+            // Восстанавливаем путь к изображению
+            savedImagePath = bundle.getString("saved_image_path")
+            hasUnsavedChanges = bundle.getBoolean("has_unsaved_changes", false)
+
+            // Восстанавливаем изображение если оно было выбрано
+            savedImagePath?.let { path ->
+                val imageFile = File(path)
+                if (imageFile.exists()) {
+                    try {
+                        val bitmap = BitmapFactory.decodeFile(path)
+                        coverImageButton.setImageBitmap(bitmap)
+                        coverImageButton.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+                    } catch (e: Exception) {
+                        Log.e("NewPlaylistFragment", "Error restoring image", e)
+                        // В случае ошибки устанавливаем изображение по умолчанию
+                        coverImageButton.setImageResource(R.drawable.add_photo)
+                    }
+                }
+            }
+
+            // Восстанавливаем URI выбранного изображения
+            bundle.getString("selected_image_uri")?.let { uriString ->
+                selectedImageUri = Uri.parse(uriString)
+            }
+        }
+
+        // Настройка слушателей
         view.findViewById<ImageButton>(R.id.menu_button).setOnClickListener {
             checkForUnsavedChangesAndNavigateBack()
         }
@@ -133,10 +187,41 @@ class NewPlaylistFragment : Fragment() {
             openImagePicker()
         }
 
+        // Обработка кнопки "Назад"
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                checkForUnsavedChangesAndNavigateBack()
+            }
+        })
+
         setupFocusListeners()
         setupTextWatchers()
-        updateCreateButtonState(false)
+
+        // Обновляем состояние кнопки после восстановления
+        val hasName = nameEditText.text.toString().trim().isNotEmpty()
+        updateCreateButtonState(hasName)
+
+        // Обновляем внешний вид полей
+        updateFieldAppearance(nameEditText, nameFrame, nameLabel, nameEditText.hasFocus())
+        updateFieldAppearance(descriptionEditText, descriptionFrame, descriptionLabel, descriptionEditText.hasFocus())
     }
+
+
+    private fun handleImageSelection(uri: Uri) {
+        view?.findViewById<ImageButton>(R.id.add_picture)?.let { coverImageButton ->
+            coverImageButton.setImageURI(uri)
+            coverImageButton.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+        }
+        selectedImageUri = uri
+        savedImagePath = saveImageToPrivateStorage(uri)
+        hasUnsavedChanges = true
+    }
+
+    private fun navigateBack() {
+        // Унифицируйте с подходом TrackPlayerFragment
+        parentFragmentManager.popBackStack()
+    }
+
 
     override fun onResume() {
         super.onResume()
@@ -187,9 +272,42 @@ class NewPlaylistFragment : Fragment() {
             .setNegativeButton("Отмена") { dialog, _ -> dialog.dismiss() }
             .setPositiveButton("Завершить") { dialog, _ ->
                 dialog.dismiss()
-                savePlaylistAndExit()
+                discardChangesAndExit() // Изменено на метод сброса данных
             }
             .show()
+    }
+    private fun discardChangesAndExit() {
+        // Сбрасываем все поля
+        nameEditText.text.clear()
+        descriptionEditText.text.clear()
+        coverImageButton.setImageResource(R.drawable.add_photo) // Установите вашу иконку по умолчанию
+        coverImageButton.scaleType = android.widget.ImageView.ScaleType.CENTER // Вернуть масштабирование по умолчанию
+        selectedImageUri = null
+        savedImagePath = null
+
+        // Сбрасываем состояние кнопки
+        updateCreateButtonState(false)
+
+        // Сбрасываем внешний вид полей
+        updateFieldAppearance(nameEditText, nameFrame, nameLabel, false)
+        updateFieldAppearance(descriptionEditText, descriptionFrame, descriptionLabel, false)
+
+        // Сбрасываем флаг несохраненных изменений
+        hasUnsavedChanges = false
+
+        // Переходим к фрагменту плейлистов
+        navigateToPlaylists()
+    }
+
+    private fun navigateToPlaylists() {
+        try {
+            // Навигация к фрагменту плейлистов
+            findNavController().navigate(R.id.fragment_list) // Замените на ваш ID фрагмента плейлистов
+        } catch (e: Exception) {
+            Log.e("NewPlaylistFragment", "Error navigating to playlists", e)
+            // Альтернативный способ навигации
+            parentFragmentManager.popBackStack()
+        }
     }
 
     private fun savePlaylistAndExit() {
@@ -259,15 +377,6 @@ class NewPlaylistFragment : Fragment() {
         descriptionEditText.setOnFocusChangeListener { _, hasFocus ->
             updateFieldAppearance(descriptionEditText, descriptionFrame, descriptionLabel, hasFocus)
             if (!hasFocus) checkForUnsavedChanges()
-        }
-    }
-
-    private fun navigateBack() {
-        try {
-            // Возвращаемся к экрану аудиоплеера
-            findNavController().popBackStack()
-        } catch (e: Exception) {
-            parentFragmentManager.popBackStack()
         }
     }
 

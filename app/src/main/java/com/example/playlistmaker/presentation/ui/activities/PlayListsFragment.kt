@@ -81,6 +81,7 @@ class PlayListsFragment : Fragment() {
         }
     }
 
+
     private fun openNewPlaylistScreen() {
         // Получаем трек из аргументов фрагмента или используем null
         val track = arguments?.getParcelable<TrackUi>("track") // или ваш ключ ARG_TRACK

@@ -120,11 +120,9 @@ class PlaylistSelectionBottomSheet : BottomSheetDialogFragment() {
     private fun openNewPlaylistScreen() {
         val track = arguments?.getParcelable<TrackUi>("track")
 
-        // Используем Navigation Component вместо прямого FragmentTransaction
         try {
-            // Способ 1: Через findNavController() если bottom sheet вложен в навигационный граф
             findNavController().navigate(
-                R.id.newPlaylistFragment, // Добавьте это действие в ваш nav_graph
+                R.id.newPlaylistFragment,
                 Bundle().apply {
                     putParcelable("track", track)
                 }
