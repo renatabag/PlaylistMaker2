@@ -7,15 +7,6 @@
     android:layout_height="match_parent"
     android:id="@+id/fragment_list">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/playlists_recycler"
-        android:layout_width="@dimen/zero"
-        android:layout_height="@dimen/zero"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/create_playlist_button"
@@ -32,6 +23,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="@dimen/layoutMarginTopBytton"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/playlists_recycler"
+        android:layout_width="@dimen/zero"
+        android:layout_height="@dimen/zero"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/create_playlist_button" />
 
     <ImageView
         android:id="@+id/empty_media_state_image"

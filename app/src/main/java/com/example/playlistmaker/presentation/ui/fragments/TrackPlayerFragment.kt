@@ -1,7 +1,7 @@
 package com.example.playlistmaker.presentation.ui.fragments
 
-import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.TrackPlayerBinding
 import com.example.playlistmaker.domain.TrackUtils
+import com.example.playlistmaker.presentation.ui.activities.NewPlaylistFragment
 import com.example.playlistmaker.presentation.ui.states.PlayerState
 import com.example.playlistmaker.presentation.ui.states.TrackUi
 import com.example.playlistmaker.presentation.viewmodels.PlayerViewModel
@@ -53,22 +54,39 @@ class TrackPlayerFragment : Fragment() {
         }
     }
 
-    private fun displayTrackDetails(track: TrackUi) {
-        binding.trackName.text = track.trackName
-        binding.artistName.text = track.artistName
-        binding.trackTime.text = TrackUtils.formatTrackTime(track.trackTimeMillis)
-        binding.trackTimeNow.text = "00:00"
-        binding.yearLabelText.text = track.getReleaseYear()
-        binding.genreLabelText.text = track.genre
-        binding.countryLabelText.text = track.country
+    override fun onResume() {
+        super.onResume()
+        hideBottomNavigation()
+    }
 
-        val artworkUrl = track.artworkUrl?.replace("100x100bb.jpg", "512x512bb.jpg")
-        Glide.with(requireContext())
-            .load(artworkUrl)
-            .placeholder(R.drawable.placeholder_track)
-            .error(R.drawable.error)
-            .centerCrop()
-            .into(binding.itemImage)
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        showBottomNavigation()
+        viewModel.releasePlayer()
+        _binding = null
+    }
+
+    private fun hideBottomNavigation() {
+        try {
+            val activity = requireActivity()
+            val bottomNav = activity.findViewById<View>(R.id.bottom_navigation)
+            bottomNav?.visibility = View.GONE
+            Log.d("TrackPlayerFragment", "Bottom navigation hidden")
+        } catch (e: Exception) {
+            Log.e("TrackPlayerFragment", "Error hiding bottom navigation", e)
+        }
+    }
+
+    private fun showBottomNavigation() {
+        try {
+            val activity = requireActivity()
+            val bottomNav = activity.findViewById<View>(R.id.bottom_navigation)
+            bottomNav?.visibility = View.VISIBLE
+            Log.d("TrackPlayerFragment", "Bottom navigation shown")
+        } catch (e: Exception) {
+            Log.e("TrackPlayerFragment", "Error showing bottom navigation", e)
+        }
     }
 
     private fun setupButtonListeners() {
@@ -86,14 +104,27 @@ class TrackPlayerFragment : Fragment() {
                 viewModel.playbackControl()
             }
         }
+
         binding.follow.setOnClickListener {
             viewModel.toggleFavorite()
         }
+
+        // Обработка клика на кнопку добавления в плейлист
+        binding.addToAlbum.setOnClickListener {
+            showBottomSheetDialog()
+        }
+    }
+
+    private fun showBottomSheetDialog() {
+        val track = arguments?.getParcelable<TrackUi>(ARG_TRACK) ?: return
+        val bottomSheet = PlaylistSelectionBottomSheet.newInstance(track)
+        bottomSheet.show(parentFragmentManager, "playlist_selection")
     }
 
     private fun setupObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // Наблюдение за состоянием плеера
                 viewModel.playerState.collect { state ->
                     when (state) {
                         is PlayerState.Prepared -> {
@@ -134,6 +165,7 @@ class TrackPlayerFragment : Fragment() {
                 }
             }
         }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.isFavorite.collect { isFavorite ->
@@ -142,11 +174,40 @@ class TrackPlayerFragment : Fragment() {
             }
         }
     }
+
+    private fun openNewPlaylistScreen() {
+        val track = arguments?.getParcelable<TrackUi>(ARG_TRACK)
+
+        val fragment = NewPlaylistFragment.newInstance(track)
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.nav_host_fragment, fragment)
+            .addToBackStack("new_playlist")
+            .commit()
+    }
+
+    private fun displayTrackDetails(track: TrackUi) {
+        binding.trackName.text = track.trackName
+        binding.artistName.text = track.artistName
+        binding.trackTime.text = TrackUtils.formatTrackTime(track.trackTimeMillis)
+        binding.trackTimeNow.text = "00:00"
+        binding.yearLabelText.text = track.getReleaseYear()
+        binding.genreLabelText.text = track.genre
+        binding.countryLabelText.text = track.country
+
+        val artworkUrl = track.artworkUrl?.replace("100x100bb.jpg", "512x512bb.jpg")
+        Glide.with(requireContext())
+            .load(artworkUrl)
+            .placeholder(R.drawable.placeholder_track)
+            .error(R.drawable.error)
+            .centerCrop()
+            .into(binding.itemImage)
+    }
+
     private fun updateFavoriteButton(isFavorite: Boolean) {
         if (isFavorite) {
-            binding.follow.setImageResource(R.drawable.infollow) // Иконка заполненного сердца
+            binding.follow.setImageResource(R.drawable.infollow)
         } else {
-            binding.follow.setImageResource(R.drawable.follow) // Иконка пустого сердца
+            binding.follow.setImageResource(R.drawable.follow)
         }
     }
 
@@ -155,12 +216,6 @@ class TrackPlayerFragment : Fragment() {
         if (viewModel.playerState.value is PlayerState.Playing) {
             viewModel.pausePlayer()
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        viewModel.releasePlayer()
-        _binding = null
     }
 
     companion object {

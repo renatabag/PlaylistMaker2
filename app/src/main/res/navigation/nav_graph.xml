@@ -7,6 +7,12 @@
         android:id="@+id/mediaFragment"
         android:name="com.example.playlistmaker.presentation.ui.fragments.MediaLibraryFragment"
         android:label="@string/media_library_button_text" >
+        <action
+            android:id="@+id/action_mediaFragment_to_newPlaylistFragment"
+            app:destination="@id/newPlaylistFragment" />
+        <action
+            android:id="@+id/action_mediaFragment_to_playlistsFragment"
+            app:destination="@id/playlistsFragment" />
     </fragment>
 
     <fragment
@@ -23,4 +29,33 @@
         android:id="@+id/track_player"
         android:name="com.example.playlistmaker.presentation.ui.fragments.TrackPlayerFragment"
         android:label="Player" />
+
+    <fragment
+        android:id="@+id/newPlaylistFragment"
+        android:name="com.example.playlistmaker.presentation.ui.activities.NewPlaylistFragment"
+        android:label="NewPlaylistFragment" >
+        <argument
+            android:name="track"
+            app:argType="com.example.playlistmaker.presentation.ui.states.TrackUi"
+            android:defaultValue="@null" />
+        <action
+            android:id="@+id/action_newPlaylistFragment_to_playlistsFragment"
+            app:destination="@id/playlistsFragment" />
+    </fragment>
+
+    <!-- Добавьте фрагмент плейлистов, если его нет -->
+    <fragment
+        android:id="@+id/playlistsFragment"
+        android:name="com.example.playlistmaker.presentation.ui.activities.PlayListsFragment"
+        android:label="Playlists" >
+        <action
+            android:id="@+id/action_playlistsFragment_to_newPlaylistFragment"
+            app:destination="@id/newPlaylistFragment" >
+            <argument
+                android:name="track"
+                app:argType="com.example.playlistmaker.presentation.ui.states.TrackUi"
+                android:defaultValue="@null" />
+        </action>
+    </fragment>
+
 </navigation>

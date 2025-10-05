@@ -1,4 +1,4 @@
-package com.example.playlistmaker.data.db
+package com.example.playlistmaker.data.db.favouriteTracks
 
 import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.presentation.ui.states.TrackUi

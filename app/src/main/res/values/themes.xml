@@ -56,6 +56,20 @@
     <color name="active_tab_color">#3772E7</color>
     <color name="inactive_tab_color">@color/dark_white</color>
     <dimen name="len">0.5dp</dimen>
+    <dimen name="f2">42dp</dimen>
+    <dimen name="t2">32dp</dimen>
+    <dimen name="picture">312dp</dimen>
+    <dimen name="f6">56dp</dimen>
+    <dimen name="o2">12sp</dimen>
+    <dimen name="o7">17dp</dimen>
+    <dimen name="o6">16dp</dimen>
+    <dimen name="picture_album">160dp</dimen>
+    <dimen name="o4">14dp</dimen>
+    <dimen name="f0">50dp</dimen>
+    <dimen name="o9">19sp</dimen>
+    <dimen name="o35">135dp</dimen>
+    <dimen name="t6">36dp</dimen>
+
 
 
 

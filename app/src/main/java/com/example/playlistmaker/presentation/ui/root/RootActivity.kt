@@ -1,6 +1,8 @@
 package com.example.playlistmaker.presentation.ui.root
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
@@ -18,6 +20,7 @@ class RootActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityRootBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         // В коде активности/фрагмента
         val bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation)
         bottomNavigation.itemTextAppearanceActive = R.style.BottomNavTheme
@@ -27,21 +30,72 @@ class RootActivity : AppCompatActivity() {
     }
 
     private fun setupNavigation() {
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        navController = navHostFragment.navController
+        try {
+            val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
 
-        binding.bottomNavigation.setupWithNavController(navController)
+            // Безопасное приведение типа
+            if (navHostFragment is NavHostFragment) {
+                navController = navHostFragment.navController
 
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            binding.bottomNavigation.visibility = when (destination.id) {
-                R.id.track_player -> View.GONE
-                else -> View.VISIBLE
+                // Восстанавливаем граф, если он не установлен
+                if (navController.graph.id == 0) {
+                    navController.setGraph(R.navigation.nav_graph)
+                }
+
+                binding.bottomNavigation.setupWithNavController(navController)
+
+                navController.addOnDestinationChangedListener { _, destination, _ ->
+                    binding.bottomNavigation.visibility = when (destination.id) {
+                        R.id.track_player -> View.GONE
+                        R.id.newPlaylistFragment -> View.GONE
+                        else -> View.VISIBLE
+                    }
+                }
+            } else {
+                // Если это не NavHostFragment, восстанавливаем навигацию
+                restoreNavigation()
             }
+        } catch (e: Exception) {
+            Log.e("RootActivity", "Error setting up navigation", e)
+            restoreNavigation()
         }
+    }
+
+    private fun restoreNavigation() {
+        try {
+            // Создаем новый NavHostFragment
+            val navHostFragment = NavHostFragment.create(R.navigation.nav_graph)
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, navHostFragment)
+                .setPrimaryNavigationFragment(navHostFragment)
+                .commitNow()
+
+            // Повторно инициализируем навигацию
+            navController = navHostFragment.navController
+            binding.bottomNavigation.setupWithNavController(navController)
+
+            navController.addOnDestinationChangedListener { _, destination, _ ->
+                binding.bottomNavigation.visibility = when (destination.id) {
+                    R.id.track_player -> View.GONE
+                    R.id.newPlaylistFragment -> View.GONE
+                    else -> View.VISIBLE
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("RootActivity", "Error restoring navigation", e)
+            // В крайнем случае перезапускаем активность
+            restartActivity()
+        }
+    }
+
+    private fun restartActivity() {
+        val intent = Intent(this, RootActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
-
 }

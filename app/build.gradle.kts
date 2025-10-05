@@ -1,4 +1,4 @@
-import org.gradle.kotlin.dsl.implementation
+import org.jetbrains.kotlin.fir.expressions.FirEmptyArgumentList.arguments
 
 plugins {
     alias(libs.plugins.android.application)
@@ -82,4 +82,8 @@ dependencies {
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
+
+    implementation("com.markodevcic:peko:3.0.5")
+    implementation("com.google.android.material:material:1.9.0")
+
 }
