@@ -86,4 +86,6 @@ dependencies {
     implementation("com.markodevcic:peko:3.0.5")
     implementation("com.google.android.material:material:1.9.0")
 
+    implementation("com.google.android.material:material:1.9.0")
+
 }

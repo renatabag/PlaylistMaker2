@@ -4,6 +4,8 @@ import com.example.playlistmaker.data.db.playlist.PlaylistDao
 import com.example.playlistmaker.data.db.playlist.PlaylistEntity
 import com.example.playlistmaker.data.db.playlist.PlaylistTrackDao
 import com.example.playlistmaker.data.db.playlist.PlaylistTrackEntity
+import com.example.playlistmaker.domain.models.PlaylistWithTrackEntities
+import com.example.playlistmaker.domain.models.PlaylistWithTracks
 import com.example.playlistmaker.domain.repositories.PlaylistRepository
 import kotlinx.coroutines.flow.Flow
 
@@ -43,12 +45,6 @@ class PlaylistRepositoryImpl(
         playlistDao.updatePlaylist(updatedPlaylist)
     }
 
-    override suspend fun removeTrackFromPlaylist(playlistId: Long, trackId: Long) {
-        val playlist = playlistDao.getPlaylistById(playlistId) ?: return
-        val updatedPlaylist = playlist.removeTrack(trackId)
-        playlistDao.updatePlaylist(updatedPlaylist)
-    }
-
     override suspend fun getPlaylistCount(): Int {
         return playlistDao.getPlaylistCount()
     }
@@ -65,5 +61,27 @@ class PlaylistRepositoryImpl(
     override suspend fun isTrackInPlaylist(playlistId: Long, trackId: Long): Boolean {
         val playlist = playlistDao.getPlaylistById(playlistId)
         return playlist?.containsTrack(trackId) ?: false
+    }
+    override suspend fun getPlaylistWithTracks(playlistId: Long): PlaylistWithTrackEntities {
+        val playlist = playlistDao.getPlaylistById(playlistId)
+            ?: throw IllegalArgumentException("Playlist not found")
+
+        val trackIds = playlist.getTrackIds()
+        val tracks = if (trackIds.isNotEmpty()) {
+            playlistTrackDao.getTracksByIds(trackIds)
+        } else {
+            emptyList()
+        }
+
+        return PlaylistWithTrackEntities(playlist, tracks)
+    }
+
+
+    override suspend fun removeTrackFromPlaylist(playlistId: Long, trackId: Long) {
+        val playlist = playlistDao.getPlaylistById(playlistId)
+            ?: throw IllegalArgumentException("Playlist not found")
+
+        val updatedPlaylist = playlist.removeTrack(trackId)
+        playlistDao.updatePlaylist(updatedPlaylist)
     }
 }

@@ -10,6 +10,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityRootBinding
+import com.example.playlistmaker.presentation.ui.fragments.PlaylistFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class RootActivity : AppCompatActivity() {
@@ -27,6 +28,14 @@ class RootActivity : AppCompatActivity() {
         bottomNavigation.itemTextAppearanceInactive = R.style.BottomNavTheme
 
         setupNavigation()
+    }
+
+    fun hideBottomNavigation() {
+        binding.bottomNavigation.visibility = View.GONE
+    }
+
+    fun showBottomNavigation() {
+        binding.bottomNavigation.visibility = View.VISIBLE
     }
 
     private fun setupNavigation() {
@@ -48,16 +57,27 @@ class RootActivity : AppCompatActivity() {
                     binding.bottomNavigation.visibility = when (destination.id) {
                         R.id.track_player -> View.GONE
                         R.id.newPlaylistFragment -> View.GONE
+                        R.id.fragment_playlist -> View.GONE
                         else -> View.VISIBLE
                     }
                 }
             } else {
-                // Если это не NavHostFragment, восстанавливаем навигацию
                 restoreNavigation()
             }
         } catch (e: Exception) {
             Log.e("RootActivity", "Error setting up navigation", e)
             restoreNavigation()
+        }
+    }
+    // В RootActivity добавьте:
+    override fun onResume() {
+        super.onResume()
+        // Принудительно скрываем навигацию если текущий фрагмент - PlaylistFragment
+        val currentFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+            ?.childFragmentManager?.fragments?.firstOrNull()
+
+        if (currentFragment is PlaylistFragment) {
+            binding.bottomNavigation.visibility = View.GONE
         }
     }
 
@@ -78,6 +98,7 @@ class RootActivity : AppCompatActivity() {
                 binding.bottomNavigation.visibility = when (destination.id) {
                     R.id.track_player -> View.GONE
                     R.id.newPlaylistFragment -> View.GONE
+                    R.id.fragment_playlist -> View.GONE
                     else -> View.VISIBLE
                 }
             }

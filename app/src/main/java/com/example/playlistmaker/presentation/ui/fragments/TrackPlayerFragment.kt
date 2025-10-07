@@ -16,6 +16,7 @@ import com.example.playlistmaker.domain.TrackUtils
 import com.example.playlistmaker.presentation.ui.activities.NewPlaylistFragment
 import com.example.playlistmaker.presentation.ui.states.PlayerState
 import com.example.playlistmaker.presentation.ui.states.TrackUi
+import com.example.playlistmaker.presentation.ui.viewmodels.PlaylistSelectionBottomSheet
 import com.example.playlistmaker.presentation.viewmodels.PlayerViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -36,6 +37,7 @@ class TrackPlayerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        hideBottomNavigation()
 
         val track = arguments?.getParcelable<TrackUi>(ARG_TRACK) ?: run {
             parentFragmentManager.popBackStack()
@@ -56,13 +58,11 @@ class TrackPlayerFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        hideBottomNavigation()
     }
 
 
     override fun onDestroyView() {
         super.onDestroyView()
-        showBottomNavigation()
         viewModel.releasePlayer()
         _binding = null
     }
@@ -78,16 +78,7 @@ class TrackPlayerFragment : Fragment() {
         }
     }
 
-    private fun showBottomNavigation() {
-        try {
-            val activity = requireActivity()
-            val bottomNav = activity.findViewById<View>(R.id.bottom_navigation)
-            bottomNav?.visibility = View.VISIBLE
-            Log.d("TrackPlayerFragment", "Bottom navigation shown")
-        } catch (e: Exception) {
-            Log.e("TrackPlayerFragment", "Error showing bottom navigation", e)
-        }
-    }
+
 
     private fun setupButtonListeners() {
         binding.menuButton.setOnClickListener {

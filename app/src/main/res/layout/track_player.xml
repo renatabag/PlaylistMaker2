@@ -314,7 +314,6 @@
         android:focusable="true"
         android:visibility="gone" />
 
-    <!-- Bottom Sheet для выбора плейлиста -->
     <LinearLayout
         android:id="@+id/playlists_bottom_sheet"
         android:layout_width="match_parent"
