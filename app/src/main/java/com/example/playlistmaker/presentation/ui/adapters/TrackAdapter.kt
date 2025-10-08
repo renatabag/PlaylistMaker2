@@ -9,12 +9,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.domain.TrackUtils
-import com.example.playlistmaker.domain.models.Track
 import com.example.playlistmaker.presentation.ui.states.TrackUi
 
 class TrackAdapter(
     private var tracks: List<TrackUi>,
-    private val onTrackClick: (TrackUi) -> Unit = {}
+    private val onTrackClick: (TrackUi) -> Unit = {},
+    private val onTrackLongClick: (TrackUi) -> Unit = {}  // Добавьте этот параметр
 ) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -23,7 +23,7 @@ class TrackAdapter(
         private val trackTimeView: TextView = itemView.findViewById(R.id.track_time)
         private val artworkUrl100View: ImageView = itemView.findViewById(R.id.item_image)
 
-        fun bind(model: TrackUi) {
+        fun bind(model: TrackUi, onTrackClick: (TrackUi) -> Unit, onTrackLongClick: (TrackUi) -> Unit) {
             trackNameView.text = model.trackName
             artistNameView.text = model.artistName
             trackTimeView.text = TrackUtils.formatTrackTime(model.trackTimeMillis)
@@ -33,6 +33,17 @@ class TrackAdapter(
                 .error(R.drawable.error)
                 .centerCrop()
                 .into(artworkUrl100View)
+
+            // Обработка обычного клика
+            itemView.setOnClickListener {
+                onTrackClick(model)
+            }
+
+            // Обработка длительного нажатия
+            itemView.setOnLongClickListener {
+                onTrackLongClick(model)
+                true  // Возвращаем true, чтобы показать, что событие обработано
+            }
         }
     }
 
@@ -40,13 +51,13 @@ class TrackAdapter(
         val view = LayoutInflater.from(parent.context).inflate(R.layout.track_item, parent, false)
         return TrackViewHolder(view)
     }
+    fun getCurrentTracks(): List<TrackUi> {
+        return tracks
+    }
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         val track = tracks[position]
-        holder.bind(track)
-        holder.itemView.setOnClickListener {
-            onTrackClick(track)
-        }
+        holder.bind(track, onTrackClick, onTrackLongClick)  // Передаем оба обработчика
     }
 
     override fun getItemCount(): Int = tracks.size

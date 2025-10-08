@@ -24,6 +24,12 @@
 
     <string name="input_hint">Поиск</string>
 
+    <string name="save">Сохранить</string>
+
+    <string name="edit_playlist">Редактировать</string>
+
+    <string name="empty_playlist_message">В этом плейлисте пока нет треков</string>
+
     <string name="clear_input">Очистить</string>
 
     <string name="text_empty">Ничего не нашлось</string>

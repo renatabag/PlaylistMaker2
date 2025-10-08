@@ -2,11 +2,12 @@ package com.example.playlistmaker.domain.interactors
 
 import com.example.playlistmaker.data.db.playlist.PlaylistEntity
 import com.example.playlistmaker.data.db.playlist.PlaylistTrackEntity
+import com.example.playlistmaker.domain.models.Playlist
 import kotlinx.coroutines.flow.Flow
 
 interface PlaylistInteractor {
     suspend fun createPlaylist(name: String, description: String? = null, coverImagePath: String? = null): Long
-    suspend fun updatePlaylist(playlist: PlaylistEntity)
+    suspend fun updatePlaylist(playlist: PlaylistEntity): Boolean // Изменено: возвращает Boolean
     suspend fun deletePlaylist(playlist: PlaylistEntity)
     suspend fun getPlaylistById(playlistId: Long): PlaylistEntity?
     fun getAllPlaylists(): Flow<List<PlaylistEntity>>
@@ -14,7 +15,8 @@ interface PlaylistInteractor {
     suspend fun addTrackToPlaylist(playlistId: Long, trackId: Long)
     suspend fun removeTrackFromPlaylist(playlistId: Long, trackId: Long)
     suspend fun getPlaylistCount(): Int
-    suspend fun deletePlaylistById(playlistId: Long)
+    suspend fun deletePlaylist(playlistId: Long)
     suspend fun savePlaylistTrack(track: PlaylistTrackEntity)
     suspend fun isTrackInPlaylist(playlistId: Long, trackId: Long): Boolean
+    suspend fun getPlaylist(playlistId: Long): Playlist?
 }

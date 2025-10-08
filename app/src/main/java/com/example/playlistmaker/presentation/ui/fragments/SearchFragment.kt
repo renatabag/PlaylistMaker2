@@ -139,13 +139,16 @@ class SearchFragment : Fragment() {
     }
 
     private fun setupAdapter() {
-        adapter = TrackAdapter(emptyList()) { trackUi ->
-            val track = TrackUiMapper.mapToDomain(trackUi)
-            viewModel.addTrackToHistory(track)
+        adapter = TrackAdapter(
+            tracks = emptyList(),
+            onTrackClick = { trackUi ->
+                val track = TrackUiMapper.mapToDomain(trackUi)
+                viewModel.addTrackToHistory(track)
 
-            val bundle = bundleOf("track" to trackUi)
-            findNavController().navigate(R.id.track_player, bundle)
-        }
+                val bundle = bundleOf("track" to trackUi)
+                findNavController().navigate(R.id.track_player, bundle)
+            }
+        )
         binding.tracksList.layoutManager = LinearLayoutManager(requireContext())
         binding.tracksList.adapter = adapter
     }

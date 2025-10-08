@@ -51,6 +51,9 @@
     <color name="blue_switch">#3772E7</color>
     <color name="grey_switch">#AEAFB4</color>
     <color name="blue_switch_light">#9FBBF3</color>
+    <dimen name="bottom_sheet_peek_height">0dp</dimen>
+
+
     <color name="grey_switch_light">#E6E8EB</color>
     <dimen name="one">1dp</dimen>
     <color name="active_tab_color">#3772E7</color>
@@ -187,5 +190,30 @@
 
     </style>
 
+
+    <style name="FullScreenBottomSheetStyle" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="android:background">@drawable/bottom_sheet_background</item>
+        <item name="behavior_peekHeight">0dp</item>
+        <item name="behavior_hideable">true</item>
+        <item name="behavior_skipCollapsed">true</item>
+        <item name="android:maxHeight">@dimen/bottom_sheet_peek_height</item>
+        <item name="shapeAppearanceOverlay">@style/BottomSheetShapeAppearance</item>
+    </style>
+
+    <style name="BottomSheetShapeAppearance" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeTopRight">16dp</item>
+    </style>
+
+    <style name="BottomSheetAnimation">
+        <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
+        <item name="android:windowExitAnimation">@android:anim/fade_out</item>
+    </style>
+
+    <style name="FullScreenBottomSheetDialogTheme" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
 
 </resources>

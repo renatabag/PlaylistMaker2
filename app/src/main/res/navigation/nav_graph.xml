@@ -41,6 +41,9 @@
         <action
             android:id="@+id/action_newPlaylistFragment_to_playlistsFragment"
             app:destination="@id/playlistsFragment" />
+        <action
+            android:id="@+id/action_newPlaylistFragment_to_fragment_playlist"
+            app:destination="@id/fragment_playlist" />
     </fragment>
 
     <!-- Добавьте фрагмент плейлистов, если его нет -->
@@ -56,6 +59,29 @@
                 app:argType="com.example.playlistmaker.presentation.ui.states.TrackUi"
                 android:defaultValue="@null" />
         </action>
+        <action
+            android:id="@+id/action_playlistsFragment_to_playlistFragment"
+            app:destination="@id/fragment_playlist">
+            <argument
+                android:name="playlistId"
+                app:argType="long" />
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_playlist"
+        android:name="com.example.playlistmaker.presentation.ui.fragments.PlaylistFragment"
+        android:label="PlaylistFragment">
+
+        <argument
+            android:name="playlistId"
+            app:argType="long" />
+
+        <action
+            android:id="@+id/action_playlistFragment_to_playlistsFragment"
+            app:destination="@id/playlistsFragment" />
+        <action
+            android:id="@+id/action_fragment_playlist_to_newPlaylistFragment"
+            app:destination="@id/newPlaylistFragment" />
     </fragment>
 
 </navigation>

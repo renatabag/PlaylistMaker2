@@ -1,6 +1,5 @@
 package com.example.playlistmaker.presentation.ui.activities
 
-import android.R.attr.track
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +11,8 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.data.db.playlist.PlaylistEntity
 import com.example.playlistmaker.databinding.FragmentListBinding
 import com.example.playlistmaker.presentation.ui.adapters.PlaylistAdapter
+import com.example.playlistmaker.presentation.ui.fragments.NewPlaylistFragment
+import com.example.playlistmaker.presentation.ui.fragments.PlaylistFragment
 import com.example.playlistmaker.presentation.ui.states.PlaylistsState
 import com.example.playlistmaker.presentation.ui.states.TrackUi
 import com.example.playlistmaker.presentation.viewmodels.PlayListsViewModel
@@ -52,14 +53,24 @@ class PlayListsFragment : Fragment() {
 
     private fun setupRecyclerView() {
         playlistAdapter = PlaylistAdapter { playlist ->
-            // Обработка клика по плейлисту
-            // navigateToPlaylistDetails(playlist.id)
+            // Обработка клика по плейлисту - открываем PlaylistFragment
+            openPlaylistDetails(playlist.id)
         }
+
 
         binding.playlistsRecycler.apply {
             adapter = playlistAdapter
             layoutManager = GridLayoutManager(requireContext(), 2)
         }
+    }
+
+    private fun openPlaylistDetails(playlistId: Long) {
+        val fragment = PlaylistFragment.newInstance(playlistId)
+        requireActivity().supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.nav_host_fragment, fragment)
+            .addToBackStack("playlist_details")
+            .commit()
     }
 
     private fun setupObservers() {
@@ -81,18 +92,6 @@ class PlayListsFragment : Fragment() {
         }
     }
 
-
-    private fun openNewPlaylistScreen() {
-        // Получаем трек из аргументов фрагмента или используем null
-        val track = arguments?.getParcelable<TrackUi>("track") // или ваш ключ ARG_TRACK
-
-        val fragment = NewPlaylistFragment.newInstance(track)
-        requireActivity().supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.nav_host_fragment, fragment)
-            .addToBackStack("new_playlist")
-            .commit()
-    }
 
     private fun showLoading() {
         binding.playlistsRecycler.visibility = View.GONE
@@ -131,4 +130,16 @@ class PlayListsFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+    private fun openNewPlaylistScreen() {
+        val track = arguments?.getParcelable<TrackUi>("track")
+        val fragment = NewPlaylistFragment.newInstance(track)
+
+        requireActivity().supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.nav_host_fragment, fragment)
+            .addToBackStack("new_playlist")
+            .commit()
+    }
+
 }

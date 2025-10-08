@@ -1,4 +1,4 @@
-package com.example.playlistmaker.presentation.ui.fragments
+package com.example.playlistmaker.presentation.ui.viewmodels
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,7 +11,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
-import com.example.playlistmaker.presentation.ui.activities.NewPlaylistFragment
 import com.example.playlistmaker.presentation.ui.adapters.PlaylistSelectionAdapter
 import com.example.playlistmaker.presentation.ui.states.TrackUi
 import com.example.playlistmaker.presentation.viewmodels.PlayerViewModel
@@ -142,4 +141,5 @@ class PlaylistSelectionBottomSheet : BottomSheetDialogFragment() {
             }
         }
     }
+
 }

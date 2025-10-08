@@ -4,11 +4,13 @@ import com.example.playlistmaker.domain.SearchTracksUseCase
 import com.example.playlistmaker.domain.interactors.FavoriteTracksInteractor
 import com.example.playlistmaker.domain.interactors.PlayerInteractor
 import com.example.playlistmaker.domain.interactors.PlaylistInteractor
+import com.example.playlistmaker.domain.interactors.PlaylistTracksInteractor
 import com.example.playlistmaker.domain.interactors.SearchInteractor
 import com.example.playlistmaker.domain.interactors.SettingsInteractor
 import com.example.playlistmaker.domain.interactors.impl.FavoriteTracksInteractorImpl
 import com.example.playlistmaker.domain.interactors.impl.PlayerInteractorImpl
 import com.example.playlistmaker.domain.interactors.impl.PlaylistInteractorImpl
+import com.example.playlistmaker.domain.interactors.impl.PlaylistTracksInteractorImpl
 import com.example.playlistmaker.domain.interactors.impl.SearchInteractorImpl
 import com.example.playlistmaker.domain.interactors.impl.SettingsInteractorImpl
 import org.koin.dsl.module
@@ -19,5 +21,5 @@ val interactorModule = module {
     factory<SettingsInteractor> { SettingsInteractorImpl(get()) }
     factory<FavoriteTracksInteractor> { FavoriteTracksInteractorImpl(get()) }
     factory<PlaylistInteractor> { PlaylistInteractorImpl(get()) }
-    factory<FavoriteTracksInteractor> { FavoriteTracksInteractorImpl(get()) }
+    factory<PlaylistTracksInteractor> { PlaylistTracksInteractorImpl(get(), get()) }
 }

@@ -47,13 +47,12 @@ data class PlaylistEntity(
         return setTrackIds(currentIds)
     }
 
-    fun removeTrack(trackId: Long): PlaylistEntity {
-        val currentIds = getTrackIds().toMutableList()
-        currentIds.remove(trackId)
-        return setTrackIds(currentIds)
-    }
 
     fun containsTrack(trackId: Long): Boolean {
         return getTrackIds().contains(trackId)
+    }
+    fun removeTrack(trackId: Long): PlaylistEntity {
+        val currentIds = getTrackIds().toMutableList()
+        return setTrackIds(currentIds)
     }
 }

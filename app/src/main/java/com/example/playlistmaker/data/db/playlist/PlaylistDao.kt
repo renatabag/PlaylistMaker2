@@ -12,8 +12,9 @@ interface PlaylistDao {
     @Update
     suspend fun updatePlaylist(playlist: PlaylistEntity)
 
+    // ИСПРАВЬТЕ этот метод - он должен принимать PlaylistEntity, а не Long
     @Delete
-    suspend fun deletePlaylist(playlist: PlaylistEntity)
+    suspend fun deletePlaylist(playlist: PlaylistEntity) // Было: suspend fun deletePlaylist(playlist: Long)
 
     @Query("SELECT * FROM playlists WHERE id = :playlistId")
     suspend fun getPlaylistById(playlistId: Long): PlaylistEntity?
