@@ -34,7 +34,7 @@
                 tools:ignore="UseAppTint" />
 
             <ImageView
-                android:id="@+id/add_picture"
+                android:id="@+id/playlist_cover_image"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:background="@android:color/transparent"

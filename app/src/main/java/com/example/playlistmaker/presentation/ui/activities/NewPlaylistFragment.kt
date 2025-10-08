@@ -447,7 +447,6 @@ class NewPlaylistFragment : Fragment() {
                 updateFieldAppearance(descriptionEditText, descriptionFrame, descriptionLabel, descriptionEditText.hasFocus())
                 if (s?.toString()?.trim()?.isNotEmpty() == true) hasUnsavedChanges = true
 
-                // В режиме редактирования проверяем изменения
                 if (isEditMode) {
                     checkForChangesInEditMode()
                 }

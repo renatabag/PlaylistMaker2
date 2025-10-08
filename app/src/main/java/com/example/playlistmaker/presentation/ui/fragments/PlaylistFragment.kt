@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.playlistmaker.R
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.playlistmaker.databinding.FragmentPlaylistBinding
 import com.example.playlistmaker.presentation.ui.adapters.TrackAdapter
 import com.example.playlistmaker.presentation.ui.states.PlaylistState
@@ -308,6 +309,14 @@ class PlaylistFragment : Fragment() {
         currentPlaylistName = state.playlist.name
         currentPlaylistDescription = state.playlist.description ?: ""
         currentTracks = emptyList()
+        state.playlist.coverImagePath?.let { imagePath ->
+            Glide.with(requireContext())
+                .load(imagePath)
+                .into(binding.playlistCoverImage)
+        } ?: run {
+            binding.playlistCoverImage.setImageResource(R.drawable.placeholder_track)
+        }
+
 
         println("DEBUG: Empty state - данные сохранены: currentPlaylistName = '$currentPlaylistName'")
 
@@ -475,6 +484,14 @@ class PlaylistFragment : Fragment() {
         // Заполняем данные плейлиста
         binding.textView1.text = state.playlist.name
         binding.textView2.text = state.playlist.description ?: ""
+
+        state.playlist.coverImagePath?.let { imagePath ->
+            Glide.with(requireContext())
+                .load(imagePath)
+                .into(binding.playlistCoverImage) // нужно добавить этот ImageView в layout
+        } ?: run {
+            binding.playlistCoverImage.setImageResource(R.drawable.placeholder_track)
+        }
 
         val trackCount = state.playlist.trackCount
         binding.tracksCount.text = formatTrackCount(trackCount)
