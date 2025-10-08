@@ -14,24 +14,10 @@
         android:orientation="vertical"
         android:background="@color/light_grey">
 
-        <!-- Контейнер для изображения и кнопки назад -->
+        <!-- Контейнер для изображения -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
-            <ImageButton
-                android:id="@+id/menu_button"
-                android:layout_width="@dimen/track_player_main_size"
-                android:layout_height="@dimen/track_player_main_size"
-                android:layout_marginStart="@dimen/margine_track"
-                android:layout_marginTop="@dimen/margine_track"
-                android:background="@null"
-                android:scaleType="fitCenter"
-                android:tint="@color/dark_white"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/baseline_arrow_back_24"
-                tools:ignore="UseAppTint" />
 
             <ImageView
                 android:id="@+id/playlist_cover_image"
@@ -190,6 +176,22 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <!-- Кнопка назад поверх всего контента -->
+    <ImageButton
+        android:id="@+id/menu_button"
+        android:layout_width="@dimen/track_player_main_size"
+        android:layout_height="@dimen/track_player_main_size"
+        android:layout_marginStart="@dimen/margine_track"
+        android:layout_marginTop="@dimen/margine_track"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="fitCenter"
+        android:tint="@color/dark_white"
+        android:elevation="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/baseline_arrow_back_24"
+        tools:ignore="UseAppTint" />
 
     <!-- Bottom Sheet с треками (показывается только когда есть треки) -->
     <LinearLayout
