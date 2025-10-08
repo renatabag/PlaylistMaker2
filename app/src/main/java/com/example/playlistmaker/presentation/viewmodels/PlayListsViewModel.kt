@@ -42,4 +42,11 @@ class PlayListsViewModel(
     fun refreshPlaylists() {
         loadPlaylists()
     }
+
+    // Добавьте метод для принудительного обновления
+    fun forceRefreshPlaylists() {
+        viewModelScope.launch {
+            loadPlaylists()
+        }
+    }
 }

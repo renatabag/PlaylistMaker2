@@ -17,6 +17,7 @@ import com.example.playlistmaker.presentation.ui.states.PlaylistState
 import com.example.playlistmaker.presentation.ui.states.TrackUi
 import com.example.playlistmaker.presentation.viewmodels.PlaylistViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -75,13 +76,11 @@ class PlaylistFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // Гарантируем скрытие навигации при каждом показе фрагмента
         hideBottomNavigation()
     }
 
     override fun onPause() {
         super.onPause()
-        // Показываем навигацию только когда полностью уходим из фрагмента
         showBottomNavigation()
     }
 
@@ -235,8 +234,60 @@ class PlaylistFragment : Fragment() {
             println("Ошибка: playlistId не найден") // Отладка
         }
     }
+    private fun deleteCurrentPlaylist() {
+        val playlistId = arguments?.getLong(ARG_PLAYLIST_ID) ?: -1L
+        val playlistName = currentPlaylistName
 
+        if (playlistId == -1L) {
+            println("DELETE: Ошибка - playlistId не найден")
+            Toast.makeText(requireContext(), "Ошибка: плейлист не найден", Toast.LENGTH_SHORT).show()
+            return
+        }
 
+        println("DELETE: Начало удаления плейлиста '$playlistName' ID: $playlistId")
+        println("DELETE: Треков в плейлисте: ${currentTracks.size}")
+
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setMessage("Хотите удалить плейлист \"$playlistName\"?")
+            .setNegativeButton("Отмена") { dialog, _ ->
+                println("DELETE: Отмена удаления")
+                dialog.dismiss()
+            }
+            .setPositiveButton("Удалить") { dialog, _ ->
+                println("DELETE: Подтверждено удаление плейлиста ID: $playlistId")
+
+                viewLifecycleOwner.lifecycleScope.launch {
+                    try {
+                        // Используем playlistId из arguments, а не currentPlaylistId
+                        viewModel.deletePlaylist(playlistId)
+
+                        // Ждем немного чтобы запрос успел выполниться
+                        delay(300)
+
+                        // Показываем Toast
+                        Toast.makeText(
+                            requireContext(),
+                            "Плейлист \"$playlistName\" удален",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        println("DELETE: Успешно удален, возвращаемся назад")
+                        requireActivity().onBackPressed()
+
+                    } catch (e: Exception) {
+                        println("DELETE: Ошибка при удалении: ${e.message}")
+                        e.printStackTrace()
+                        Toast.makeText(
+                            requireContext(),
+                            "Ошибка при удалении плейлиста: ${e.message}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
+            .create()
+            .show()
+    }
     private fun setupObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.playlistState.collectLatest { state ->
@@ -249,17 +300,27 @@ class PlaylistFragment : Fragment() {
             }
         }
     }
-    private fun showEmptyState() {
-        // Скрываем Bottom Sheet
+    private fun showEmptyState(state: PlaylistState.Empty) {
         binding.tracksBottomSheet.visibility = View.GONE
 
-        // Показываем Toast
-        showEmptyPlaylistToast()
+        // СОХРАНЯЕМ ДАННЫЕ ПЛЕЙЛИСТА ДАЖЕ КОГДА НЕТ ТРЕКОВ
+        currentPlaylistId = state.playlist.id
+        currentPlaylistName = state.playlist.name
+        currentPlaylistDescription = state.playlist.description ?: ""
+        currentTracks = emptyList()
 
-        // Обновляем информацию о плейлисте (название, описание)
+        println("DEBUG: Empty state - данные сохранены: currentPlaylistName = '$currentPlaylistName'")
+
+        // Заполняем данные плейлиста из состояния
+        binding.textView1.text = state.playlist.name
+        binding.textView2.text = state.playlist.description ?: ""
+
         // Для времени и количества треков показываем "0"
         binding.allTime.text = "0 мин"
         binding.tracksCount.text = "0 треков"
+
+        // Показываем Toast
+        showEmptyPlaylistToast()
     }
     private fun showEmptyPlaylistToast() {
         Toast.makeText(
@@ -395,30 +456,7 @@ class PlaylistFragment : Fragment() {
         bottomSheet.show(parentFragmentManager, PlaylistSettingsBottomSheet.TAG)
     }
 
-    private fun deleteCurrentPlaylist() {
-        val playlistName = currentPlaylistName
 
-        androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("Удаление плейлиста")
-            .setMessage("Плейлист \"$playlistName\" будет удален")
-            .setNegativeButton("Отмена") { dialog, _ -> dialog.dismiss() }
-            .setPositiveButton("Удалить") { dialog, _ ->
-                // Вызываем ViewModel для удаления плейлиста
-                viewModel.deletePlaylist(currentPlaylistId)
-
-                // Показываем Toast
-                Toast.makeText(
-                    requireContext(),
-                    "Плейлист \"$playlistName\" удален",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                // Безопасное возвращение на экран списка плейлистов
-                safelyNavigateBackToPlaylists()
-            }
-            .create()
-            .show()
-    }
     private fun showPlaylist(state: PlaylistState.Content) {
         // Показываем bottom sheet и скрываем empty state
         binding.tracksBottomSheet.visibility = View.VISIBLE
@@ -457,61 +495,11 @@ class PlaylistFragment : Fragment() {
         val totalTimeFormatted = formatTotalTime(totalTimeMs)
         binding.allTime.text = totalTimeFormatted
 
-        // Если треков не осталось, переключаем на empty state
         if (updatedTracks.isEmpty()) {
             binding.emptyStateContainer.visibility = View.GONE
             binding.tracksBottomSheet.visibility = View.GONE
             showEmptyPlaylistToast()
         }
     }
-    private fun showEmptyState(state: PlaylistState.Empty) {
-        // Скрываем Bottom Sheet
-        binding.tracksBottomSheet.visibility = View.GONE
-
-        // Заполняем данные плейлиста из состояния
-        binding.textView1.text = state.playlist.name
-        binding.textView2.text = state.playlist.description ?: ""
-
-        // Для времени и количества треков показываем "0"
-        binding.allTime.text = "0 мин"
-        binding.tracksCount.text = "0 треков"
-
-        // Показываем Toast
-        showEmptyPlaylistToast()
-    }
-
-    private fun safelyNavigateBackToPlaylists() {
-        try {
-            // Способ 1: Попробовать найти фрагмент списка плейлистов в back stack
-            val fragmentManager = parentFragmentManager
-            val backStackEntryCount = fragmentManager.backStackEntryCount
-
-            // Ищем запись в back stack, которая соответствует списку плейлистов
-            for (i in backStackEntryCount - 1 downTo 0) {
-                val backStackEntry = fragmentManager.getBackStackEntryAt(i)
-                if (backStackEntry.name == "playlist_details" || backStackEntry.name?.contains("playlist") == true) {
-                    // Нашли запись - возвращаемся к ней
-                    fragmentManager.popBackStack(backStackEntry.id, 0)
-                    return
-                }
-            }
-
-            // Способ 2: Если не нашли в back stack, используем navigateUp
-            if (findNavController().currentDestination?.id == R.id.playlistsFragment) {
-                findNavController().navigateUp()
-            }
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            // Способ 3: Аварийный возврат на главный экран
-            try {
-                findNavController().popBackStack(R.id.playlistsFragment, false)
-            } catch (e2: Exception) {
-                // Последняя попытка - просто назад
-                requireActivity().onBackPressed()
-            }
-        }
-    }
-
 
 }

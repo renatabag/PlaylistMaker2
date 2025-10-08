@@ -33,7 +33,7 @@ class PlaylistAdapter(
         private val trackCountText: TextView = itemView.findViewById(R.id.playlist_track_count)
 
         fun bind(playlist: PlaylistEntity) {
-            titleText.text = playlist.name
+            titleText.text = playlist.name // Убедитесь, что здесь правильное название
 
             // Форматирование количества треков
             val trackCountTextFormatted = when (playlist.trackCount) {
@@ -48,7 +48,7 @@ class PlaylistAdapter(
             playlist.coverImagePath?.let { imagePath ->
                 Glide.with(itemView)
                     .load(imagePath)
-                    .transform(RoundedCorners(dpToPx(itemView.context, 16).toInt())) // Приводим к Int
+                    .transform(RoundedCorners(dpToPx(itemView.context, 16).toInt()))
                     .into(coverImage)
             } ?: run {
                 // Установка placeholder, если нет изображения

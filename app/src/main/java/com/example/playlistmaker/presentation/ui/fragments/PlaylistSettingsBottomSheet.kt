@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.view.isVisible
 import com.example.playlistmaker.R
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -71,7 +69,6 @@ class PlaylistSettingsBottomSheet : BottomSheetDialogFragment() {
         // Устанавливаем количество треков
         val trackCountText = formatTrackCount(trackCount)
         view.findViewById<TextView>(R.id.playlist_track_count).text = trackCountText
-
     }
 
     private fun formatTrackCount(count: Int): String {
@@ -93,27 +90,14 @@ class PlaylistSettingsBottomSheet : BottomSheetDialogFragment() {
             dismiss()
         }
 
+        // УБИРАЕМ вызов диалогового окна и сразу вызываем удаление
         view.findViewById<View>(R.id.delete_playlist_button).setOnClickListener {
-            showDeleteConfirmationDialog()
+            listener?.onDeletePlaylist()
+            dismiss()
         }
     }
 
-    private fun showDeleteConfirmationDialog() {
-        val playlistName = arguments?.getString(ARG_PLAYLIST_NAME) ?: ""
-
-        androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("Удаление плейлиста")
-            .setMessage("Вы уверены, что хотите удалить плейлист \"$playlistName\"?")
-            .setNegativeButton("Отмена") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .setPositiveButton("Удалить") { dialog, _ ->
-                listener?.onDeletePlaylist()
-                dismiss()
-            }
-            .create()
-            .show()
-    }
+    // УДАЛЯЕМ метод showDeleteConfirmationDialog()
 
     fun setListener(listener: PlaylistSettingsListener) {
         this.listener = listener
