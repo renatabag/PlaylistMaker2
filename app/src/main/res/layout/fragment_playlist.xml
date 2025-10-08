@@ -156,7 +156,6 @@
                     android:layout_height="24dp"
                     android:layout_marginStart="16dp"
                     android:src="@drawable/vector"
-
                     android:background="?attr/selectableItemBackgroundBorderless"
                     app:layout_constraintStart_toEndOf="@id/shareButton"
                     app:layout_constraintTop_toTopOf="parent"
@@ -165,9 +164,34 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Состояние когда нет треков -->
+        <LinearLayout
+            android:id="@+id/empty_state_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/empty"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="В этом плейлисте пока нет треков"
+                android:textSize="16sp"
+                android:textColor="@color/grey"/>
+        </LinearLayout>
+
     </LinearLayout>
 
-    <!-- Bottom Sheet с треками -->
+    <!-- Bottom Sheet с треками (показывается только когда есть треки) -->
     <LinearLayout
         android:id="@+id/tracks_bottom_sheet"
         android:layout_width="match_parent"
@@ -175,6 +199,7 @@
         android:layout_gravity="bottom"
         android:background="@drawable/bottom_sheet_bg"
         android:orientation="vertical"
+        android:visibility="gone"
         app:behavior_hideable="false"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 

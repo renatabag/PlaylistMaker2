@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.Flow
 interface PlaylistRepository {
     suspend fun createPlaylist(playlist: PlaylistEntity): Long
     suspend fun updatePlaylist(playlist: PlaylistEntity)
-    suspend fun deletePlaylist(playlist: PlaylistEntity)
     suspend fun getPlaylistById(playlistId: Long): PlaylistEntity?
     fun getAllPlaylists(): Flow<List<PlaylistEntity>>
     fun searchPlaylists(query: String): Flow<List<PlaylistEntity>>
@@ -19,4 +18,5 @@ interface PlaylistRepository {
     suspend fun savePlaylistTrack(track: PlaylistTrackEntity)
     suspend fun isTrackInPlaylist(playlistId: Long, trackId: Long): Boolean
     suspend fun getPlaylistWithTracks(playlistId: Long): PlaylistWithTrackEntities
+
 }

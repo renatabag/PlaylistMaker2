@@ -27,6 +27,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.navOptions
 import com.example.playlistmaker.R
 import com.example.playlistmaker.data.db.playlist.PlaylistEntity
 import com.example.playlistmaker.domain.interactors.PlaylistInteractor
@@ -217,11 +218,6 @@ class NewPlaylistFragment : Fragment() {
         hasUnsavedChanges = true
     }
 
-    private fun navigateBack() {
-        // Унифицируйте с подходом TrackPlayerFragment
-        parentFragmentManager.popBackStack()
-    }
-
 
     override fun onResume() {
         super.onResume()
@@ -297,6 +293,20 @@ class NewPlaylistFragment : Fragment() {
 
         // Переходим к фрагменту плейлистов
         navigateToPlaylists()
+    }
+    private fun navigateBack() {
+        try {
+            findNavController().navigate(
+                R.id.fragment_list,
+                null,
+                navOptions {
+                    popUpTo(R.id.fragment_list) { inclusive = true }
+                }
+            )
+        } catch (e: Exception) {
+            Log.e("NewPlaylistFragment", "Error navigating back", e)
+            parentFragmentManager.popBackStack()
+        }
     }
 
     private fun navigateToPlaylists() {
@@ -453,11 +463,12 @@ class NewPlaylistFragment : Fragment() {
                 )
 
                 if (playlistId > 0) {
-                    // Получаем созданный плейлист
-                    val createdPlaylist = playlistInteractor.getPlaylistById(playlistId)
+                    // УСПЕШНОЕ СОЗДАНИЕ ПЛЕЙЛИСТА - независимо от наличия трека
+                    Toast.makeText(requireContext(), "Плейлист \"$name\" создан!", Toast.LENGTH_SHORT).show()
 
-                    // Если есть трек, добавляем его в созданный плейлист через ViewModel
+                    // ЕСЛИ ЕСТЬ ТРЕК - добавляем его
                     track?.let { trackToAdd ->
+                        val createdPlaylist = playlistInteractor.getPlaylistById(playlistId)
                         createdPlaylist?.let { playlist ->
                             // Используем метод из PlayerViewModel для добавления трека
                             playerViewModel.addTrackToPlaylist(playlist, trackToAdd)
@@ -468,42 +479,37 @@ class NewPlaylistFragment : Fragment() {
                                     is PlayerViewModel.AddToPlaylistStatus.Success -> {
                                         Toast.makeText(
                                             requireContext(),
-                                            "Плейлист \"$name\" создан и трек добавлен!",
+                                            "Трек добавлен в плейлист!",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                         playerViewModel.resetAddToPlaylistStatus()
-                                        hasUnsavedChanges = false
-                                        navigateBack()
+                                        completeCreationAndExit()
                                     }
                                     is PlayerViewModel.AddToPlaylistStatus.AlreadyExists -> {
                                         Toast.makeText(
                                             requireContext(),
-                                            "Плейлист \"$name\" создан, но трек уже был добавлен ранее",
+                                            "Трек уже был в плейлисте",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                         playerViewModel.resetAddToPlaylistStatus()
-                                        hasUnsavedChanges = false
-                                        navigateBack()
+                                        completeCreationAndExit()
                                     }
                                     is PlayerViewModel.AddToPlaylistStatus.Error -> {
                                         Toast.makeText(
                                             requireContext(),
-                                            "Плейлист \"$name\" создан, но произошла ошибка при добавлении трека",
+                                            "Ошибка при добавлении трека",
                                             Toast.LENGTH_SHORT
                                         ).show()
                                         playerViewModel.resetAddToPlaylistStatus()
-                                        hasUnsavedChanges = false
-                                        navigateBack()
+                                        completeCreationAndExit()
                                     }
                                     else -> {}
                                 }
                             }
                         }
                     } ?: run {
-                        // Если трека нет, просто сообщаем о создании плейлиста
-                        Toast.makeText(requireContext(), "Плейлист \"$name\" создан!", Toast.LENGTH_SHORT).show()
-                        hasUnsavedChanges = false
-                        navigateBack()
+                        // ЕСЛИ ТРЕКА НЕТ - просто завершаем создание
+                        completeCreationAndExit()
                     }
                 } else {
                     Toast.makeText(requireContext(), "Ошибка создания плейлиста", Toast.LENGTH_SHORT).show()
@@ -513,5 +519,10 @@ class NewPlaylistFragment : Fragment() {
                 Toast.makeText(requireContext(), "Ошибка создания плейлиста", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun completeCreationAndExit() {
+        hasUnsavedChanges = false
+        navigateBack()
     }
 }

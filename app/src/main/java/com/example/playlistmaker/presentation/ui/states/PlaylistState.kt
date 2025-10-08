@@ -4,7 +4,7 @@ import com.example.playlistmaker.data.db.playlist.PlaylistEntity
 
 sealed class PlaylistState {
     object Loading : PlaylistState()
-    object Empty : PlaylistState()
+    data class Empty(val playlist: PlaylistEntity) : PlaylistState()
     data class Content(
         val playlist: PlaylistEntity,
         val tracks: List<TrackUi>

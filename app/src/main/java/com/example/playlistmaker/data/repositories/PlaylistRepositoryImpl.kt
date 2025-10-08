@@ -21,10 +21,6 @@ class PlaylistRepositoryImpl(
         playlistDao.updatePlaylist(playlist)
     }
 
-    override suspend fun deletePlaylist(playlist: PlaylistEntity) {
-        playlistDao.deletePlaylist(playlist)
-    }
-
     override suspend fun getPlaylistById(playlistId: Long): PlaylistEntity? {
         return playlistDao.getPlaylistById(playlistId)
     }
@@ -37,12 +33,6 @@ class PlaylistRepositoryImpl(
         return playlistDao.searchPlaylists(query)
     }
 
-    // УДАЛИТЕ этот метод - он дублируется
-    // override suspend fun addTrackToPlaylist(playlistId: Long, trackId: Long) {
-    //     TODO("Not yet implemented")
-    // }
-
-    // ИСПРАВЬТЕ этот метод - используйте Long вместо Int
     override suspend fun removeTrackFromPlaylist(playlistId: Long, trackId: Long) {
         val playlist = playlistDao.getPlaylistById(playlistId)
         playlist?.let {
@@ -51,7 +41,6 @@ class PlaylistRepositoryImpl(
         }
     }
 
-    // ИСПРАВЬТЕ этот метод - используйте правильные типы
     override suspend fun addTrackToPlaylist(playlistId: Long, trackId: Long) {
         val playlist = playlistDao.getPlaylistById(playlistId) ?: return
         val updatedPlaylist = playlist.addTrack(trackId)

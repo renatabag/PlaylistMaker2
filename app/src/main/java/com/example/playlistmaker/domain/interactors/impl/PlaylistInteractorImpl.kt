@@ -23,7 +23,7 @@ class PlaylistInteractorImpl(
     }
 
     override suspend fun deletePlaylist(playlist: PlaylistEntity) {
-        playlistRepository.deletePlaylist(playlist)
+        playlistRepository.deletePlaylistById(playlist.id)
     }
 
     override suspend fun getPlaylistById(playlistId: Long): PlaylistEntity? {
@@ -42,7 +42,6 @@ class PlaylistInteractorImpl(
         playlistRepository.addTrackToPlaylist(playlistId, trackId)
     }
 
-
     override suspend fun removeTrackFromPlaylist(playlistId: Long, trackId: Long) {
         playlistRepository.removeTrackFromPlaylist(playlistId, trackId)
     }
@@ -51,9 +50,6 @@ class PlaylistInteractorImpl(
         return playlistRepository.getPlaylistCount()
     }
 
-    override suspend fun deletePlaylistById(playlistId: Long) {
-        playlistRepository.deletePlaylistById(playlistId)
-    }
     override suspend fun savePlaylistTrack(track: PlaylistTrackEntity) {
         playlistRepository.savePlaylistTrack(track)
     }
@@ -61,4 +57,9 @@ class PlaylistInteractorImpl(
     override suspend fun isTrackInPlaylist(playlistId: Long, trackId: Long): Boolean {
         return playlistRepository.isTrackInPlaylist(playlistId, trackId)
     }
+
+    override suspend fun deletePlaylistById(playlistId: Long) {
+        playlistRepository.deletePlaylistById(playlistId)
+    }
+
 }
