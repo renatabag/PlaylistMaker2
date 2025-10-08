@@ -53,11 +53,6 @@ data class PlaylistEntity(
     }
     fun removeTrack(trackId: Long): PlaylistEntity {
         val currentIds = getTrackIds().toMutableList()
-        println("Удаление трека: trackId=$trackId, текущие ID: $currentIds") // Отладка
-
-        val wasRemoved = currentIds.remove(trackId) // Исправлено: remove вместо removeAt
-        println("Результат удаления: $wasRemoved, новые ID: $currentIds") // Отладка
-
         return setTrackIds(currentIds)
     }
 }

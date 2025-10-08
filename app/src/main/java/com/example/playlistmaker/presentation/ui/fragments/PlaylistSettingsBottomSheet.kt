@@ -18,31 +18,6 @@ class PlaylistSettingsBottomSheet : BottomSheetDialogFragment() {
 
     private var listener: PlaylistSettingsListener? = null
 
-    companion object {
-        const val TAG = "PlaylistSettingsBottomSheet"
-        private const val ARG_PLAYLIST_NAME = "playlist_name"
-        private const val ARG_TRACK_COUNT = "track_count"
-        private const val ARG_PLAYLIST_ID = "playlist_id"
-        private const val ARG_PLAYLIST_DESCRIPTION = "playlist_description"
-
-        fun newInstance(
-            playlistId: Long,
-            playlistName: String,
-            trackCount: Int,
-            description: String? = null
-        ): PlaylistSettingsBottomSheet {
-            val fragment = PlaylistSettingsBottomSheet()
-            val args = Bundle().apply {
-                putLong(ARG_PLAYLIST_ID, playlistId)
-                putString(ARG_PLAYLIST_NAME, playlistName)
-                putInt(ARG_TRACK_COUNT, trackCount)
-                putString(ARG_PLAYLIST_DESCRIPTION, description)
-            }
-            fragment.arguments = args
-            return fragment
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -101,5 +76,29 @@ class PlaylistSettingsBottomSheet : BottomSheetDialogFragment() {
 
     fun setListener(listener: Any) {
         this.listener = listener as PlaylistSettingsListener?
+    }
+    companion object {
+        const val TAG = "PlaylistSettingsBottomSheet"
+        private const val ARG_PLAYLIST_NAME = "playlist_name"
+        private const val ARG_TRACK_COUNT = "track_count"
+        private const val ARG_PLAYLIST_ID = "playlist_id"
+        private const val ARG_PLAYLIST_DESCRIPTION = "playlist_description"
+
+        fun newInstance(
+            playlistId: Long,
+            playlistName: String,
+            trackCount: Int,
+            description: String? = null
+        ): PlaylistSettingsBottomSheet {
+            val fragment = PlaylistSettingsBottomSheet()
+            val args = Bundle().apply {
+                putLong(ARG_PLAYLIST_ID, playlistId)
+                putString(ARG_PLAYLIST_NAME, playlistName)
+                putInt(ARG_TRACK_COUNT, trackCount)
+                putString(ARG_PLAYLIST_DESCRIPTION, description)
+            }
+            fragment.arguments = args
+            return fragment
+        }
     }
 }
