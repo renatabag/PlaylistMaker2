@@ -171,6 +171,9 @@ class PlaylistFragment : Fragment() {
             tracks = emptyList(),
             onTrackClick = { track ->
                 playTrack(track)
+            },
+            onTrackLongClick = { track ->  // Добавьте этот параметр
+                showDeleteTrackDialog(track)
             }
         )
 
@@ -180,13 +183,74 @@ class PlaylistFragment : Fragment() {
             overScrollMode = View.OVER_SCROLL_NEVER
         }
     }
+    private fun showDeleteTrackDialog(track: TrackUi) {
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("Удаление трека")
+            .setMessage("Хотите удалить трек ?")
+            .setNegativeButton("НЕТ") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setPositiveButton("ДА") { dialog, _ ->
+                deleteTrackFromPlaylist(track)
+                dialog.dismiss()
+            }
+            .create()
+
+        dialog.show()
+    }
+    private fun deleteTrackFromPlaylist(track: TrackUi) {
+        val playlistId = arguments?.getLong(ARG_PLAYLIST_ID) ?: -1L
+        if (playlistId != -1L) {
+            println("Начало удаления трека: ${track.trackName} (ID: ${track.trackId}) из плейлиста $playlistId") // Отладка
+
+            // Мгновенно удаляем трек из адаптера
+            val currentTracks = tracksAdapter.getCurrentTracks().toMutableList()
+            val initialCount = currentTracks.size
+            currentTracks.remove(track)
+            tracksAdapter.updateTracks(currentTracks)
+
+            println("Трек удален из UI: было $initialCount, стало ${currentTracks.size}") // Отладка
+
+            // Обновляем информацию о плейлисте
+            updatePlaylistInfoAfterDeletion(currentTracks)
+
+            // Вызываем ViewModel для удаления из базы данных
+            viewModel.deleteTrackFromPlaylist(playlistId, track.trackId.toLong())
+
+            // Показываем Toast с подтверждением
+            Toast.makeText(
+                requireContext(),
+                "Трек \"${track.trackName}\" удален из плейлиста",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            println("Запрос на удаление из БД отправлен в ViewModel") // Отладка
+        } else {
+            println("Ошибка: playlistId не найден") // Отладка
+        }
+    }
+
+    // Добавьте этот метод для обновления информации о плейлисте
+    private fun updatePlaylistInfoAfterDeletion(updatedTracks: List<TrackUi>) {
+        val trackCount = updatedTracks.size
+        binding.tracksCount.text = formatTrackCount(trackCount)
+
+        val totalTimeMs = updatedTracks.sumOf { it.trackTimeMillis }
+        val totalTimeFormatted = formatTotalTime(totalTimeMs)
+        binding.allTime.text = totalTimeFormatted
+
+        // Если треков не осталось, показываем пустое состояние
+        if (updatedTracks.isEmpty()) {
+            showEmptyState()
+        }
+    }
 
     private fun setupObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.playlistState.collectLatest { state ->
                 when (state) {
                     is PlaylistState.Loading -> showLoading()
-                    is PlaylistState.Empty -> showEmptyState() // Добавьте этот case
+                    is PlaylistState.Empty -> showEmptyState()
                     is PlaylistState.Content -> showPlaylist(state)
                     is PlaylistState.Error -> showError(state.message)
                 }

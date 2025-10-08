@@ -43,12 +43,15 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = TrackAdapter(emptyList()) { trackUi ->
-            val bundle = Bundle().apply {
-                putParcelable("track", trackUi)
+        adapter = TrackAdapter(
+            tracks = emptyList(),
+            onTrackClick = { trackUi ->  // Явно передаем обработчик кликов
+                val bundle = Bundle().apply {
+                    putParcelable("track", trackUi)
+                }
+                findNavController().navigate(R.id.track_player, bundle)
             }
-            findNavController().navigate(R.id.track_player, bundle)
-        }
+        )
 
         binding.playlistsRecycler.layoutManager = LinearLayoutManager(requireContext())
         binding.playlistsRecycler.adapter = adapter

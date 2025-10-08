@@ -5,16 +5,14 @@ import com.example.playlistmaker.data.db.playlist.PlaylistEntity
 import com.example.playlistmaker.data.db.playlist.PlaylistTrackDao
 import com.example.playlistmaker.data.db.playlist.PlaylistTrackEntity
 import com.example.playlistmaker.domain.models.PlaylistWithTrackEntities
-import com.example.playlistmaker.domain.models.PlaylistWithTracks
 import com.example.playlistmaker.domain.repositories.PlaylistRepository
 import kotlinx.coroutines.flow.Flow
 
 class PlaylistRepositoryImpl(
     private val playlistDao: PlaylistDao,
-    private val playlistTrackDao: PlaylistTrackDao  // Добавьте этот параметр
+    private val playlistTrackDao: PlaylistTrackDao
 ) : PlaylistRepository {
 
-    // Существующие методы остаются без изменений...
     override suspend fun createPlaylist(playlist: PlaylistEntity): Long {
         return playlistDao.insertPlaylist(playlist)
     }
@@ -39,6 +37,21 @@ class PlaylistRepositoryImpl(
         return playlistDao.searchPlaylists(query)
     }
 
+    // УДАЛИТЕ этот метод - он дублируется
+    // override suspend fun addTrackToPlaylist(playlistId: Long, trackId: Long) {
+    //     TODO("Not yet implemented")
+    // }
+
+    // ИСПРАВЬТЕ этот метод - используйте Long вместо Int
+    override suspend fun removeTrackFromPlaylist(playlistId: Long, trackId: Long) {
+        val playlist = playlistDao.getPlaylistById(playlistId)
+        playlist?.let {
+            val updatedPlaylist = it.removeTrack(trackId)
+            playlistDao.updatePlaylist(updatedPlaylist)
+        }
+    }
+
+    // ИСПРАВЬТЕ этот метод - используйте правильные типы
     override suspend fun addTrackToPlaylist(playlistId: Long, trackId: Long) {
         val playlist = playlistDao.getPlaylistById(playlistId) ?: return
         val updatedPlaylist = playlist.addTrack(trackId)
@@ -53,7 +66,6 @@ class PlaylistRepositoryImpl(
         playlistDao.deletePlaylistById(playlistId)
     }
 
-    // Новые методы
     override suspend fun savePlaylistTrack(track: PlaylistTrackEntity) {
         playlistTrackDao.insertTrack(track)
     }
@@ -62,6 +74,7 @@ class PlaylistRepositoryImpl(
         val playlist = playlistDao.getPlaylistById(playlistId)
         return playlist?.containsTrack(trackId) ?: false
     }
+
     override suspend fun getPlaylistWithTracks(playlistId: Long): PlaylistWithTrackEntities {
         val playlist = playlistDao.getPlaylistById(playlistId)
             ?: throw IllegalArgumentException("Playlist not found")
@@ -74,14 +87,5 @@ class PlaylistRepositoryImpl(
         }
 
         return PlaylistWithTrackEntities(playlist, tracks)
-    }
-
-
-    override suspend fun removeTrackFromPlaylist(playlistId: Long, trackId: Long) {
-        val playlist = playlistDao.getPlaylistById(playlistId)
-            ?: throw IllegalArgumentException("Playlist not found")
-
-        val updatedPlaylist = playlist.removeTrack(trackId)
-        playlistDao.updatePlaylist(updatedPlaylist)
     }
 }

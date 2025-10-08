@@ -40,7 +40,7 @@ data class TrackUi(
     }
 
     override fun writeToParcel(dest: Parcel, flags: Int) {
-        dest.writeInt(trackId)
+        dest.writeInt(trackId.toInt())
         dest.writeString(trackName)
         dest.writeString(artistName)
         dest.writeLong(trackTimeMillis)

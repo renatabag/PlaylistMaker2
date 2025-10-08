@@ -36,4 +36,15 @@ class PlaylistViewModel(
             }
         }
     }
+    fun deleteTrackFromPlaylist(playlistId: Long, trackId: Long) {
+        viewModelScope.launch {
+            try {
+                playlistTracksInteractor.removeTrackFromPlaylist(playlistId, trackId)
+                // Перезагружаем плейлист после удаления
+                loadPlaylist(playlistId)
+            } catch (e: Exception) {
+                _playlistState.value = PlaylistState.Error("Ошибка при удалении трека: ${e.message}")
+            }
+        }
+    }
 }

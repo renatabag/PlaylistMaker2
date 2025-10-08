@@ -3,7 +3,6 @@ package com.example.playlistmaker.domain.repositories
 import com.example.playlistmaker.data.db.playlist.PlaylistEntity
 import com.example.playlistmaker.data.db.playlist.PlaylistTrackEntity
 import com.example.playlistmaker.domain.models.PlaylistWithTrackEntities
-import com.example.playlistmaker.domain.models.PlaylistWithTracks
 import kotlinx.coroutines.flow.Flow
 
 interface PlaylistRepository {
