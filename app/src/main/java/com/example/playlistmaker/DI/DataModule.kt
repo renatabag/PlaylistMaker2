@@ -38,10 +38,7 @@ val dataModule = module {
     // MediaPlayer
     factory { MediaPlayer() }
 
-    // Database
-    single {
-        AppDatabase.getDatabase(androidContext())
-    }
+    // Database - УБЕРИТЕ ДУБЛИРУЮЩУЮСЯ СТРОКУ
     single {
         AppDatabase.getDatabase(androidContext())
     }

@@ -249,11 +249,11 @@ class PlaylistFragment : Fragment() {
 
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
             .setMessage("Хотите удалить плейлист \"$playlistName\"?")
-            .setNegativeButton("Отмена") { dialog, _ ->
+            .setNegativeButton("НЕТ") { dialog, _ ->
                 println("DELETE: Отмена удаления")
                 dialog.dismiss()
             }
-            .setPositiveButton("Удалить") { dialog, _ ->
+            .setPositiveButton("ДА") { dialog, _ ->
                 println("DELETE: Подтверждено удаление плейлиста ID: $playlistId")
 
                 viewLifecycleOwner.lifecycleScope.launch {
@@ -444,8 +444,12 @@ class PlaylistFragment : Fragment() {
             }
 
             override fun onEditPlaylist() {
-                // TODO: Реализовать редактирование плейлиста
-                Toast.makeText(requireContext(), "Редактирование плейлиста: $currentPlaylistName", Toast.LENGTH_SHORT).show()
+                val editPlaylistFragment = NewPlaylistFragment.newEditInstance(currentPlaylistId)
+
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.nav_host_fragment, editPlaylistFragment)
+                    .addToBackStack("playlist_to_edit")
+                    .commit()
             }
 
             override fun onDeletePlaylist() {

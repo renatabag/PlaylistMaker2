@@ -99,7 +99,7 @@ class PlaylistSettingsBottomSheet : BottomSheetDialogFragment() {
 
     // УДАЛЯЕМ метод showDeleteConfirmationDialog()
 
-    fun setListener(listener: PlaylistSettingsListener) {
-        this.listener = listener
+    fun setListener(listener: Any) {
+        this.listener = listener as PlaylistSettingsListener?
     }
 }

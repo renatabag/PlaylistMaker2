@@ -13,7 +13,6 @@ import com.bumptech.glide.Glide
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.TrackPlayerBinding
 import com.example.playlistmaker.domain.TrackUtils
-import com.example.playlistmaker.presentation.ui.activities.NewPlaylistFragment
 import com.example.playlistmaker.presentation.ui.states.PlayerState
 import com.example.playlistmaker.presentation.ui.states.TrackUi
 import com.example.playlistmaker.presentation.ui.viewmodels.PlaylistSelectionBottomSheet

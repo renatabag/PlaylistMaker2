@@ -11,7 +11,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
-import com.example.playlistmaker.presentation.ui.activities.NewPlaylistFragment
 import com.example.playlistmaker.presentation.ui.adapters.PlaylistSelectionAdapter
 import com.example.playlistmaker.presentation.ui.states.TrackUi
 import com.example.playlistmaker.presentation.viewmodels.PlayerViewModel

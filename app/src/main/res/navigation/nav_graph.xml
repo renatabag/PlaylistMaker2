@@ -41,6 +41,9 @@
         <action
             android:id="@+id/action_newPlaylistFragment_to_playlistsFragment"
             app:destination="@id/playlistsFragment" />
+        <action
+            android:id="@+id/action_newPlaylistFragment_to_fragment_playlist"
+            app:destination="@id/fragment_playlist" />
     </fragment>
 
     <!-- Добавьте фрагмент плейлистов, если его нет -->
@@ -76,6 +79,9 @@
         <action
             android:id="@+id/action_playlistFragment_to_playlistsFragment"
             app:destination="@id/playlistsFragment" />
+        <action
+            android:id="@+id/action_fragment_playlist_to_newPlaylistFragment"
+            app:destination="@id/newPlaylistFragment" />
     </fragment>
 
 </navigation>

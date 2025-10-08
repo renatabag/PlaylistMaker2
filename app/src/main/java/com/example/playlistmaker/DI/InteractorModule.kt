@@ -21,6 +21,5 @@ val interactorModule = module {
     factory<SettingsInteractor> { SettingsInteractorImpl(get()) }
     factory<FavoriteTracksInteractor> { FavoriteTracksInteractorImpl(get()) }
     factory<PlaylistInteractor> { PlaylistInteractorImpl(get()) }
-    factory<FavoriteTracksInteractor> { FavoriteTracksInteractorImpl(get()) }
     factory<PlaylistTracksInteractor> { PlaylistTracksInteractorImpl(get(), get()) }
 }

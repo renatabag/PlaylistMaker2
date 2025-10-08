@@ -11,6 +11,7 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.data.db.playlist.PlaylistEntity
 import com.example.playlistmaker.databinding.FragmentListBinding
 import com.example.playlistmaker.presentation.ui.adapters.PlaylistAdapter
+import com.example.playlistmaker.presentation.ui.fragments.NewPlaylistFragment
 import com.example.playlistmaker.presentation.ui.fragments.PlaylistFragment
 import com.example.playlistmaker.presentation.ui.states.PlaylistsState
 import com.example.playlistmaker.presentation.ui.states.TrackUi
@@ -91,16 +92,6 @@ class PlayListsFragment : Fragment() {
         }
     }
 
-    private fun openNewPlaylistScreen() {
-        val track = arguments?.getParcelable<TrackUi>("track")
-
-        val fragment = NewPlaylistFragment.newInstance(track)
-        requireActivity().supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.nav_host_fragment, fragment)
-            .addToBackStack("new_playlist")
-            .commit()
-    }
 
     private fun showLoading() {
         binding.playlistsRecycler.visibility = View.GONE
@@ -138,6 +129,17 @@ class PlayListsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun openNewPlaylistScreen() {
+        val track = arguments?.getParcelable<TrackUi>("track")
+        val fragment = NewPlaylistFragment.newInstance(track)
+
+        requireActivity().supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.nav_host_fragment, fragment)
+            .addToBackStack("new_playlist")
+            .commit()
     }
 
 }

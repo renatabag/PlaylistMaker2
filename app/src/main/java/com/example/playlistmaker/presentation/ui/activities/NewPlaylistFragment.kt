@@ -1,4 +1,4 @@
-package com.example.playlistmaker.presentation.ui.activities
+package com.example.playlistmaker.presentation.ui.fragments
 
 import android.app.Activity
 import android.content.Intent
@@ -32,7 +32,7 @@ import com.example.playlistmaker.R
 import com.example.playlistmaker.data.db.playlist.PlaylistEntity
 import com.example.playlistmaker.domain.interactors.PlaylistInteractor
 import com.example.playlistmaker.presentation.ui.states.TrackUi
-import com.example.playlistmaker.presentation.viewmodels.PlayerViewModel
+import com.example.playlistmaker.presentation.viewmodels.NewPlaylistViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -53,34 +53,37 @@ class NewPlaylistFragment : Fragment() {
     private lateinit var nameLabel: TextView
     private lateinit var descriptionLabel: TextView
     private lateinit var coverImageButton: ImageButton
+    private lateinit var titleText: TextView
+    private lateinit var createButtonText: TextView
     private lateinit var blueButtonDrawable: Drawable
     private lateinit var grayButtonDrawable: Drawable
     private lateinit var blueFrameDrawable: Drawable
     private lateinit var grayFrameDrawable: Drawable
 
     private val playlistInteractor: PlaylistInteractor by inject()
-    private val playerViewModel: PlayerViewModel by viewModel() // Добавляем ViewModel
+    private val viewModel: NewPlaylistViewModel by viewModel()
 
     private var selectedImageUri: Uri? = null
     private var savedImagePath: String? = null
     private var track: TrackUi? = null
-
-    // Флаг для отслеживания наличия несохраненных данных
+    private var isEditMode = false
+    private var currentPlaylistId: Long = -1L
     private var hasUnsavedChanges: Boolean = false
-
-    
 
     private lateinit var pickImageLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        track = arguments?.getParcelable(ARG_TRACK)
 
-        // Восстановление состояния ДО создания View
+        // Получаем параметры
+        track = arguments?.getParcelable(ARG_TRACK)
+        isEditMode = arguments?.getBoolean(ARG_IS_EDIT_MODE, false) ?: false
+        currentPlaylistId = arguments?.getLong(ARG_PLAYLIST_ID, -1L) ?: -1L
+
+        // Восстановление состояния
         savedInstanceState?.let {
             savedImagePath = it.getString("saved_image_path")
             hasUnsavedChanges = it.getBoolean("has_unsaved_changes", false)
-            // НЕ восстанавливаем текстовые поля здесь - они еще не созданы!
         }
 
         pickImageLauncher = registerForActivityResult(
@@ -96,15 +99,30 @@ class NewPlaylistFragment : Fragment() {
 
     companion object {
         private const val ARG_TRACK = "track"
+        private const val ARG_PLAYLIST_ID = "playlist_id"
+        private const val ARG_IS_EDIT_MODE = "is_edit_mode"
 
-        fun newInstance(track: TrackUi?): NewPlaylistFragment {
+        // Для создания плейлиста (из медиатеки или с треком)
+        fun newInstance(track: TrackUi? = null): NewPlaylistFragment {
             return NewPlaylistFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable(ARG_TRACK, track)
+                    putBoolean(ARG_IS_EDIT_MODE, false)
+                }
+            }
+        }
+
+        // Для редактирования существующего плейлиста
+        fun newEditInstance(playlistId: Long): NewPlaylistFragment {
+            return NewPlaylistFragment().apply {
+                arguments = Bundle().apply {
+                    putLong(ARG_PLAYLIST_ID, playlistId)
+                    putBoolean(ARG_IS_EDIT_MODE, true)
                 }
             }
         }
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -142,22 +160,24 @@ class NewPlaylistFragment : Fragment() {
         nameLabel = view.findViewById(R.id.name_label)
         descriptionLabel = view.findViewById(R.id.description_label)
         coverImageButton = view.findViewById(R.id.add_picture)
+        titleText = view.findViewById(R.id.title_text)
+        createButtonText = view.findViewById(R.id.create_button_text)
 
-        // ВОССТАНОВЛЕНИЕ СОСТОЯНИЯ - ТОЛЬКО ОДИН РАЗ
+        // Настройка UI в зависимости от режима
+        setupUI()
+
+        // Восстановление состояния
         savedInstanceState?.let { bundle ->
-            // Восстанавливаем текстовые поля
             bundle.getString("playlist_name")?.let { name ->
                 nameEditText.setText(name)
             }
             bundle.getString("playlist_description")?.let { description ->
                 descriptionEditText.setText(description)
             }
-
-            // Восстанавливаем путь к изображению
             savedImagePath = bundle.getString("saved_image_path")
             hasUnsavedChanges = bundle.getBoolean("has_unsaved_changes", false)
 
-            // Восстанавливаем изображение если оно было выбрано
+            // Восстанавливаем изображение
             savedImagePath?.let { path ->
                 val imageFile = File(path)
                 if (imageFile.exists()) {
@@ -167,34 +187,23 @@ class NewPlaylistFragment : Fragment() {
                         coverImageButton.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
                     } catch (e: Exception) {
                         Log.e("NewPlaylistFragment", "Error restoring image", e)
-                        // В случае ошибки устанавливаем изображение по умолчанию
                         coverImageButton.setImageResource(R.drawable.add_photo)
                     }
                 }
             }
 
-            // Восстанавливаем URI выбранного изображения
             bundle.getString("selected_image_uri")?.let { uriString ->
                 selectedImageUri = Uri.parse(uriString)
             }
         }
 
-        // Настройка слушателей
-        view.findViewById<ImageButton>(R.id.menu_button).setOnClickListener {
-            checkForUnsavedChangesAndNavigateBack()
+        // Если режим редактирования - загружаем данные плейлиста
+        if (isEditMode && currentPlaylistId != -1L) {
+            viewModel.loadPlaylistForEditing(currentPlaylistId)
         }
 
-        coverImageButton.setOnClickListener {
-            openImagePicker()
-        }
-
-        // Обработка кнопки "Назад"
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                checkForUnsavedChangesAndNavigateBack()
-            }
-        })
-
+        setupClickListeners()
+        setupObservers()
         setupFocusListeners()
         setupTextWatchers()
 
@@ -207,58 +216,86 @@ class NewPlaylistFragment : Fragment() {
         updateFieldAppearance(descriptionEditText, descriptionFrame, descriptionLabel, descriptionEditText.hasFocus())
     }
 
-
-    private fun handleImageSelection(uri: Uri) {
-        view?.findViewById<ImageButton>(R.id.add_picture)?.let { coverImageButton ->
-            coverImageButton.setImageURI(uri)
-            coverImageButton.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
-        }
-        selectedImageUri = uri
-        savedImagePath = saveImageToPrivateStorage(uri)
-        hasUnsavedChanges = true
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-        setBottomNavigationVisibility(false)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        checkForUnsavedChanges()
-        setBottomNavigationVisibility(true)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        setBottomNavigationVisibility(true)
-    }
-
-    private fun setBottomNavigationVisibility(visible: Boolean) {
-        try {
-            val activity = requireActivity()
-            val bottomNav = activity.findViewById<View>(R.id.bottom_navigation)
-            bottomNav?.visibility = if (visible) View.VISIBLE else View.GONE
-        } catch (e: Exception) {
-            Log.e("NewPlaylistFragment", "Error setting bottom navigation visibility", e)
+    private fun setupUI() {
+        if (isEditMode) {
+            titleText.text = getString(R.string.edit_playlist)
+            createButtonText.text = getString(R.string.save)
+            // В режиме редактирования кнопка изначально активна
+            updateCreateButtonState(true)
+        } else {
+            titleText.text = getString(R.string.new_playlist)
+            createButtonText.text = getString(R.string.create)
+            // В режиме создания кнопка изначально неактивна
+            updateCreateButtonState(false)
         }
     }
 
-    private fun checkForUnsavedChanges() {
-        val hasName = nameEditText.text.toString().trim().isNotEmpty()
-        val hasDescription = descriptionEditText.text.toString().trim().isNotEmpty()
-        val hasImage = savedImagePath != null
-        hasUnsavedChanges = hasName || hasDescription || hasImage
+    private fun setupClickListeners() {
+        view?.findViewById<ImageButton>(R.id.menu_button)?.setOnClickListener {
+            handleBackNavigation()
+        }
+
+        coverImageButton.setOnClickListener {
+            openImagePicker()
+        }
+
+        // Обработка кнопки "Назад"
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                handleBackNavigation()
+            }
+        })
     }
 
-    private fun checkForUnsavedChangesAndNavigateBack() {
+    private fun setupObservers() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.playlistForEditing.collect { playlist ->
+                playlist?.let {
+                    populatePlaylistData(it)
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.creationSuccess.collect { success ->
+                if (success) {
+                    handleSuccess()
+                }
+            }
+        }
+    }
+
+    private fun handleBackNavigation() {
         checkForUnsavedChanges()
-        if (hasUnsavedChanges) {
+        if (hasUnsavedChanges && !isEditMode) {
             showExitConfirmationDialog()
         } else {
             navigateBack()
         }
+        // В режиме редактирования при нажатии назад просто закрываем без подтверждения
+    }
+
+    private fun populatePlaylistData(playlist: com.example.playlistmaker.domain.models.Playlist) {
+        nameEditText.setText(playlist.name)
+        descriptionEditText.setText(playlist.description ?: "")
+
+        // Загружаем изображение обложки если есть
+        playlist.coverImagePath?.let { path ->
+            val imageFile = File(path)
+            if (imageFile.exists()) {
+                try {
+                    val bitmap = BitmapFactory.decodeFile(path)
+                    coverImageButton.setImageBitmap(bitmap)
+                    coverImageButton.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+                    savedImagePath = path
+                } catch (e: Exception) {
+                    Log.e("NewPlaylistFragment", "Error loading playlist image", e)
+                }
+            }
+        }
+
+        updateCreateButtonState(true)
+        hasUnsavedChanges = false // Сбрасываем флаг после загрузки данных
     }
 
     private fun showExitConfirmationDialog() {
@@ -268,16 +305,17 @@ class NewPlaylistFragment : Fragment() {
             .setNegativeButton("Отмена") { dialog, _ -> dialog.dismiss() }
             .setPositiveButton("Завершить") { dialog, _ ->
                 dialog.dismiss()
-                discardChangesAndExit() // Изменено на метод сброса данных
+                discardChangesAndExit()
             }
             .show()
     }
+
     private fun discardChangesAndExit() {
         // Сбрасываем все поля
         nameEditText.text.clear()
         descriptionEditText.text.clear()
-        coverImageButton.setImageResource(R.drawable.add_photo) // Установите вашу иконку по умолчанию
-        coverImageButton.scaleType = android.widget.ImageView.ScaleType.CENTER // Вернуть масштабирование по умолчанию
+        coverImageButton.setImageResource(R.drawable.add_photo)
+        coverImageButton.scaleType = android.widget.ImageView.ScaleType.CENTER
         selectedImageUri = null
         savedImagePath = null
 
@@ -294,15 +332,10 @@ class NewPlaylistFragment : Fragment() {
         // Переходим к фрагменту плейлистов
         navigateToPlaylists()
     }
+
     private fun navigateBack() {
         try {
-            findNavController().navigate(
-                R.id.fragment_list,
-                null,
-                navOptions {
-                    popUpTo(R.id.fragment_list) { inclusive = true }
-                }
-            )
+            findNavController().navigateUp()
         } catch (e: Exception) {
             Log.e("NewPlaylistFragment", "Error navigating back", e)
             parentFragmentManager.popBackStack()
@@ -311,23 +344,23 @@ class NewPlaylistFragment : Fragment() {
 
     private fun navigateToPlaylists() {
         try {
-            // Навигация к фрагменту плейлистов
-            findNavController().navigate(R.id.fragment_list) // Замените на ваш ID фрагмента плейлистов
+            findNavController().navigate(R.id.fragment_list)
         } catch (e: Exception) {
             Log.e("NewPlaylistFragment", "Error navigating to playlists", e)
-            // Альтернативный способ навигации
             parentFragmentManager.popBackStack()
         }
     }
 
-    private fun savePlaylistAndExit() {
-        val name = nameEditText.text.toString().trim()
-        if (name.isNotEmpty()) {
-            createPlaylist()
-        } else {
-            Toast.makeText(requireContext(), "Создание плейлиста отменено", Toast.LENGTH_SHORT).show()
-            navigateBack()
-        }
+    // Остальные методы (handleImageSelection, openImagePicker, saveImageToPrivateStorage,
+    // setupFocusListeners, setupTextWatchers, updateFieldAppearance, updateCreateButtonState)
+    // остаются такими же как в вашем исходном коде
+
+    private fun handleImageSelection(uri: Uri) {
+        coverImageButton.setImageURI(uri)
+        coverImageButton.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+        selectedImageUri = uri
+        savedImagePath = saveImageToPrivateStorage(uri)
+        hasUnsavedChanges = true
     }
 
     private fun openImagePicker() {
@@ -399,6 +432,11 @@ class NewPlaylistFragment : Fragment() {
                 updateFieldAppearance(nameEditText, nameFrame, nameLabel, nameEditText.hasFocus())
                 updateCreateButtonState(hasText)
                 if (hasText) hasUnsavedChanges = true
+
+                // В режиме редактирования проверяем изменения
+                if (isEditMode) {
+                    checkForChangesInEditMode()
+                }
             }
         })
 
@@ -408,8 +446,33 @@ class NewPlaylistFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {
                 updateFieldAppearance(descriptionEditText, descriptionFrame, descriptionLabel, descriptionEditText.hasFocus())
                 if (s?.toString()?.trim()?.isNotEmpty() == true) hasUnsavedChanges = true
+
+                // В режиме редактирования проверяем изменения
+                if (isEditMode) {
+                    checkForChangesInEditMode()
+                }
             }
         })
+    }
+
+    private fun checkForChangesInEditMode() {
+        val currentName = nameEditText.text.toString().trim()
+        val currentDescription = descriptionEditText.text.toString().trim()
+
+        val originalPlaylist = viewModel.playlistForEditing.value
+        if (originalPlaylist != null) {
+            val nameChanged = currentName != originalPlaylist.name
+            val descriptionChanged = currentDescription != (originalPlaylist.description ?: "")
+            val hasChanges = nameChanged || descriptionChanged || (savedImagePath != originalPlaylist.coverImagePath)
+
+            // Обновляем текст кнопки, если есть изменения
+            if (hasChanges && currentName.isNotEmpty()) {
+                createButtonText.text = getString(R.string.save)
+                updateCreateButtonState(true)
+            } else if (currentName.isEmpty()) {
+                updateCreateButtonState(false)
+            }
+        }
     }
 
     private fun updateFieldAppearance(editText: EditText, frame: FrameLayout, label: TextView, hasFocus: Boolean) {
@@ -441,7 +504,13 @@ class NewPlaylistFragment : Fragment() {
             createButton.background = blueButtonDrawable
             createButton.isClickable = true
             createButton.isFocusable = true
-            createButton.setOnClickListener { createPlaylist() }
+            createButton.setOnClickListener {
+                if (isEditMode) {
+                    savePlaylistChanges()
+                } else {
+                    createNewPlaylist()
+                }
+            }
         } else {
             createButton.background = grayButtonDrawable
             createButton.isClickable = false
@@ -450,79 +519,87 @@ class NewPlaylistFragment : Fragment() {
         }
     }
 
-    private fun createPlaylist() {
+    private fun createNewPlaylist() {
         val name = nameEditText.text.toString().trim()
         val description = descriptionEditText.text.toString().trim()
 
-        lifecycleScope.launch {
-            try {
-                val playlistId = playlistInteractor.createPlaylist(
-                    name = name,
-                    description = if (description.isNotEmpty()) description else null,
-                    coverImagePath = savedImagePath
-                )
-
-                if (playlistId > 0) {
-                    // УСПЕШНОЕ СОЗДАНИЕ ПЛЕЙЛИСТА - независимо от наличия трека
-                    Toast.makeText(requireContext(), "Плейлист \"$name\" создан!", Toast.LENGTH_SHORT).show()
-
-                    // ЕСЛИ ЕСТЬ ТРЕК - добавляем его
-                    track?.let { trackToAdd ->
-                        val createdPlaylist = playlistInteractor.getPlaylistById(playlistId)
-                        createdPlaylist?.let { playlist ->
-                            // Используем метод из PlayerViewModel для добавления трека
-                            playerViewModel.addTrackToPlaylist(playlist, trackToAdd)
-
-                            // Наблюдаем за статусом добавления
-                            playerViewModel.addToPlaylistStatus.collect { status ->
-                                when (status) {
-                                    is PlayerViewModel.AddToPlaylistStatus.Success -> {
-                                        Toast.makeText(
-                                            requireContext(),
-                                            "Трек добавлен в плейлист!",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        playerViewModel.resetAddToPlaylistStatus()
-                                        completeCreationAndExit()
-                                    }
-                                    is PlayerViewModel.AddToPlaylistStatus.AlreadyExists -> {
-                                        Toast.makeText(
-                                            requireContext(),
-                                            "Трек уже был в плейлисте",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        playerViewModel.resetAddToPlaylistStatus()
-                                        completeCreationAndExit()
-                                    }
-                                    is PlayerViewModel.AddToPlaylistStatus.Error -> {
-                                        Toast.makeText(
-                                            requireContext(),
-                                            "Ошибка при добавлении трека",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        playerViewModel.resetAddToPlaylistStatus()
-                                        completeCreationAndExit()
-                                    }
-                                    else -> {}
-                                }
-                            }
-                        }
-                    } ?: run {
-                        // ЕСЛИ ТРЕКА НЕТ - просто завершаем создание
-                        completeCreationAndExit()
-                    }
-                } else {
-                    Toast.makeText(requireContext(), "Ошибка создания плейлиста", Toast.LENGTH_SHORT).show()
-                }
-            } catch (e: Exception) {
-                Log.e("NewPlaylistFragment", "Error creating playlist", e)
-                Toast.makeText(requireContext(), "Ошибка создания плейлиста", Toast.LENGTH_SHORT).show()
-            }
+        if (name.isNotEmpty()) {
+            viewModel.createPlaylist(name, if (description.isEmpty()) null else description, savedImagePath)
         }
     }
 
-    private fun completeCreationAndExit() {
-        hasUnsavedChanges = false
-        navigateBack()
+    private fun savePlaylistChanges() {
+        val name = nameEditText.text.toString().trim()
+        val description = descriptionEditText.text.toString().trim()
+
+        if (name.isNotEmpty() && currentPlaylistId != -1L) {
+            viewModel.updatePlaylist(currentPlaylistId, name, if (description.isEmpty()) null else description, savedImagePath)
+        }
     }
+
+    private fun checkForUnsavedChanges() {
+        val hasName = nameEditText.text.toString().trim().isNotEmpty()
+        val hasDescription = descriptionEditText.text.toString().trim().isNotEmpty()
+        val hasImage = savedImagePath != null
+        hasUnsavedChanges = hasName || hasDescription || hasImage
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setBottomNavigationVisibility(false)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        checkForUnsavedChanges()
+        setBottomNavigationVisibility(true)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        setBottomNavigationVisibility(true)
+    }
+
+    private fun setBottomNavigationVisibility(visible: Boolean) {
+        try {
+            val activity = requireActivity()
+            val bottomNav = activity.findViewById<View>(R.id.bottom_navigation)
+            bottomNav?.visibility = if (visible) View.VISIBLE else View.GONE
+        } catch (e: Exception) {
+            Log.e("NewPlaylistFragment", "Error setting bottom navigation visibility", e)
+        }
+    }
+    private fun handleSuccess() {
+        track?.let { trackToAdd ->
+            viewModel.addTrackToCreatedPlaylist(trackToAdd)
+        }
+
+        if (isEditMode) {
+            Toast.makeText(
+                requireContext(),
+                "Плейлист успешно обновлен",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            returnToPlaylistFragment()
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "Плейлист успешно создан",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            navigateToPlaylists()
+        }
+    }
+
+    private fun returnToPlaylistFragment() {
+        try {
+            findNavController().navigateUp()
+        } catch (e: Exception) {
+            Log.e("NewPlaylistFragment", "Error returning to playlist fragment", e)
+            parentFragmentManager.popBackStack()
+        }
+    }
+
 }
